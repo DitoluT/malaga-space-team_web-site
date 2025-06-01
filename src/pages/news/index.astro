@@ -1,0 +1,124 @@
+---
+import '@/styles/globals.css'
+import Layout from '../../layouts/Layout.astro';
+import { HeroSection } from '@/components/HeroSection';
+import { Calendar, Tag } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+
+const newsItems = [
+  {
+    title: "Successful Integration of Communication Subsystem",
+    date: "July 12, 2024",
+    excerpt: "The Communications team has successfully integrated and tested the radio communication subsystem with the satellite's main computer.",
+    image: "https://images.pexels.com/photos/73871/rocket-launch-rocket-take-off-nasa-73871.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
+    slug: "communications-milestone",
+    tags: ["Development", "Milestone"]
+  },
+  {
+    title: "CubeSat Team Wins Innovation Award",
+    date: "June 3, 2024",
+    excerpt: "Our student team has been recognized with the University Innovation Award for their work on the novel attitude control system for our CubeSat.",
+    image: "https://images.pexels.com/photos/796206/pexels-photo-796206.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
+    slug: "innovation-award",
+    tags: ["Awards", "Student Achievement"]
+  },
+  {
+    title: "New Partnership with Aerospace Industry Leader",
+    date: "May 15, 2024",
+    excerpt: "We are excited to announce a new partnership with Aerospace Engineering Corporation to support our CubeSat development and testing.",
+    image: "https://images.pexels.com/photos/60132/pexels-photo-60132.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
+    slug: "new-partnership",
+    tags: ["Partnership"]
+  },
+  {
+    title: "International Conference on Small Satellites Features UMA Research",
+    date: "April 22, 2024",
+    excerpt: "Our research team presented their innovative approach to CubeSat power management at this year's International Conference on Small Satellites.",
+    image: "https://images.pexels.com/photos/2166/flight-sky-earth-space.jpg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
+    slug: "conference-presentation",
+    tags: ["Research", "Conference"]
+  },
+  {
+    title: "Engineering Students Complete Satellite Prototype",
+    date: "February 5, 2024",
+    excerpt: "A team of undergraduate and graduate students has successfully completed the first prototype of our CubeSat's structure subsystem.",
+    image: "https://images.pexels.com/photos/2156/sky-earth-space-working.jpg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
+    slug: "prototype-completed",
+    tags: ["Development", "Student Achievement"]
+  },
+  {
+    title: "University of Málaga Secures Funding for CubeSat Project",
+    date: "November 10, 2023",
+    excerpt: "The European Space Agency has approved funding for our CubeSat project, marking a significant milestone in our space research initiatives.",
+    image: "https://images.pexels.com/photos/256219/pexels-photo-256219.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
+    slug: "funding-secured",
+    tags: ["Funding", "Milestone"]
+  }
+];
+---
+
+<Layout title="News" description="Latest news and updates from the University of Málaga CubeSat Project">
+  <main>
+    <HeroSection 
+      title="News & Updates" 
+      subtitle="Stay informed about the latest developments, achievements, and milestones from our CubeSat project."
+      image="https://images.pexels.com/photos/355956/pexels-photo-355956.jpeg"
+      client:load
+    />
+    
+    <section class="py-16 bg-background">
+      <div class="container mx-auto px-4">
+        <div class="grid grid-cols-1 gap-8">
+          {newsItems.map((item) => (
+            <article class="bg-card rounded-lg overflow-hidden border hover:shadow-md transition-shadow">
+              <div class="flex flex-col md:flex-row">
+                <div class="md:w-1/3">
+                  <img 
+                    src={item.image} 
+                    alt={item.title} 
+                    class="w-full h-full object-cover aspect-video md:aspect-auto"
+                  />
+                </div>
+                <div class="md:w-2/3 p-6">
+                  <div class="flex items-center text-sm text-muted-foreground mb-2">
+                    <Calendar className="h-4 w-4 mr-1" />
+                    <span>{item.date}</span>
+                  </div>
+                  <h2 class="text-2xl font-bold mb-3 hover:text-primary transition-colors">
+                    <a href={`/news/${item.slug}`}>{item.title}</a>
+                  </h2>
+                  <p class="text-muted-foreground mb-4">{item.excerpt}</p>
+                  <div class="flex flex-wrap gap-2 mb-4">
+                    {item.tags.map((tag) => (
+                      <Badge variant="secondary">
+                        <Tag className="h-3 w-3 mr-1" />
+                        {tag}
+                      </Badge>
+                    ))}
+                  </div>
+                  <Button variant="outline" asChild>
+                    <a href={`/news/${item.slug}`}>Read More</a>
+                  </Button>
+                </div>
+              </div>
+            </article>
+          ))}
+        </div>
+        
+        <div class="flex justify-center mt-12">
+          <div class="flex space-x-2">
+            <Button variant="outline" size="icon" disabled>
+              <span>←</span>
+            </Button>
+            <Button variant="default">1</Button>
+            <Button variant="outline">2</Button>
+            <Button variant="outline" size="icon">
+              <span>→</span>
+            </Button>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+</Layout>

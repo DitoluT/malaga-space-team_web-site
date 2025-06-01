@@ -1,0 +1,216 @@
+---
+import '@/styles/globals.css'
+import Layout from '../layouts/Layout.astro';
+import { HeroSection } from '@/components/HeroSection';
+import { 
+	MapPin, 
+	Mail, 
+	Phone, 
+	Clock,
+	User,
+	FileText,
+	Send
+} from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+---
+
+<Layout title="Contact" description="Get in touch with the University of Málaga CubeSat Project team">
+	<main>
+		<HeroSection 
+			title="Contact Us" 
+			subtitle="Have questions or interested in joining our project? Get in touch with the CubeSat team."
+			image="https://images.pexels.com/photos/355906/pexels-photo-355906.jpeg"
+			client:load
+		/>
+		
+		<section class="py-16 bg-background">
+			<div class="container mx-auto px-4">
+				<div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+					<!-- Contact Information -->
+					<div>
+						<h2 class="text-3xl font-bold mb-8">Get in Touch</h2>
+						
+						<div class="space-y-6">
+							<div class="flex items-start space-x-4">
+								<div class="bg-primary/10 rounded-full p-3 text-primary">
+									<MapPin class="h-6 w-6" />
+								</div>
+								<div>
+									<h3 class="text-lg font-semibold">Our Location</h3>
+									<p class="text-muted-foreground">
+										School of Engineering<br />
+										Universidad de Málaga<br />
+										Av. de Cervantes, 2<br />
+										29016 Málaga, Spain
+									</p>
+								</div>
+							</div>
+							
+							<div class="flex items-start space-x-4">
+								<div class="bg-primary/10 rounded-full p-3 text-primary">
+									<Mail class="h-6 w-6" />
+								</div>
+								<div>
+									<h3 class="text-lg font-semibold">Email Address</h3>
+									<p class="text-muted-foreground">
+										<a href="mailto:cubesat@uma.es" class="hover:text-primary transition-colors">
+											cubesat@uma.es
+										</a>
+									</p>
+								</div>
+							</div>
+							
+							<div class="flex items-start space-x-4">
+								<div class="bg-primary/10 rounded-full p-3 text-primary">
+									<Phone class="h-6 w-6" />
+								</div>
+								<div>
+									<h3 class="text-lg font-semibold">Phone Number</h3>
+									<p class="text-muted-foreground">
+										<a href="tel:+34952131000" class="hover:text-primary transition-colors">
+											+34 952 13 10 00
+										</a>
+									</p>
+								</div>
+							</div>
+							
+							<div class="flex items-start space-x-4">
+								<div class="bg-primary/10 rounded-full p-3 text-primary">
+									<Clock class="h-6 w-6" />
+								</div>
+								<div>
+									<h3 class="text-lg font-semibold">Office Hours</h3>
+									<p class="text-muted-foreground">
+										Monday - Friday: 9:00 AM - 5:00 PM<br />
+										Saturday - Sunday: Closed
+									</p>
+								</div>
+							</div>
+						</div>
+						
+						<div class="mt-8">
+							<h3 class="text-xl font-semibold mb-4">Join Our Team</h3>
+							<p class="text-muted-foreground mb-4">
+								We're always looking for passionate students and researchers to join our project. Whether you're interested in aerospace engineering, electronics, programming, or science, there's a place for you in our CubeSat team.
+							</p>
+							<div class="flex flex-wrap gap-3">
+								<Badge>Aerospace Engineering</Badge>
+								<Badge>Electrical Engineering</Badge>
+								<Badge>Computer Science</Badge>
+								<Badge>Telecommunications</Badge>
+								<Badge>Physics</Badge>
+							</div>
+						</div>
+					</div>
+					
+					<!-- Contact Form -->
+					<div class="bg-card rounded-lg border p-8">
+						<h2 class="text-2xl font-bold mb-6">Send Us a Message</h2>
+						
+						<form class="space-y-6">
+							<div class="space-y-2">
+								<label for="name" class="text-sm font-medium">
+									Full Name
+								</label>
+								<div class="relative">
+									<div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-muted-foreground">
+										<User class="h-4 w-4" />
+									</div>
+									<input 
+										type="text" 
+										id="name" 
+										placeholder="Your name" 
+										class="w-full rounded-md border border-input bg-background py-2 pl-10 pr-3 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+										required
+									/>
+								</div>
+							</div>
+							
+							<div class="space-y-2">
+								<label for="email" class="text-sm font-medium">
+									Email Address
+								</label>
+								<div class="relative">
+									<div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-muted-foreground">
+										<Mail class="h-4 w-4" />
+									</div>
+									<input 
+										type="email" 
+										id="email" 
+										placeholder="your.email@example.com" 
+										class="w-full rounded-md border border-input bg-background py-2 pl-10 pr-3 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+										required
+									/>
+								</div>
+							</div>
+							
+							<div class="space-y-2">
+								<label for="subject" class="text-sm font-medium">
+									Subject
+								</label>
+								<div class="relative">
+									<div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-muted-foreground">
+										<FileText class="h-4 w-4" />
+									</div>
+									<input 
+										type="text" 
+										id="subject" 
+										placeholder="Message subject" 
+										class="w-full rounded-md border border-input bg-background py-2 pl-10 pr-3 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+										required
+									/>
+								</div>
+							</div>
+							
+							<div class="space-y-2">
+								<label for="message" class="text-sm font-medium">
+									Message
+								</label>
+								<textarea 
+									id="message" 
+									placeholder="Your message here..." 
+									rows="5" 
+									class="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+									required
+								></textarea>
+							</div>
+							
+							<div class="flex items-center space-x-2">
+								<input 
+									type="checkbox" 
+									id="consent" 
+									class="rounded-sm border border-input ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+									required
+								/>
+								<label for="consent" class="text-sm text-muted-foreground">
+									I consent to having this website store my submitted information so they can respond to my inquiry.
+								</label>
+							</div>
+							
+							<Button type="submit" class="w-full">
+								<Send class="mr-2 h-4 w-4" />
+								Send Message
+							</Button>
+						</form>
+					</div>
+				</div>
+			</div>
+		</section>
+		
+		<!-- Map Section -->
+		<section class="bg-card">
+			<div class="h-96">
+				<iframe 
+					src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3198.022942807!2d-4.483384824201742!3d36.719815872543564!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0xd72f741b4525815%3A0x876f0c70cc968c43!2sUniversidad%20de%20M%C3%A1laga!5e0!3m2!1sen!2ses!4v1686756901154!5m2!1sen!2ses" 
+					width="100%" 
+					height="100%" 
+					style="border:0;" 
+					allowfullscreen="" 
+					loading="lazy" 
+					referrerpolicy="no-referrer-when-downgrade"
+				></iframe>
+			</div>
+		</section>
+	</main>
+</Layout>

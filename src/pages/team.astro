@@ -1,0 +1,134 @@
+---
+import '@/styles/globals.css'
+import Layout from '../layouts/Layout.astro';
+import { HeroSection } from '@/components/HeroSection';
+import { Badge } from '@/components/ui/badge';
+import { Github, Linkedin, Mail } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+
+const teamMembers = [
+  {
+    name: "Dr. María González",
+    role: "Structure Lead",
+    image: "https://images.pexels.com/photos/3796217/pexels-photo-3796217.jpeg",
+    subsystem: "Structure",
+    social: {
+      linkedin: "#",
+      github: "#",
+      email: "maria.gonzalez@uma.es"
+    }
+  },
+  {
+    name: "Dr. Juan Pérez",
+    role: "Power Systems Engineer",
+    image: "https://images.pexels.com/photos/2379004/pexels-photo-2379004.jpeg",
+    subsystem: "Power",
+    social: {
+      linkedin: "#",
+      github: "#",
+      email: "juan.perez@uma.es"
+    }
+  },
+  {
+    name: "Ana Martínez",
+    role: "ADCS Specialist",
+    image: "https://images.pexels.com/photos/762020/pexels-photo-762020.jpeg",
+    subsystem: "ADCS",
+    social: {
+      linkedin: "#",
+      github: "#",
+      email: "ana.martinez@uma.es"
+    }
+  },
+  {
+    name: "Carlos Ruiz",
+    role: "Communications Lead",
+    image: "https://images.pexels.com/photos/1516680/pexels-photo-1516680.jpeg",
+    subsystem: "Communications",
+    social: {
+      linkedin: "#",
+      github: "#",
+      email: "carlos.ruiz@uma.es"
+    }
+  },
+  {
+    name: "Laura Sánchez",
+    role: "Payload Engineer",
+    image: "https://images.pexels.com/photos/3861958/pexels-photo-3861958.jpeg",
+    subsystem: "Payload",
+    social: {
+      linkedin: "#",
+      github: "#",
+      email: "laura.sanchez@uma.es"
+    }
+  },
+  {
+    name: "David Torres",
+    role: "CDHS Developer",
+    image: "https://images.pexels.com/photos/2379005/pexels-photo-2379005.jpeg",
+    subsystem: "CDHS",
+    social: {
+      linkedin: "#",
+      github: "#",
+      email: "david.torres@uma.es"
+    }
+  }
+];
+---
+
+<Layout title="Team">
+  <main>
+    <HeroSection 
+      title="Meet the Team" 
+      subtitle="Get to know the dedicated professionals and researchers behind the University of Málaga CubeSat Project."
+      image="https://images.pexels.com/photos/3183150/pexels-photo-3183150.jpeg"
+      client:load
+    />
+    
+    <section class="py-16 bg-background">
+      <div class="container mx-auto px-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {teamMembers.map((member) => (
+            <div class="bg-card rounded-lg overflow-hidden border hover:border-primary transition-all duration-300 hover:shadow-lg">
+              <div class="aspect-square overflow-hidden">
+                <img
+                  src={member.image}
+                  alt={member.name}
+                  class="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
+                />
+              </div>
+              <div class="p-6">
+                <h3 class="text-xl font-semibold mb-1">{member.name}</h3>
+                <p class="text-muted-foreground mb-3">{member.role}</p>
+                <Badge variant="secondary" class="mb-4">{member.subsystem}</Badge>
+                <div class="flex space-x-2 mt-4">
+                  {member.social?.linkedin && (
+                    <Button variant="ghost" size="icon" asChild>
+                      <a href={member.social.linkedin} target="_blank" rel="noopener noreferrer" aria-label="LinkedIn profile">
+                        <Linkedin className="h-4 w-4" />
+                      </a>
+                    </Button>
+                  )}
+                  {member.social?.github && (
+                    <Button variant="ghost" size="icon" asChild>
+                      <a href={member.social.github} target="_blank" rel="noopener noreferrer" aria-label="GitHub profile">
+                        <Github className="h-4 w-4" />
+                      </a>
+                    </Button>
+                  )}
+                  {member.social?.email && (
+                    <Button variant="ghost" size="icon" asChild>
+                      <a href={`mailto:${member.social.email}`} aria-label="Email">
+                        <Mail className="h-4 w-4" />
+                      </a>
+                    </Button>
+                  )}
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  </main>
+</Layout>

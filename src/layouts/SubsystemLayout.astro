@@ -1,0 +1,72 @@
+---
+import Layout from './Layout.astro';
+import { HeroSection } from '@/components/HeroSection';
+import { TeamSection } from '@/components/TeamSection';
+
+interface Props {
+  title: string;
+  description: string;
+  image: string;
+  teamMembers?: {
+    name: string;
+    role: string;
+    image: string;
+    social?: {
+      linkedin?: string;
+      github?: string;
+      email?: string;
+    };
+  }[];
+}
+
+const { title, description, image, teamMembers } = Astro.props;
+---
+
+<Layout title={title}>
+  <main>
+    <HeroSection 
+      title={title}
+      subtitle={description}
+      image={image}
+      client:load
+    />
+    
+    <section class="py-16 bg-background">
+      <div class="container mx-auto px-4">
+        <div class="prose prose-neutral dark:prose-invert max-w-none">
+          <slot />
+        </div>
+      </div>
+    </section>
+
+    {teamMembers && (
+      <section class="py-16 bg-card">
+        <div class="container mx-auto px-4">
+          <h2 class="text-3xl font-bold mb-8 text-center">Subsystem Team</h2>
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {teamMembers.map((member) => (
+              <div class="bg-background rounded-lg overflow-hidden border hover:border-primary transition-all duration-300">
+                <div class="aspect-square overflow-hidden">
+                  <img
+                    src={member.image}
+                    alt={member.name}
+                    class="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
+                  />
+                </div>
+                <div class="p-6">
+                  <h3 class="text-xl font-semibold mb-2">{member.name}</h3>
+                  <p class="text-muted-foreground">{member.role}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+          <div class="text-center mt-8">
+            <a href="/team" class="inline-flex items-center text-primary hover:text-primary/80 transition-colors">
+              View All Team Members →
+            </a>
+          </div>
+        </div>
+      </section>
+    )}
+  </main>
+</Layout>
