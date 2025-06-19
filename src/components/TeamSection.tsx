@@ -26,14 +26,14 @@ interface TeamMemberProps {
 
 const teamMembers: TeamMemberProps[] = [
   {
-    name: "Dr. Elena Rodríguez",
-    role: "Project Director",
+    name: "Sergio Fortes",
+    role: "Associate Proffessor",
     image: "https://images.pexels.com/photos/3796217/pexels-photo-3796217.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
-    department: "Aerospace Engineering",
+    department: "Communications Engineering",
     social: {
       linkedin: "#",
       github: "#",
-      email: "elena.rodriguez@uma.es"
+      email: "sfr@ic.uma.es"
     }
   },
   {
