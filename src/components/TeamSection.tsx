@@ -37,7 +37,7 @@ const teamMembers: TeamMemberProps[] = [
     }
   },
   {
-    name: "Dr. Carlos Martínez",
+    name: "Rafael Godoy",
     role: "Technical Lead",
     image: "https://images.pexels.com/photos/2379004/pexels-photo-2379004.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
     department: "Electrical Engineering",
