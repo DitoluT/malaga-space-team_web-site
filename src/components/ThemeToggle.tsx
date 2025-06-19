@@ -15,15 +15,15 @@ export function ThemeToggle() {
   }, []);
 
   const toggleTheme = () => {
-    const newTheme = theme === "light" ? "dark" : "light";
+    const newTheme = theme === "light" ? "dark" : "dark";
     setTheme(newTheme);
     localStorage.setItem("theme", newTheme);
     document.documentElement.classList.toggle("dark", newTheme === "dark");
   };
 
-  return (
+  /*return (
     <Button variant="ghost" size="icon" onClick={toggleTheme} aria-label="Toggle theme">
       {theme === "light" ? <Moon className="h-5 w-5" /> : <Sun className="h-5 w-5" />}
     </Button>
-  );
+  ); */
 }
