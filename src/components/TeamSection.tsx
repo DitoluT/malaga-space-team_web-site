@@ -28,7 +28,7 @@ const teamMembers: TeamMemberProps[] = [
   {
     name: "Sergio Fortes",
     role: "Associate Proffessor",
-    image: "https://images.pexels.com/photos/3796217/pexels-photo-3796217.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
+    image: "",
     department: "Communications Engineering",
     social: {
       linkedin: "#",
@@ -48,7 +48,7 @@ const teamMembers: TeamMemberProps[] = [
     }
   },
   {
-    name: "Dr. Laura Fernández",
+    name: "Paco Muro",
     role: "Communications Lead",
     image: "https://images.pexels.com/photos/762020/pexels-photo-762020.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
     department: "Telecommunications",
@@ -59,7 +59,7 @@ const teamMembers: TeamMemberProps[] = [
     }
   },
   {
-    name: "Prof. Antonio López",
+    name: "Pepe Pulido",
     role: "Software Lead",
     image: "https://images.pexels.com/photos/1516680/pexels-photo-1516680.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
     department: "Computer Science",
