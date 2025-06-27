@@ -137,7 +137,7 @@ export function TeamSection() {
 
         <div className="text-center mt-12">
           <Button asChild>
-            <a href="/about#team">View Full Team</a>
+            <a href="/team">View Full Team</a>
           </Button>
         </div>
       </div>

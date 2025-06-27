@@ -10,8 +10,8 @@ const navLinks = [
   { href: "/about", label: "About" },
   { href: "/subsystems", label: "Subsystems" },
   { href: "/team", label: "Team" },
-  { href: "/gallery", label: "Gallery" },
-  { href: "/news", label: "News" },
+  //{ href: "/gallery", label: "Gallery" },
+ // { href: "/news", label: "News" },
   { href: "/contact", label: "Contact" },
 ];
 
@@ -48,7 +48,7 @@ export function Navbar() {
             aria-label="University of Málaga CubeSat Project"
           >
             <Satellite className="h-7 w-7 text-primary" />
-            <span className="hidden sm:inline-block font-bold text-lg">UMA CubeSat</span>
+            <span className="hidden sm:inline-block font-bold text-lg">Málaga Space Team</span>
           </a>
 
           {/* Desktop Navigation */}
