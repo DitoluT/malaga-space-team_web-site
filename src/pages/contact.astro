@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { ContactForm } from '@/components/Contact'
 ---
 
 <Layout title="Contact" description="Get in touch with the University of Málaga CubeSat Project team">
@@ -103,8 +104,10 @@ import { Badge } from '@/components/ui/badge';
 							</div>
 						</div>
 					</div>
+
+					<ContactForm client:visible/>
 					
-					<!-- Contact Form -->
+					<!-- Contact Form 
 					<div class="bg-card rounded-lg border p-8">
 						<h2 class="text-2xl font-bold mb-6">Send Us a Message</h2>
 						
@@ -195,9 +198,9 @@ import { Badge } from '@/components/ui/badge';
 						</form>
 					</div>
 				</div>
-			</div>
-		</section>
+			</div>-->
 		
+		</section> 
 		<!-- Map Section -->
 		<section class="bg-card">
 			<div class="h-96">
