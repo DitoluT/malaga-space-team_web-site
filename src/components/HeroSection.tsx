@@ -89,7 +89,7 @@ export function HeroSection({
         </div>
       </div>
 
-      {/* Floating Satellite Icon */}
+      {/* Floating Satellite Icon 
       <motion.div 
         className="hidden lg:block absolute bottom-20 right-20 z-20"
         animate={{ y: [0, -15, 0] }}
@@ -102,7 +102,7 @@ export function HeroSection({
         <div className="bg-primary/20 backdrop-blur-lg p-4 rounded-full">
           <Rocket className="h-12 w-12 text-primary" />
         </div>
-      </motion.div>
+      </motion.div>*/}
     </section>
   );
 }

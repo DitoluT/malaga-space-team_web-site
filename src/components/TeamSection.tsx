@@ -109,7 +109,7 @@ export function TeamSection() {
                 </CardContent>
                 <CardFooter className="flex justify-start space-x-2 border-t pt-4">
                   {member.social?.linkedin && (
-                    <Button variant="ghost\" size="icon\" asChild>
+                    <Button variant="ghost" size="icon" asChild>
                       <a href={member.social.linkedin} target="_blank" rel="noopener noreferrer" aria-label="LinkedIn profile">
                         <Linkedin className="h-4 w-4" />
                       </a>

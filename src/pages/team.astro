@@ -2,6 +2,7 @@
 import '@/styles/globals.css'
 import Layout from '../layouts/Layout.astro';
 import { HeroSection } from '@/components/HeroSection';
+import { LeaderTeam, LeaderStudentTeam, ADCSTeam, CommsTeam, EPSTeam, StructureTeam, OBSoftTeam, GSTeam } from "@/components/Team";
 import { Badge } from '@/components/ui/badge';
 import { Github, Linkedin, Mail } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -81,54 +82,18 @@ const teamMembers = [
     <HeroSection 
       title="Meet the Team" 
       subtitle="Get to know the dedicated professionals and researchers behind the University of Málaga CubeSat Project."
-      image="https://images.pexels.com/photos/3183150/pexels-photo-3183150.jpeg"
+      image="https://images.pexels.com/photos/256152/pexels-photo-256152.jpeg"
       client:load
     />
-    
-    <section class="py-16 bg-background">
-      <div class="container mx-auto px-4">
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {teamMembers.map((member) => (
-            <div class="bg-card rounded-lg overflow-hidden border hover:border-primary transition-all duration-300 hover:shadow-lg">
-              <div class="aspect-square overflow-hidden">
-                <img
-                  src={member.image}
-                  alt={member.name}
-                  class="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
-                />
-              </div>
-              <div class="p-6">
-                <h3 class="text-xl font-semibold mb-1">{member.name}</h3>
-                <p class="text-muted-foreground mb-3">{member.role}</p>
-                <Badge variant="secondary" class="mb-4">{member.subsystem}</Badge>
-                <div class="flex space-x-2 mt-4">
-                  {member.social?.linkedin && (
-                    <Button variant="ghost" size="icon" asChild>
-                      <a href={member.social.linkedin} target="_blank" rel="noopener noreferrer" aria-label="LinkedIn profile">
-                        <Linkedin className="h-4 w-4" />
-                      </a>
-                    </Button>
-                  )}
-                  {member.social?.github && (
-                    <Button variant="ghost" size="icon" asChild>
-                      <a href={member.social.github} target="_blank" rel="noopener noreferrer" aria-label="GitHub profile">
-                        <Github className="h-4 w-4" />
-                      </a>
-                    </Button>
-                  )}
-                  {member.social?.email && (
-                    <Button variant="ghost" size="icon" asChild>
-                      <a href={`mailto:${member.social.email}`} aria-label="Email">
-                        <Mail className="h-4 w-4" />
-                      </a>
-                    </Button>
-                  )}
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
+
+    <LeaderTeam client:visible/>
+    <LeaderStudentTeam client:visible/>
+    <ADCSTeam client:visible/>
+    <CommsTeam client:visible/>
+    <GSTeam client:visible/>
+    <EPSTeam client:visible/>
+    <StructureTeam client:visible/>
+    <OBSoftTeam client:visible/>
+
   </main>
 </Layout>
