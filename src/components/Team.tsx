@@ -50,7 +50,7 @@ const academicSupervisors: TeamMemberProps[] = [
   {
     name: "Paco Muro",
     role: "Communications Lead",
-    image: "http://www.ic.uma.es/repository/fileDownloader?rfname=91c535ad-2d44-44ed-ac3b-ebf970f4bdfd.jpeg",
+    image: "https://media.licdn.com/dms/image/v2/D4D03AQG3dIZFpuMaag/profile-displayphoto-shrink_800_800/B4DZcd6PjwGUAk-/0/1748553497543?e=1756944000&v=beta&t=moM2mcYeNMIUiL7U9YKHxw5iE3JRXnbigQwG9OP0xEs",
     department: "Telecommunications",
     social: {
       linkedin: "#",
@@ -61,7 +61,7 @@ const academicSupervisors: TeamMemberProps[] = [
   {
     name: "Pepe Pulido",
     role: "Software Lead",
-    image: "https://images.pexels.com/photos/1516680/pexels-photo-1516680.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
+    image: "https://media.licdn.com/dms/image/v2/C5603AQH52eHLjjhBIg/profile-displayphoto-shrink_800_800/profile-displayphoto-shrink_800_800/0/1621333477207?e=1756944000&v=beta&t=nv2VDig0VDPofSc1A-j6sXyl9GUxVKp4obaKFcrPBmA",
     department: "Computer Science",
     social: {
       linkedin: "#",
