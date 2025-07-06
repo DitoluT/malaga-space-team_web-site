@@ -68,7 +68,7 @@ export const SponsorsSection: React.FC = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-16">
           {collaborators.map((collaborator, index) => (
             <GlassContainer key={index} className="collaboration-glass">
-              <div className="p-6 text-center h-full flex flex-col min-h-[400px]">
+              <div className="p-6 text-center h-[420px] flex flex-col">
                 <div className={`inline-flex w-12 h-12 bg-gradient-to-br ${collaborator.color} rounded-full items-center justify-center mb-4`}>
                   <collaborator.icon className="w-6 h-6 text-white" />
                 </div>
@@ -83,7 +83,7 @@ export const SponsorsSection: React.FC = () => {
                   <p className="text-white/80 text-xs">{collaborator.contribution}</p>
                 </div>
                 
-                <div className="mt-auto">
+                <div>
                   <a 
                   href={collaborator.website}
                   target="_blank"
