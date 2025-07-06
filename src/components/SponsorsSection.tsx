@@ -98,21 +98,6 @@ export const SponsorsSection: React.FC = () => {
             </GlassContainer>
           ))}
         </div>
-
-
-        <GlassContainer className="collaboration-glass">
-          <div className="p-6 md:p-8 lg:p-12 text-center">
-            <h3 className="text-2xl md:text-3xl font-bold text-white mb-4 md:mb-6">¿Interesado en Colaborar?</h3>
-            <p className="text-lg md:text-xl text-white/80 mb-6 md:mb-8">
-              Estamos abiertos a nuevas colaboraciones con empresas, instituciones y organizaciones 
-              que compartan nuestra visión de avanzar en la tecnología espacial.
-            </p>
-            
-            <GlassButton variant="accent" size="lg" onClick={() => document.getElementById('contacto')?.scrollIntoView({ behavior: 'smooth' })}>
-              Información de Colaboración
-            </GlassButton>
-          </div>
-        </GlassContainer>
       </div>
     </section>
   );
