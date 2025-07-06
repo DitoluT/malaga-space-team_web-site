@@ -56,9 +56,9 @@ export const TeamSection: React.FC = () => {
       <section id="equipo" className="py-20 px-4">
       <div className="max-w-7xl mx-auto">
         <GlassContainer className="section-glass mb-16">
-          <div className="p-12 text-center">
-            <h2 className="text-5xl font-bold text-white mb-8">Conoce al Equipo</h2>
-            <p className="text-xl text-white/80 max-w-4xl mx-auto">
+          <div className="p-8 text-center">
+            <h2 className="text-4xl font-bold text-white mb-6">Conoce al Equipo</h2>
+            <p className="text-lg text-white/80 max-w-4xl mx-auto">
               Un equipo multidisciplinario de más de 25 estudiantes e investigadores 
               apasionados por la tecnología espacial y la innovación.
             </p>
@@ -69,13 +69,13 @@ export const TeamSection: React.FC = () => {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-16">
           {teamStats.map((stat, index) => (
             <GlassContainer key={index} className="team-stat-glass">
-              <div className="p-6 text-center h-full flex flex-col justify-center">
+              <div className="p-4 text-center h-full flex flex-col justify-center">
                 <div className="mb-4">
                   <div className="mx-auto w-12 h-12 bg-gradient-to-br from-green-400 to-green-600 rounded-full flex items-center justify-center">
                     <stat.icon className="w-6 h-6 text-white" />
                   </div>
                 </div>
-                <div className="text-3xl font-bold text-white mb-2">{stat.number}</div>
+                <div className="text-2xl font-bold text-white mb-2">{stat.number}</div>
                 <div className="text-sm text-white/80">{stat.label}</div>
               </div>
             </GlassContainer>
@@ -84,32 +84,32 @@ export const TeamSection: React.FC = () => {
 
         {/* Join Team Section */}
         <GlassContainer className="join-team-glass mb-16">
-          <div className="p-12">
+          <div className="p-8">
             <div className="text-center mb-12">
-              <h3 className="text-4xl font-bold text-white mb-6">Únete al Equipo</h3>
-              <h4 className="text-2xl font-semibold text-blue-300 mb-6">Un Proyecto Colaborativo e Innovador</h4>
-              <p className="text-lg text-white/80 max-w-4xl mx-auto leading-relaxed">
+              <h3 className="text-3xl font-bold text-white mb-4">Únete al Equipo</h3>
+              <h4 className="text-xl font-semibold text-blue-300 mb-4">Un Proyecto Colaborativo e Innovador</h4>
+              <p className="text-base text-white/80 max-w-4xl mx-auto leading-relaxed">
                 Nuestro equipo reúne estudiantes e investigadores de múltiples disciplinas: 
                 ingeniería aeroespacial, telecomunicaciones, informática, física y más. 
                 Trabajamos juntos para desarrollar un CubeSat 2U completamente funcional.
               </p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
               {benefits.map((benefit, index) => (
                 <div key={index} className="text-center">
-                  <h4 className="text-xl font-bold text-white mb-3">{benefit.title}</h4>
-                  <p className="text-white/80">{benefit.description}</p>
+                  <h4 className="text-lg font-bold text-white mb-2">{benefit.title}</h4>
+                  <p className="text-sm text-white/80">{benefit.description}</p>
                 </div>
               ))}
             </div>
 
             <div className="text-center">
               <div className="mb-8">
-                <h4 className="text-2xl font-bold text-white mb-4">🚀 ¿Listo para la Aventura Espacial?</h4>
-                <p className="text-lg text-white/80 mb-6">
+                <h4 className="text-xl font-bold text-white mb-3">🚀 ¿Listo para la Aventura Espacial?</h4>
+                <p className="text-base text-white/80 mb-4">
                   Únete a nosotros y sé parte de la próxima generación de innovadores espaciales. 
-                  Buscamos estudiantes motivados de todas las disciplinas.
+                  Buscamos estudiantes motivados de todas las disciplinas así como colaboraciones externas.
                 </p>
               </div>
 
@@ -126,7 +126,7 @@ export const TeamSection: React.FC = () => {
                 </GlassButton>
                 
                 <GlassButton variant="secondary" size="lg" onClick={() => setIsJoinModalOpen(true)}>
-                  Únete al Equipo
+                  Únete o Colabora
                 </GlassButton>
               </div>
             </div>

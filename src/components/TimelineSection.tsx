@@ -101,9 +101,9 @@ export const TimelineSection: React.FC = () => {
     <section className="py-20 px-4" ref={timelineRef}>
       <div className="max-w-7xl mx-auto">
         <GlassContainer className="section-glass mb-16">
-          <div className="p-12 text-center">
-            <h2 className="text-5xl font-bold text-white mb-8">Cronología del Proyecto</h2>
-            <p className="text-xl text-white/80">
+          <div className="p-8 text-center">
+            <h2 className="text-4xl font-bold text-white mb-6">Cronología del Proyecto</h2>
+            <p className="text-lg text-white/80">
               Seguimiento del progreso desde la concepción hasta el lanzamiento del CubeSat 2U
             </p>
           </div>

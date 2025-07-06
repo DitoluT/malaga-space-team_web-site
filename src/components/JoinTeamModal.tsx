@@ -112,8 +112,8 @@ export const JoinTeamModal: React.FC<JoinTeamModalProps> = ({ isOpen, onClose })
         <div className="modal-content-wrapper p-3 sm:p-4 md:p-6 lg:p-8 max-h-[88vh] sm:max-h-[85vh] overflow-y-auto">
           <div className="flex justify-between items-start mb-6">
             <div>
-              <h2 className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold text-white drop-shadow-lg mb-2">Únete a la Misión</h2>
-              <p className="text-white/80 drop-shadow text-sm sm:text-base">Forma parte del Proyecto CubeSat de la Universidad de Málaga</p>
+              <h2 className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold text-white drop-shadow-lg mb-2">Únete o Colabora</h2>
+              <p className="text-white/80 drop-shadow text-sm sm:text-base">Forma parte del Proyecto CubeSat de la Universidad de Málaga o colabora con nosotros</p>
             </div>
             <button 
               onClick={handleClose}

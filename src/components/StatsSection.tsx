@@ -36,14 +36,14 @@ export const StatsSection: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {stats.map((stat, index) => (
             <GlassContainer key={index} className="stats-glass">
-              <div className="p-8 text-center h-full flex flex-col justify-center">
+              <div className="p-6 text-center h-full flex flex-col justify-center">
                 <div className="mb-6">
                   <div className="mx-auto w-16 h-16 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center">
                     <stat.icon className="w-8 h-8 text-white" />
                   </div>
                 </div>
                 <div className="text-4xl font-bold text-white mb-2">{stat.number}</div>
-                <div className="text-xl font-semibold text-white/90 mb-2">{stat.label}</div>
+                <div className="text-lg font-semibold text-white/90 mb-2">{stat.label}</div>
                 <div className="text-sm text-white/70">{stat.description}</div>
               </div>
             </GlassContainer>

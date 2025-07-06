@@ -105,14 +105,14 @@ export const SubsystemsSection: React.FC = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
             {subsystems.map((subsystem, index) => (
               <GlassContainer key={index} className="subsystem-glass">
-                <div className="p-6 md:p-8 text-center h-full flex flex-col min-h-[320px] md:min-h-[380px]">
+                <div className="p-4 md:p-6 text-center h-full flex flex-col min-h-[260px] md:min-h-[300px]">
                   <div className="mb-6">
-                    <div className="mx-auto w-20 h-20 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center">
-                      <subsystem.icon className="w-10 h-10 text-white" />
+                    <div className="mx-auto w-16 h-16 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center">
+                      <subsystem.icon className="w-8 h-8 text-white" />
                     </div>
                   </div>
-                  <h3 className="text-xl md:text-2xl font-bold text-white mb-3 md:mb-4">{subsystem.title}</h3>
-                  <p className="text-sm md:text-base text-white/80 leading-relaxed mb-4 md:mb-6 flex-1 line-clamp-4">{subsystem.description}</p>
+                  <h3 className="text-lg md:text-xl font-bold text-white mb-2 md:mb-3">{subsystem.title}</h3>
+                  <p className="text-sm text-white/80 leading-relaxed mb-3 md:mb-4 flex-1 line-clamp-4">{subsystem.description}</p>
                   <div className="mt-auto">
                     <GlassButton 
                       variant="primary" 
@@ -120,9 +120,9 @@ export const SubsystemsSection: React.FC = () => {
                       onClick={() => openModal(subsystem)}
                     >
                       Ver Detalles →
-                    </GlassButton>
-                  </div>
-                </div>
+          <div className="p-8 text-center">
+            <h2 className="text-4xl font-bold text-white mb-6">Subsistemas CubeSat 2U</h2>
+            <p className="text-lg text-white/80">
               </GlassContainer>
             ))}
           </div>
