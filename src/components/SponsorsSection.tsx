@@ -96,27 +96,17 @@ export const SponsorsSection: React.FC = () => {
             </GlassContainer>
           ))}
         </div>
-      </div>
-    </section>
-  );
-};
-                  </div>
-                  
-                  {/* Description */}
-                  <div className="lg:col-span-2">
-                    <p className="text-white/90 text-base md:text-lg leading-relaxed mb-4 md:mb-6">{collaborator.description}</p>
-                    
-                    <div className="bg-white/5 rounded-lg p-3 md:p-4">
-                      <h4 className="text-white font-semibold mb-2 flex items-center text-sm md:text-base">
-                        🤝 Contribución al Proyecto
-                      </h4>
-                      <p className="text-white/80 text-sm md:text-base">{collaborator.contribution}</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </GlassContainer>
-          ))}
+
+        {/* Description */}
+        <div className="lg:col-span-2">
+          <p className="text-white/90 text-base md:text-lg leading-relaxed mb-4 md:mb-6">{collaborator.description}</p>
+          
+          <div className="bg-white/5 rounded-lg p-3 md:p-4">
+            <h4 className="text-white font-semibold mb-2 flex items-center text-sm md:text-base">
+              🤝 Contribución al Proyecto
+            </h4>
+            <p className="text-white/80 text-sm md:text-base">{collaborator.contribution}</p>
+          </div>
         </div>
 
         {/* Collaboration Benefits */}
