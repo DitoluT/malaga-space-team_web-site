@@ -4,22 +4,6 @@
 
 /* Liquid Glass Effect CSS */
 .GlassContainer {
-    --corner-radius: 24px;
-    --base-strength: 24px;
-    --extra-blur: 3px;
-    --softness: 5px;
-    --tint-amount: 0.08;
-    --tint-saturation: 2;
-    --tint-hue: 157deg;
-    --contrast: 1.06;
-    --brightness: 1.07;
-    --invert: 0%;
-
-    --total-strength: calc(var(--base-strength) + var(--extra-blur));
-    --edge-width: calc(0.3px + (var(--softness) * 0.1));
-    --emboss-width: calc((var(--softness) * 0.38));
-    --refraction-width: calc((var(--softness) * 0.3));
-
     position: relative;
     overflow: visible;
 }
@@ -27,130 +11,60 @@
 .GlassContent {
     position: relative;
     display: block;
-    z-index: 2;
-    overflow: hidden;
-    border-radius: var(--corner-radius);
-}
-
-.GlassMaterial {
-    position: absolute;
-    inset: 0;
     z-index: 1;
-    pointer-events: none;
-}
-
-.GlassMaterial .GlassEdgeReflection {
-    backdrop-filter: blur(var(--total-strength)) brightness(1.2);
-    padding: var(--edge-width);
-    border: var(--total-strength) solid transparent;
-    mask: linear-gradient(white 0 0) padding-box, linear-gradient(white 0 0) content-box;
-    mask-composite: exclude;
-    pointer-events: none;
-}
-
-.GlassMaterial .GlassRefraction {
-    backdrop-filter: invert(0.15) brightness(1.15) contrast(1.5);
-    padding: var(--refraction-width);
-    border: calc(var(--emboss-width)) solid transparent;
-    mask: linear-gradient(white 0 0) padding-box, linear-gradient(white 0 0) content-box;
-    mask-composite: exclude;
-    pointer-events: none;
-}
-
-.GlassMaterial .GlassBlur {
-    backdrop-filter: blur(var(--extra-blur)) brightness(1.2);
-    margin: calc(var(--emboss-width) + var(--refraction-width));
-    pointer-events: none;
+    overflow: hidden;
+    border-radius: 24px;
 }
 
 .GlassContent {
-    transform-origin: center;
-    transform: scale(1.0);
     pointer-events: auto;
 }
 
-
 /* Navigation specific styles */
-.nav-glass {
-    --corner-radius: 20px;
-    --base-strength: 20px;
-    --extra-blur: 2px;
-    --softness: 4px;
-}
-
 .nav-glass .GlassContent {
     background: rgba(255, 255, 255, 0.1);
     border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 20px;
 }
 
 /* Hero specific styles */
-.hero-glass {
-    --corner-radius: 32px;
-    --base-strength: 28px;
-    --extra-blur: 4px;
-    --softness: 6px;
-}
-
 .hero-glass .GlassContent {
   background: rgba(255, 255, 255, 0.08);
   border: 1px solid rgba(255, 255, 255, 0.3);
     box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
+    border-radius: 32px;
 }
 
 /* Section glass styles */
-.section-glass {
-    --corner-radius: 28px;
-    --base-strength: 26px;
-    --extra-blur: 3px;
-    --softness: 5px;
-}
-
 .section-glass .GlassContent {
   background: rgba(0, 0, 0, 0.25);
   border: 1px solid rgba(255, 255, 255, 0.2);
     box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
+    border-radius: 28px;
 }
 
 /* Stats glass styles */
-.stats-glass {
-    --corner-radius: 20px;
-    --base-strength: 22px;
-    --extra-blur: 2px;
-    --softness: 4px;
-}
-
 .stats-glass .GlassContent {
   background: rgba(0, 0, 0, 0.2);
   border: 1px solid rgba(255, 255, 255, 0.25);
     box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+    border-radius: 20px;
 }
 
 /* Mission glass styles */
-.mission-glass {
-    --corner-radius: 24px;
-    --base-strength: 24px;
-    --extra-blur: 3px;
-    --softness: 5px;
-}
-
 .mission-glass .GlassContent {
   background: rgba(0, 0, 0, 0.22);
   border: 1px solid rgba(255, 255, 255, 0.23);
     box-shadow: 0 18px 35px rgba(0, 0, 0, 0.22);
+    border-radius: 24px;
 }
 
 /* Timeline glass styles */
-.timeline-glass {
-    --corner-radius: 26px;
-    --base-strength: 25px;
-    --extra-blur: 3px;
-    --softness: 5px;
-}
-
 .timeline-glass .GlassContent {
   background: rgba(0, 0, 0, 0.25);
   border: 1px solid rgba(255, 255, 255, 0.2);
     box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
+    border-radius: 26px;
 }
 
 /* Responsive timeline adjustments */
@@ -176,135 +90,76 @@
 }
 
 /* Subsystem glass styles */
-.subsystem-glass {
-    --corner-radius: 22px;
-    --base-strength: 23px;
-    --extra-blur: 3px;
-    --softness: 4px;
-}
-
 .subsystem-glass .GlassContent {
   background: rgba(0, 0, 0, 0.22);
   border: 1px solid rgba(255, 255, 255, 0.24);
     box-shadow: 0 16px 32px rgba(0, 0, 0, 0.2);
+    border-radius: 22px;
 }
 
 /* Team glass styles */
-.team-stat-glass {
-    --corner-radius: 18px;
-    --base-strength: 20px;
-    --extra-blur: 2px;
-    --softness: 3px;
-}
-
 .team-stat-glass .GlassContent {
   background: rgba(0, 0, 0, 0.2);
   border: 1px solid rgba(255, 255, 255, 0.25);
     box-shadow: 0 12px 24px rgba(0, 0, 0, 0.18);
-}
-
-.join-team-glass {
-    --corner-radius: 30px;
-    --base-strength: 27px;
-    --extra-blur: 4px;
-    --softness: 6px;
+    border-radius: 18px;
 }
 
 .join-team-glass .GlassContent {
   background: rgba(0, 0, 0, 0.28);
   border: 1px solid rgba(255, 255, 255, 0.2);
     box-shadow: 0 22px 45px rgba(0, 0, 0, 0.28);
+    border-radius: 30px;
 }
 
 /* Sponsor glass styles */
-.sponsor-level-glass {
-    --corner-radius: 24px;
-    --base-strength: 24px;
-    --extra-blur: 3px;
-    --softness: 5px;
-}
-
 .sponsor-level-glass .GlassContent {
   background: rgba(0, 0, 0, 0.22);
   border: 1px solid rgba(255, 255, 255, 0.23);
     box-shadow: 0 18px 35px rgba(0, 0, 0, 0.22);
-}
-
-.collaboration-glass {
-    --corner-radius: 26px;
-    --base-strength: 25px;
-    --extra-blur: 3px;
-    --softness: 5px;
+    border-radius: 24px;
 }
 
 .collaboration-glass .GlassContent {
   background: rgba(0, 0, 0, 0.25);
   border: 1px solid rgba(255, 255, 255, 0.2);
     box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
-}
-
-.become-sponsor-glass {
-    --corner-radius: 28px;
-    --base-strength: 26px;
-    --extra-blur: 4px;
-    --softness: 6px;
+    border-radius: 26px;
 }
 
 .become-sponsor-glass .GlassContent {
   background: rgba(0, 0, 0, 0.28);
   border: 1px solid rgba(255, 255, 255, 0.2);
     box-shadow: 0 24px 48px rgba(0, 0, 0, 0.3);
+    border-radius: 28px;
 }
 
 /* Contact glass styles */
-.contact-info-glass, .contact-form-glass {
-    --corner-radius: 26px;
-    --base-strength: 25px;
-    --extra-blur: 3px;
-    --softness: 5px;
-}
-
 .contact-info-glass .GlassContent, .contact-form-glass .GlassContent {
   background: rgba(0, 0, 0, 0.25);
   border: 1px solid rgba(255, 255, 255, 0.23);
     box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
+    border-radius: 26px;
 }
 
 /* Footer glass styles */
-.footer-glass {
-    --corner-radius: 30px;
-    --base-strength: 27px;
-    --extra-blur: 4px;
-    --softness: 6px;
-}
-
 .footer-glass .GlassContent {
   background: rgba(0, 0, 0, 0.3);
   border: 1px solid rgba(255, 255, 255, 0.2);
     box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
+    border-radius: 30px;
 }
 
 /* Glass Button Styles */
-.glass-button-container {
-  --corner-radius: 50px;
-  --base-strength: 16px;
-  --extra-blur: 2px;
-  --softness: 3px;
-}
-
 .glass-button-container .GlassContent {
   background: transparent;
   border: none;
   box-shadow: none;
+  border-radius: 50px;
 }
 
 /* Modal Glass Styles */
-.modal-glass {
-  --corner-radius: 24px;
-  --base-strength: 28px;
-  --extra-blur: 4px;
-  --softness: 6px;
-  
+.modal-glass {  
   /* Modal entrance animation */
   animation: modalFadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
   transform: scale(0.95) translateY(20px);
@@ -315,6 +170,7 @@
   background: rgba(0, 0, 0, 0.4);
   border: 1px solid rgba(255, 255, 255, 0.3);
   box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5);
+  border-radius: 24px;
   
   /* Content animation with slight delay */
   animation: modalContentSlideIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.1s forwards;
@@ -495,30 +351,18 @@
 }
 
 /* Navigation CTA Button Styles */
-.nav-cta-glass {
-  --corner-radius: 50px;
-  --base-strength: 18px;
-  --extra-blur: 2px;
-  --softness: 4px;
-}
-
 .nav-cta-glass .GlassContent {
   background: transparent;
   border: none;
   box-shadow: 0 8px 32px rgba(59, 130, 246, 0.3);
-}
-
-.nav-cta-mobile-glass {
-  --corner-radius: 12px;
-  --base-strength: 16px;
-  --extra-blur: 2px;
-  --softness: 3px;
+  border-radius: 50px;
 }
 
 .nav-cta-mobile-glass .GlassContent {
   background: transparent;
   border: none;
   box-shadow: 0 6px 24px rgba(59, 130, 246, 0.25);
+  border-radius: 12px;
 }
 
 /* CTA Button hover effects */
@@ -533,17 +377,13 @@
 /* Responsive modal improvements */
 @media (max-width: 768px) {
   .modal-glass {
-    --corner-radius: 16px;
-    --base-strength: 20px;
-    --extra-blur: 3px;
-    --softness: 4px;
-    
     /* Reduce animation distance on mobile */
     animation: modalFadeInMobile 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
     transform: scale(0.98) translateY(15px);
   }
   
   .modal-glass .GlassContent {
+    border-radius: 16px;
     margin: 0.25rem;
     max-height: calc(95vh - 0.5rem);
     min-height: auto;
@@ -578,10 +418,10 @@
 
 @media (max-width: 480px) {
   .modal-glass {
-    --corner-radius: 12px;
   }
   
   .modal-glass .GlassContent {
+    border-radius: 12px;
     margin: 0.125rem;
     max-height: calc(100vh - 0.25rem);
   }
@@ -590,13 +430,10 @@
 /* Mobile modal specific improvements */
 @media (max-width: 640px) {
   .modal-glass {
-    --corner-radius: 12px;
-    --base-strength: 16px;
-    --extra-blur: 2px;
-    --softness: 3px;
   }
   
   .modal-glass .GlassContent {
+    border-radius: 12px;
     margin: 0.25rem;
     max-height: calc(90vh - 0.5rem);
     min-height: auto;
@@ -674,6 +511,7 @@
 /* Extra small devices */
 @media (max-width: 375px) {
   .modal-glass .GlassContent {
+    border-radius: 8px;
     margin: 0.125rem;
     max-height: calc(88vh - 0.25rem);
   }
