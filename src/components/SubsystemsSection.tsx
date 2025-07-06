@@ -120,9 +120,9 @@ export const SubsystemsSection: React.FC = () => {
                       onClick={() => openModal(subsystem)}
                     >
                       Ver Detalles →
-          <div className="p-8 text-center">
-            <h2 className="text-4xl font-bold text-white mb-6">Subsistemas CubeSat 2U</h2>
-            <p className="text-lg text-white/80">
+                    </GlassButton>
+                  </div>
+                </div>
               </GlassContainer>
             ))}
           </div>
@@ -137,8 +137,3 @@ export const SubsystemsSection: React.FC = () => {
     </>
   );
 };
-    )
-    )
-    }
-  )
-}
