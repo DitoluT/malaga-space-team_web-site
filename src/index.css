@@ -1,0 +1,986 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Liquid Glass Effect CSS */
+.GlassContainer {
+    --corner-radius: 24px;
+    --base-strength: 24px;
+    --extra-blur: 3px;
+    --softness: 5px;
+    --tint-amount: 0.08;
+    --tint-saturation: 2;
+    --tint-hue: 157deg;
+    --contrast: 1.06;
+    --brightness: 1.07;
+    --invert: 0%;
+
+    --total-strength: calc(var(--base-strength) + var(--extra-blur));
+    --edge-width: calc(0.3px + (var(--softness) * 0.1));
+    --emboss-width: calc((var(--softness) * 0.38));
+    --refraction-width: calc((var(--softness) * 0.3));
+
+    position: relative;
+    overflow: visible;
+}
+
+.GlassContent {
+    position: relative;
+    display: block;
+    z-index: 2;
+    overflow: hidden;
+    border-radius: var(--corner-radius);
+}
+
+.GlassMaterial {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+}
+
+.GlassMaterial .GlassEdgeReflection {
+    backdrop-filter: blur(var(--total-strength)) brightness(1.2);
+    padding: var(--edge-width);
+    border: var(--total-strength) solid transparent;
+    mask: linear-gradient(white 0 0) padding-box, linear-gradient(white 0 0) content-box;
+    mask-composite: exclude;
+    pointer-events: none;
+}
+
+.GlassMaterial .GlassRefraction {
+    backdrop-filter: invert(0.15) brightness(1.15) contrast(1.5);
+    padding: var(--refraction-width);
+    border: calc(var(--emboss-width)) solid transparent;
+    mask: linear-gradient(white 0 0) padding-box, linear-gradient(white 0 0) content-box;
+    mask-composite: exclude;
+    pointer-events: none;
+}
+
+.GlassMaterial .GlassBlur {
+    backdrop-filter: blur(var(--extra-blur)) brightness(1.2);
+    margin: calc(var(--emboss-width) + var(--refraction-width));
+    pointer-events: none;
+}
+
+.GlassContent {
+    transform-origin: center;
+    transform: scale(1.0);
+    pointer-events: auto;
+}
+
+
+/* Navigation specific styles */
+.nav-glass {
+    --corner-radius: 20px;
+    --base-strength: 20px;
+    --extra-blur: 2px;
+    --softness: 4px;
+}
+
+.nav-glass .GlassContent {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* Hero specific styles */
+.hero-glass {
+    --corner-radius: 32px;
+    --base-strength: 28px;
+    --extra-blur: 4px;
+    --softness: 6px;
+}
+
+.hero-glass .GlassContent {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
+}
+
+/* Section glass styles */
+.section-glass {
+    --corner-radius: 28px;
+    --base-strength: 26px;
+    --extra-blur: 3px;
+    --softness: 5px;
+}
+
+.section-glass .GlassContent {
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
+}
+
+/* Stats glass styles */
+.stats-glass {
+    --corner-radius: 20px;
+    --base-strength: 22px;
+    --extra-blur: 2px;
+    --softness: 4px;
+}
+
+.stats-glass .GlassContent {
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+}
+
+/* Mission glass styles */
+.mission-glass {
+    --corner-radius: 24px;
+    --base-strength: 24px;
+    --extra-blur: 3px;
+    --softness: 5px;
+}
+
+.mission-glass .GlassContent {
+  background: rgba(0, 0, 0, 0.22);
+  border: 1px solid rgba(255, 255, 255, 0.23);
+    box-shadow: 0 18px 35px rgba(0, 0, 0, 0.22);
+}
+
+/* Timeline glass styles */
+.timeline-glass {
+    --corner-radius: 26px;
+    --base-strength: 25px;
+    --extra-blur: 3px;
+    --softness: 5px;
+}
+
+.timeline-glass .GlassContent {
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
+}
+
+/* Responsive timeline adjustments */
+@media (max-width: 768px) {
+  /* Mobile timeline layout */
+  .timeline-mobile-layout {
+    width: 100% !important;
+    margin-left: 3rem !important;
+    padding-left: 0 !important;
+    padding-right: 1rem !important;
+    text-align: left !important;
+  }
+  
+  .timeline-mobile-node {
+    left: 1rem !important;
+    transform: translateX(-50%) !important;
+  }
+  
+  .timeline-mobile-line {
+    left: 1rem !important;
+    transform: translateX(-50%) !important;
+  }
+}
+
+/* Subsystem glass styles */
+.subsystem-glass {
+    --corner-radius: 22px;
+    --base-strength: 23px;
+    --extra-blur: 3px;
+    --softness: 4px;
+}
+
+.subsystem-glass .GlassContent {
+  background: rgba(0, 0, 0, 0.22);
+  border: 1px solid rgba(255, 255, 255, 0.24);
+    box-shadow: 0 16px 32px rgba(0, 0, 0, 0.2);
+}
+
+/* Team glass styles */
+.team-stat-glass {
+    --corner-radius: 18px;
+    --base-strength: 20px;
+    --extra-blur: 2px;
+    --softness: 3px;
+}
+
+.team-stat-glass .GlassContent {
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.18);
+}
+
+.join-team-glass {
+    --corner-radius: 30px;
+    --base-strength: 27px;
+    --extra-blur: 4px;
+    --softness: 6px;
+}
+
+.join-team-glass .GlassContent {
+  background: rgba(0, 0, 0, 0.28);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 22px 45px rgba(0, 0, 0, 0.28);
+}
+
+/* Sponsor glass styles */
+.sponsor-level-glass {
+    --corner-radius: 24px;
+    --base-strength: 24px;
+    --extra-blur: 3px;
+    --softness: 5px;
+}
+
+.sponsor-level-glass .GlassContent {
+  background: rgba(0, 0, 0, 0.22);
+  border: 1px solid rgba(255, 255, 255, 0.23);
+    box-shadow: 0 18px 35px rgba(0, 0, 0, 0.22);
+}
+
+.collaboration-glass {
+    --corner-radius: 26px;
+    --base-strength: 25px;
+    --extra-blur: 3px;
+    --softness: 5px;
+}
+
+.collaboration-glass .GlassContent {
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
+}
+
+.become-sponsor-glass {
+    --corner-radius: 28px;
+    --base-strength: 26px;
+    --extra-blur: 4px;
+    --softness: 6px;
+}
+
+.become-sponsor-glass .GlassContent {
+  background: rgba(0, 0, 0, 0.28);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 24px 48px rgba(0, 0, 0, 0.3);
+}
+
+/* Contact glass styles */
+.contact-info-glass, .contact-form-glass {
+    --corner-radius: 26px;
+    --base-strength: 25px;
+    --extra-blur: 3px;
+    --softness: 5px;
+}
+
+.contact-info-glass .GlassContent, .contact-form-glass .GlassContent {
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.23);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
+}
+
+/* Footer glass styles */
+.footer-glass {
+    --corner-radius: 30px;
+    --base-strength: 27px;
+    --extra-blur: 4px;
+    --softness: 6px;
+}
+
+.footer-glass .GlassContent {
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
+}
+
+/* Glass Button Styles */
+.glass-button-container {
+  --corner-radius: 50px;
+  --base-strength: 16px;
+  --extra-blur: 2px;
+  --softness: 3px;
+}
+
+.glass-button-container .GlassContent {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+}
+
+/* Modal Glass Styles */
+.modal-glass {
+  --corner-radius: 24px;
+  --base-strength: 28px;
+  --extra-blur: 4px;
+  --softness: 6px;
+  
+  /* Modal entrance animation */
+  animation: modalFadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  transform: scale(0.95) translateY(20px);
+  opacity: 0;
+}
+
+.modal-glass .GlassContent {
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5);
+  
+  /* Content animation with slight delay */
+  animation: modalContentSlideIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.1s forwards;
+  transform: translateY(30px);
+  opacity: 0;
+}
+
+/* Modal backdrop animation */
+[data-modal] {
+  animation: backdropFadeIn 0.3s ease-out forwards;
+  opacity: 0;
+}
+
+/* Modal animations */
+@keyframes modalFadeIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.95) translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes modalContentSlideIn {
+  0% {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes backdropFadeIn {
+  0% {
+    opacity: 0;
+    backdrop-filter: blur(0px);
+  }
+  100% {
+    opacity: 1;
+    backdrop-filter: blur(8px);
+  }
+}
+
+/* Modal exit animations */
+.modal-glass.modal-exit {
+  animation: modalFadeOut 0.3s cubic-bezier(0.4, 0, 0.6, 1) forwards;
+}
+
+@keyframes modalFadeOut {
+  0% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.95) translateY(-20px);
+  }
+}
+
+/* Staggered card animations for subsystems and team sections */
+.subsystem-glass,
+.mission-glass {
+  animation: cardSlideInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  transform: translateY(40px);
+  opacity: 0;
+}
+
+@keyframes cardSlideInUp {
+  0% {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Stagger delays for cards */
+.subsystem-glass:nth-child(1) { animation-delay: 0.1s; }
+.subsystem-glass:nth-child(2) { animation-delay: 0.2s; }
+.subsystem-glass:nth-child(3) { animation-delay: 0.3s; }
+.subsystem-glass:nth-child(4) { animation-delay: 0.4s; }
+.subsystem-glass:nth-child(5) { animation-delay: 0.5s; }
+.subsystem-glass:nth-child(6) { animation-delay: 0.6s; }
+
+.mission-glass:nth-child(1) { animation-delay: 0.1s; }
+.mission-glass:nth-child(2) { animation-delay: 0.2s; }
+.mission-glass:nth-child(3) { animation-delay: 0.3s; }
+.mission-glass:nth-child(4) { animation-delay: 0.4s; }
+/* Text shadow for better contrast */
+.GlassContent h1,
+.GlassContent h2, 
+.GlassContent h3,
+.GlassContent h4,
+.GlassContent p,
+.GlassContent span,
+.GlassContent div {
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
+}
+
+/* Navigation specific improvements */
+.nav-glass .GlassContent {
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(20px);
+}
+
+/* Mobile navigation improvements */
+@media (max-width: 768px) {
+  /* Ensure mobile menu has enough space */
+  .nav-glass .GlassContent {
+    min-height: auto;
+  }
+  
+  /* Better mobile menu positioning */
+  [data-mobile-nav] {
+    position: relative;
+    z-index: 51;
+  }
+  
+  /* Improve mobile menu item spacing */
+  [data-mobile-nav] .space-y-3 > * + * {
+    margin-top: 0.75rem;
+  }
+  
+  /* Mobile navigation container padding */
+  nav {
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+}
+
+/* Handle mobile viewport issues */
+@media (max-width: 640px) {
+  /* Account for mobile browser UI */
+  nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 50;
+  }
+  
+  /* Ensure menu doesn't get cut off on small screens */
+  [data-mobile-nav] .nav-glass .GlassContent {
+    max-height: calc(100vh - 120px);
+    overflow-y: auto;
+  }
+  
+  /* Better mobile menu button sizing */
+  .nav-cta-mobile-glass .GlassContent button {
+    min-height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+}
+
+/* Extra safety for very small screens */
+@media (max-height: 700px) and (max-width: 640px) {
+  [data-mobile-nav] .nav-glass .GlassContent {
+    max-height: calc(100vh - 100px);
+    overflow-y: auto;
+  }
+  
+  /* Reduce spacing on very small screens */
+  [data-mobile-nav] .space-y-3 > * + * {
+    margin-top: 0.5rem;
+  }
+  
+  [data-mobile-nav] .p-4 {
+    padding: 0.75rem !important;
+  }
+}
+
+/* Navigation CTA Button Styles */
+.nav-cta-glass {
+  --corner-radius: 50px;
+  --base-strength: 18px;
+  --extra-blur: 2px;
+  --softness: 4px;
+}
+
+.nav-cta-glass .GlassContent {
+  background: transparent;
+  border: none;
+  box-shadow: 0 8px 32px rgba(59, 130, 246, 0.3);
+}
+
+.nav-cta-mobile-glass {
+  --corner-radius: 12px;
+  --base-strength: 16px;
+  --extra-blur: 2px;
+  --softness: 3px;
+}
+
+.nav-cta-mobile-glass .GlassContent {
+  background: transparent;
+  border: none;
+  box-shadow: 0 6px 24px rgba(59, 130, 246, 0.25);
+}
+
+/* CTA Button hover effects */
+.nav-cta-glass:hover .GlassContent {
+  box-shadow: 0 12px 40px rgba(59, 130, 246, 0.4);
+}
+
+.nav-cta-mobile-glass:hover .GlassContent {
+  box-shadow: 0 8px 30px rgba(59, 130, 246, 0.35);
+}
+
+/* Responsive modal improvements */
+@media (max-width: 768px) {
+  .modal-glass {
+    --corner-radius: 16px;
+    --base-strength: 20px;
+    --extra-blur: 3px;
+    --softness: 4px;
+    
+    /* Reduce animation distance on mobile */
+    animation: modalFadeInMobile 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    transform: scale(0.98) translateY(15px);
+  }
+  
+  .modal-glass .GlassContent {
+    margin: 0.25rem;
+    max-height: calc(95vh - 0.5rem);
+    min-height: auto;
+    
+    /* Mobile content animation */
+    animation: modalContentSlideInMobile 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.1s forwards;
+    transform: translateY(20px);
+  }
+}
+
+@keyframes modalFadeInMobile {
+  0% {
+    opacity: 0;
+    transform: scale(0.98) translateY(15px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes modalContentSlideInMobile {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 480px) {
+  .modal-glass {
+    --corner-radius: 12px;
+  }
+  
+  .modal-glass .GlassContent {
+    margin: 0.125rem;
+    max-height: calc(100vh - 0.25rem);
+  }
+}
+
+/* Mobile modal specific improvements */
+@media (max-width: 640px) {
+  .modal-glass {
+    --corner-radius: 12px;
+    --base-strength: 16px;
+    --extra-blur: 2px;
+    --softness: 3px;
+  }
+  
+  .modal-glass .GlassContent {
+    margin: 0.25rem;
+    max-height: calc(90vh - 0.5rem);
+    min-height: auto;
+  }
+  
+  /* Ensure modal content is scrollable */
+  .modal-content-wrapper {
+    max-height: calc(88vh - 1rem);
+    overflow-y: auto;
+    padding: 0.75rem;
+  }
+  
+  /* Reduce font sizes for better mobile fit */
+  .modal-glass h2 {
+    font-size: 1.5rem !important;
+    line-height: 1.3;
+  }
+  
+  .modal-glass h3 {
+    font-size: 1.25rem !important;
+    line-height: 1.3;
+  }
+  
+  .modal-glass h4 {
+    font-size: 1.1rem !important;
+    line-height: 1.3;
+  }
+  
+  /* Reduce spacing in modals */
+  .modal-glass .space-y-8 > * + * {
+    margin-top: 1.5rem !important;
+  }
+  
+  .modal-glass .space-y-6 > * + * {
+    margin-top: 1rem !important;
+  }
+  
+  .modal-glass .mb-8 {
+    margin-bottom: 1.5rem !important;
+  }
+  
+  .modal-glass .mb-6 {
+    margin-bottom: 1rem !important;
+  }
+  
+  /* Improve grid layouts in modals */
+  .modal-glass .grid-cols-2 {
+    grid-template-columns: 1fr !important;
+    gap: 0.75rem !important;
+  }
+  
+  .modal-glass .md\\:grid-cols-2 {
+    grid-template-columns: 1fr !important;
+  }
+  
+  .modal-glass .lg\\:grid-cols-2 {
+    grid-template-columns: 1fr !important;
+  }
+  
+  /* Improve form inputs in modals */
+  .modal-glass input,
+  .modal-glass textarea,
+  .modal-glass select {
+    font-size: 16px !important; /* Prevent zoom on iOS */
+    padding: 0.75rem !important;
+  }
+  
+  /* Better button sizing */
+  .modal-glass .glass-button-container button {
+    padding: 0.75rem 1.5rem !important;
+    font-size: 0.875rem !important;
+  }
+}
+
+/* Extra small devices */
+@media (max-width: 375px) {
+  .modal-glass .GlassContent {
+    margin: 0.125rem;
+    max-height: calc(88vh - 0.25rem);
+  }
+  
+  .modal-content-wrapper {
+    padding: 0.5rem;
+    max-height: calc(86vh - 1rem);
+  }
+  
+  .modal-glass h2 {
+    font-size: 1.25rem !important;
+  }
+  
+  .modal-glass h3 {
+    font-size: 1.1rem !important;
+  }
+}
+
+/* Card height adjustments for better mobile fit */
+@media (max-width: 768px) {
+  .subsystem-glass .GlassContent,
+  .mission-glass .GlassContent {
+    min-height: auto;
+    height: auto;
+  }
+  
+  /* Reduce padding in cards */
+  .subsystem-glass .GlassContent > div,
+  .mission-glass .GlassContent > div {
+    padding: 1.5rem !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .subsystem-glass .GlassContent > div,
+  .mission-glass .GlassContent > div {
+    padding: 1rem !important;
+  }
+  
+  /* Reduce text sizes slightly for better fit */
+  .subsystem-glass h3,
+  .mission-glass h3 {
+    font-size: 1.25rem !important;
+    line-height: 1.3;
+  }
+  
+  .subsystem-glass p,
+  .mission-glass p {
+    font-size: 0.875rem !important;
+    line-height: 1.4;
+  }
+}
+/* Custom animations */
+@keyframes heroFadeInUp {
+    0% { 
+        opacity: 0;
+        transform: translateY(30px) scale(0.95);
+    }
+    100% { 
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+@keyframes heroGlow {
+    0%, 100% { 
+        box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3), 0 0 0 rgba(59, 130, 246, 0);
+    }
+    50% { 
+        box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3), 0 0 30px rgba(59, 130, 246, 0.2);
+    }
+}
+
+@keyframes logoEntry {
+    0% { 
+        opacity: 0;
+        transform: translateY(-20px) scale(0.8);
+        filter: blur(4px);
+    }
+    100% { 
+        opacity: 1;
+        transform: translateY(0) scale(1);
+        filter: blur(0px);
+    }
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+}
+
+.hero-glass .GlassContent {
+    animation: heroGlow 4s ease-in-out infinite;
+}
+
+@keyframes pulse-glow {
+    0%, 100% { box-shadow: 0 0 20px rgba(59, 130, 246, 0.3); }
+    50% { box-shadow: 0 0 30px rgba(59, 130, 246, 0.5); }
+}
+
+.stats-glass:hover .GlassContent {
+    animation: pulse-glow 2s ease-in-out infinite;
+}
+
+/* Ensure proper stacking for modals */
+.subsystem-modal {
+    z-index: 70 !important;
+}
+
+.join-team-modal {
+    z-index: 70 !important;
+}
+
+.team-tree-modal {
+    z-index: 70 !important;
+}
+
+/* Modal overlay improvements */
+[data-modal] {
+    z-index: 70 !important;
+    backdrop-filter: blur(8px) !important;
+}
+
+/* Navigation should be below modals */
+nav {
+    z-index: 50 !important;
+}
+
+/* Ensure modal content is interactive */
+[data-modal] .modal-glass {
+    pointer-events: auto !important;
+}
+
+[data-modal] .modal-glass .GlassContent {
+    pointer-events: auto !important;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    /* Mobile navigation improvements */
+    .nav-glass .GlassContent {
+        padding: 0.75rem 1rem;
+    }
+    
+    .hero-glass .GlassContent {
+        margin: 0.5rem;
+        padding: 2rem 1.5rem;
+    }
+    
+    .nav-glass .GlassContent {
+        padding: 0.75rem 1rem;
+    }
+    
+    .nav-glass .GlassContent > div {
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+    
+    .section-glass .GlassContent {
+        padding: 2rem 1.5rem;
+    }
+    
+    /* Mobile timeline specific adjustments */
+    .timeline-mobile-layout {
+        width: 100% !important;
+        margin-left: 0 !important;
+        padding-left: 5rem !important;
+        padding-right: 1rem !important;
+        text-align: left !important;
+    }
+}
+
+/* Timeline responsive improvements */
+@media (max-width: 1024px) {
+    .timeline-glass .GlassContent {
+        padding: 1.5rem;
+    }
+}
+
+@media (max-width: 640px) {
+    .timeline-glass .GlassContent {
+        padding: 1rem;
+    }
+    
+    .hero-glass .GlassContent {
+        padding: 1.5rem 1rem;
+    }
+    
+    .section-glass .GlassContent {
+        padding: 1.5rem 1rem;
+    }
+    
+    /* Improve mobile spacing */
+    .mission-glass .GlassContent,
+    .subsystem-glass .GlassContent,
+    .collaboration-glass .GlassContent,
+    .become-sponsor-glass .GlassContent {
+        padding: 1.5rem;
+    }
+    
+    /* Mobile text scaling */
+    .section-glass h2 {
+        font-size: 2.5rem !important;
+    }
+    
+    /* Mobile grid improvements */
+    .grid.grid-cols-1.md\\:grid-cols-3 {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    
+    /* Improve mobile buttons */
+    .glass-button-container button {
+        font-size: 0.875rem;
+        padding: 0.75rem 1.5rem;
+    }
+}
+
+/* Tablet responsive adjustments */
+@media (max-width: 1024px) and (min-width: 769px) {
+    .collaboration-glass .GlassContent {
+        padding: 2rem;
+    }
+    
+    .become-sponsor-glass .GlassContent {
+        padding: 2rem;
+    }
+}
+
+/* Extra small mobile devices */
+@media (max-width: 480px) {
+    .section-glass h2 {
+        font-size: 2rem !important;
+    }
+    
+    .collaboration-glass .GlassContent,
+    .become-sponsor-glass .GlassContent {
+        padding: 1rem;
+    }
+    
+    /* Mobile menu spacing */
+    .nav-glass .GlassContent {
+        padding: 0.5rem;
+    }
+}
+
+/* Smooth scrolling */
+html {
+    scroll-behavior: smooth;
+}
+
+/* Body styling */
+body {
+    margin: 0;
+    padding: 0;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+        'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+        sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.5);
+}
+
+/* Improve modal positioning */
+.fixed {
+    position: fixed !important;
+}
+
+/* Ensure modals are above navigation */
+[data-modal] {
+    z-index: 60 !important;
+}
+
+/* Navigation z-index */
+nav {
+    z-index: 50 !important;
+}
+
+/* Ensure mobile menu items are clickable */
+[data-mobile-nav] {
+    position: relative;
+    z-index: 51;
+}
+
+/* Modal backdrop */
+[data-modal] {
+    z-index: 60 !important;
+}
+
+/* Prevent body scroll when modal is open */
+body.modal-open {
+    overflow: hidden !important;
+}
