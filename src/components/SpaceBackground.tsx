@@ -15,7 +15,7 @@ export const SpaceBackground: React.FC = () => {
           minHeight: '100%'
         }}
       >
-        <source src="/Video_Lunar_Descripción_y_Creación.mp4" type="video/mp4" />
+        <source src="/Video_Lunar_Descripción_y_Creacion.mp4" type="video/mp4" />
         {/* Fallback to image if video fails to load */}
         <div 
           className="absolute inset-0 w-full h-full bg-cover bg-center bg-no-repeat"
