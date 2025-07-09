@@ -69,8 +69,8 @@ export const SponsorsSection: React.FC = () => {
           {collaborators.map((collaborator, index) => (
             <GlassContainer key={index} className="collaboration-glass">
               <div className="p-6 text-center h-[420px] flex flex-col">
-                <div className={`inline-flex w-12 h-12 bg-gradient-to-br ${collaborator.color} rounded-full items-center justify-center mb-4`}>
-                  <collaborator.icon className="w-6 h-6 text-white" />
+                <div className="inline-flex w-12 h-12 bg-white/10 border border-white/20 rounded-full items-center justify-center mb-4 backdrop-blur-sm shadow-lg">
+                  <collaborator.icon className="w-6 h-6 text-white/90" />
                 </div>
                 <h3 className="text-lg font-bold text-white mb-2">{collaborator.name}</h3>
                 <p className="text-sm font-semibold text-blue-300 mb-3">{collaborator.role}</p>

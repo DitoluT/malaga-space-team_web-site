@@ -20,8 +20,8 @@ export const Footer: React.FC = () => {
               {/* Logo and Description */}
               <div className="md:col-span-1">
                 <div className="flex items-center space-x-4 mb-6">
-                  <div className="w-12 h-12 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center">
-                    <Rocket className="w-6 h-6 text-white transform rotate-45" />
+                  <div className="w-12 h-12 bg-white/10 border border-white/20 rounded-full flex items-center justify-center backdrop-blur-sm shadow-lg">
+                    <Rocket className="w-6 h-6 text-white/90 transform rotate-45" />
                   </div>
                   <div>
                     <h3 className="text-2xl font-bold text-white">Málaga Space Team</h3>

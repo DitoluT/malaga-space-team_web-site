@@ -71,8 +71,8 @@ export const TeamSection: React.FC = () => {
             <GlassContainer key={index} className="team-stat-glass">
               <div className="p-4 text-center h-full flex flex-col justify-center">
                 <div className="mb-4">
-                  <div className="mx-auto w-12 h-12 bg-gradient-to-br from-green-400 to-green-600 rounded-full flex items-center justify-center">
-                    <stat.icon className="w-6 h-6 text-white" />
+                  <div className="mx-auto w-12 h-12 bg-white/10 border border-white/20 rounded-full flex items-center justify-center backdrop-blur-sm shadow-lg">
+                    <stat.icon className="w-6 h-6 text-white/90" />
                   </div>
                 </div>
                 <div className="text-2xl font-bold text-white mb-2">{stat.number}</div>

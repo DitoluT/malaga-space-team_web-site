@@ -38,8 +38,8 @@ export const StatsSection: React.FC = () => {
             <GlassContainer key={index} className="stats-glass">
               <div className="p-6 text-center h-full flex flex-col justify-center">
                 <div className="mb-6">
-                  <div className="mx-auto w-16 h-16 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center">
-                    <stat.icon className="w-8 h-8 text-white" />
+                  <div className="mx-auto w-16 h-16 bg-white/10 border border-white/20 rounded-full flex items-center justify-center backdrop-blur-sm shadow-lg">
+                    <stat.icon className="w-8 h-8 text-white/90" />
                   </div>
                 </div>
                 <div className="text-4xl font-bold text-white mb-2">{stat.number}</div>

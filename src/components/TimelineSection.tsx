@@ -133,22 +133,22 @@ export const TimelineSection: React.FC = () => {
                   {/* Timeline node */}
                   <div className="absolute left-8 md:left-1/2 transform -translate-x-1/2 md:-translate-x-1/2 z-20">
                     <div 
-                      className={`w-16 h-16 rounded-full flex items-center justify-center transition-all duration-700 ${
+                      className={`w-16 h-16 rounded-full flex items-center justify-center transition-all duration-700 backdrop-blur-sm border ${
                         isVisible 
                           ? phase.status === 'completed' 
-                            ? 'bg-green-500 shadow-lg shadow-green-500/50 scale-100' 
+                            ? 'bg-green-500/20 border-green-500/40 shadow-lg shadow-green-500/30 scale-100' 
                             : phase.status === 'in-progress' 
-                            ? 'bg-blue-500 shadow-lg shadow-blue-500/50 scale-100' 
-                            : 'bg-gray-500 shadow-lg shadow-gray-500/50 scale-100'
-                          : 'bg-gray-700 scale-75'
+                            ? 'bg-blue-500/20 border-blue-500/40 shadow-lg shadow-blue-500/30 scale-100' 
+                            : 'bg-white/10 border-white/20 shadow-lg shadow-white/20 scale-100'
+                          : 'bg-gray-700/20 border-gray-700/40 scale-75'
                       } ${isVisible ? 'opacity-100' : 'opacity-50'}`}
                     >
                       {phase.status === 'completed' ? (
-                        <CheckCircle className="w-8 h-8 text-white" />
+                        <CheckCircle className="w-8 h-8 text-white/90" />
                       ) : phase.status === 'in-progress' ? (
-                        <Clock className="w-8 h-8 text-white" />
+                        <Clock className="w-8 h-8 text-white/90" />
                       ) : (
-                        <ArrowRight className="w-8 h-8 text-white" />
+                        <ArrowRight className="w-8 h-8 text-white/90" />
                       )}
                     </div>
                   </div>

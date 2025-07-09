@@ -46,8 +46,8 @@ export const MissionSection: React.FC = () => {
               <div className="p-4 md:p-6 h-full min-h-[180px] md:min-h-[200px] flex flex-col">
                 <div className="flex items-start space-x-6">
                   <div className="flex-shrink-0">
-                    <div className="w-12 h-12 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center">
-                      <mission.icon className="w-6 h-6 text-white" />
+                    <div className="w-12 h-12 bg-white/10 border border-white/20 rounded-full flex items-center justify-center backdrop-blur-sm shadow-lg">
+                      <mission.icon className="w-6 h-6 text-white/90" />
                     </div>
                   </div>
                   <div className="flex-1">

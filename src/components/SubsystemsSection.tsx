@@ -107,8 +107,8 @@ export const SubsystemsSection: React.FC = () => {
               <GlassContainer key={index} className="subsystem-glass">
                 <div className="p-4 md:p-6 text-center h-full flex flex-col min-h-[260px] md:min-h-[300px]">
                   <div className="mb-6">
-                    <div className="mx-auto w-16 h-16 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center">
-                      <subsystem.icon className="w-8 h-8 text-white" />
+                    <div className="mx-auto w-16 h-16 bg-white/10 border border-white/20 rounded-full flex items-center justify-center backdrop-blur-sm shadow-lg">
+                      <subsystem.icon className="w-8 h-8 text-white/90" />
                     </div>
                   </div>
                   <h3 className="text-lg md:text-xl font-bold text-white mb-2 md:mb-3">{subsystem.title}</h3>

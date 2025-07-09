@@ -24,8 +24,8 @@ export const ContactSection: React.FC = () => {
               
               <div className="space-y-6">
                 <div className="flex items-start space-x-6">
-                  <div className="w-12 h-12 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center flex-shrink-0">
-                    <Mail className="w-6 h-6 text-white" />
+                  <div className="w-12 h-12 bg-white/10 border border-white/20 rounded-full flex items-center justify-center flex-shrink-0 backdrop-blur-sm shadow-lg">
+                    <Mail className="w-6 h-6 text-white/90" />
                   </div>
                   <div>
                     <h4 className="text-lg font-semibold text-white mb-2">Coordinación</h4>
@@ -34,8 +34,8 @@ export const ContactSection: React.FC = () => {
                 </div>
 
                 <div className="flex items-start space-x-6">
-                  <div className="w-12 h-12 bg-gradient-to-br from-green-400 to-green-600 rounded-full flex items-center justify-center flex-shrink-0">
-                    <Phone className="w-6 h-6 text-white" />
+                  <div className="w-12 h-12 bg-white/10 border border-white/20 rounded-full flex items-center justify-center flex-shrink-0 backdrop-blur-sm shadow-lg">
+                    <Phone className="w-6 h-6 text-white/90" />
                   </div>
                   <div>
                     <h4 className="text-lg font-semibold text-white mb-2">Teléfono</h4>
@@ -44,8 +44,8 @@ export const ContactSection: React.FC = () => {
                 </div>
 
                 <div className="flex items-start space-x-6">
-                  <div className="w-12 h-12 bg-gradient-to-br from-purple-400 to-purple-600 rounded-full flex items-center justify-center flex-shrink-0">
-                    <MapPin className="w-6 h-6 text-white" />
+                  <div className="w-12 h-12 bg-white/10 border border-white/20 rounded-full flex items-center justify-center flex-shrink-0 backdrop-blur-sm shadow-lg">
+                    <MapPin className="w-6 h-6 text-white/90" />
                   </div>
                   <div>
                     <h4 className="text-lg font-semibold text-white mb-2">Ubicación</h4>
