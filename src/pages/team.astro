@@ -1,0 +1,99 @@
+---
+import '@/styles/globals.css'
+import Layout from '../layouts/Layout.astro';
+import { HeroSection } from '@/components/HeroSection';
+import { LeaderTeam, LeaderStudentTeam, ADCSTeam, CommsTeam, EPSTeam, StructureTeam, OBSoftTeam, GSTeam } from "@/components/Team";
+import { Badge } from '@/components/ui/badge';
+import { Github, Linkedin, Mail } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+
+const teamMembers = [
+  {
+    name: "Dr. María González",
+    role: "Structure Lead",
+    image: "https://images.pexels.com/photos/3796217/pexels-photo-3796217.jpeg",
+    subsystem: "Structure",
+    social: {
+      linkedin: "#",
+      github: "#",
+      email: "maria.gonzalez@uma.es"
+    }
+  },
+  {
+    name: "Dr. Juan Pérez",
+    role: "Power Systems Engineer",
+    image: "https://images.pexels.com/photos/2379004/pexels-photo-2379004.jpeg",
+    subsystem: "Power",
+    social: {
+      linkedin: "#",
+      github: "#",
+      email: "juan.perez@uma.es"
+    }
+  },
+  {
+    name: "Ana Martínez",
+    role: "ADCS Specialist",
+    image: "https://images.pexels.com/photos/762020/pexels-photo-762020.jpeg",
+    subsystem: "ADCS",
+    social: {
+      linkedin: "#",
+      github: "#",
+      email: "ana.martinez@uma.es"
+    }
+  },
+  {
+    name: "Carlos Ruiz",
+    role: "Communications Lead",
+    image: "https://images.pexels.com/photos/1516680/pexels-photo-1516680.jpeg",
+    subsystem: "Communications",
+    social: {
+      linkedin: "#",
+      github: "#",
+      email: "carlos.ruiz@uma.es"
+    }
+  },
+  {
+    name: "Laura Sánchez",
+    role: "Payload Engineer",
+    image: "https://images.pexels.com/photos/3861958/pexels-photo-3861958.jpeg",
+    subsystem: "Payload",
+    social: {
+      linkedin: "#",
+      github: "#",
+      email: "laura.sanchez@uma.es"
+    }
+  },
+  {
+    name: "David Torres",
+    role: "CDHS Developer",
+    image: "https://images.pexels.com/photos/2379005/pexels-photo-2379005.jpeg",
+    subsystem: "CDHS",
+    social: {
+      linkedin: "#",
+      github: "#",
+      email: "david.torres@uma.es"
+    }
+  }
+];
+---
+
+<Layout title="Team">
+  <main>
+    <HeroSection 
+      title="Meet the Team" 
+      subtitle="Get to know the dedicated professionals and researchers behind the University of Málaga CubeSat Project."
+      image="https://images.pexels.com/photos/256152/pexels-photo-256152.jpeg"
+      client:load
+    />
+
+    <LeaderTeam client:visible/>
+    <LeaderStudentTeam client:visible/>
+    <ADCSTeam client:visible/>
+    <CommsTeam client:visible/>
+    <GSTeam client:visible/>
+    <EPSTeam client:visible/>
+    <StructureTeam client:visible/>
+    <OBSoftTeam client:visible/>
+
+  </main>
+</Layout>

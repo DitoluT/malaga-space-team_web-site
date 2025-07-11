@@ -13,7 +13,7 @@ export const footerContent = {
   },
   contact: {
     title: "Contacto",
-    email: "cubesat@uma.es",
+    email: "spaceteam@uma.es",
     phone: "+34 952 13 71 00",
     address: "Universidad de Málaga",
     city: "29071 Málaga, España"

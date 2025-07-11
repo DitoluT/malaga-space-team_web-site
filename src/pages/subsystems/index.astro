@@ -1,0 +1,45 @@
+---
+import '@/styles/globals.css'
+import Layout from '../../layouts/Layout.astro';
+import { HeroSection } from '@/components/HeroSection';
+import { SubsystemsGrid } from '@/components/SubsystemsGrid';
+---
+
+<Layout title="Subsystems" description="Explore the different subsystems of the University of Málaga CubeSat project">
+	<main>
+		<HeroSection 
+			title="CubeSat Subsystems" 
+			subtitle="Learn about the various integrated components that make our satellite function as a complete system."
+			image="https://images.pexels.com/photos/23764/pexels-photo.jpg"
+			client:load
+		/>
+		
+		<section class="py-16 bg-background">
+			<div class="container mx-auto px-4">
+				<div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+					<div>
+						<h2 class="text-3xl font-bold mb-6">System Architecture</h2>
+						<p class="mb-4 text-muted-foreground">
+							Our CubeSat follows a modular architecture with six primary subsystems working in concert to perform mission operations. Each subsystem is designed and developed by a dedicated team of students and faculty members with expertise in the relevant field.
+						</p>
+						<p class="mb-4 text-muted-foreground">
+							The subsystems are integrated through a common data bus and power distribution system, allowing for efficient communication and resource sharing. This modular approach enables parallel development and testing of individual components while ensuring compatibility within the complete system.
+						</p>
+						<p class="text-muted-foreground">
+							Click on each subsystem below to learn more about its specific functions, team members, and current development status.
+						</p>
+					</div>
+					<div class="rounded-lg overflow-hidden">
+						<img 
+							src="https://images.pexels.com/photos/21561/pexels-photo.jpg" 
+							alt="CubeSat system architecture diagram" 
+							class="w-full h-auto"
+						/>
+					</div>
+				</div>
+			</div>
+		</section>
+		
+		<SubsystemsGrid client:visible />
+	</main>
+</Layout>

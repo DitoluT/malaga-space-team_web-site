@@ -1,0 +1,114 @@
+---
+import { Navbar } from '@/components/Navbar';
+import { Footer } from '@/components/Footer';
+import '@/styles/globals.css';
+
+interface Props {
+	title: string;
+	description?: string;
+	keywords?: string;
+	image?: string;
+}
+
+const { 
+	title, 
+	description = "University of Málaga CubeSat Project - Advancing space technology education and research",
+	keywords = "CubeSat, University of Málaga, UMA, space technology, satellite, aerospace engineering, liquid glass, microsatellite",
+	image = "/og-image.jpg"
+} = Astro.props;
+---
+
+<!doctype html>
+<html lang="en" class="dark">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="description" content={description} />
+		<meta name="keywords" content={keywords} />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<meta name="robots" content="index, follow" />
+		<meta name="author" content="Málaga Space Team" />
+		
+		<!-- Open Graph / Facebook -->
+		<meta property="og:type" content="website" />
+		<meta property="og:url" content="https://malagaspaceteam.uma.es/" />
+		<meta property="og:title" content={`${title} | Málaga Space Team`} />
+		<meta property="og:description" content={description} />
+		<meta property="og:image" content={image} />
+		
+		<!-- Twitter -->
+		<meta property="twitter:card" content="summary_large_image" />
+		<meta property="twitter:url" content="https://malagaspaceteam.uma.es/" />
+		<meta property="twitter:title" content={`${title} | Málaga Space Team`} />
+		<meta property="twitter:description" content={description} />
+		<meta property="twitter:image" content={image} />
+		
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<link rel="canonical" href={`https://malagaspaceteam.uma.es${Astro.url.pathname}`} />
+		<meta name="generator" content={Astro.generator} />
+		<title>{title} | Málaga Space Team</title>
+		<link rel="preconnect" href="https://fonts.googleapis.com">
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+		<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+		
+		<!-- EmailJS SDK -->
+		<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+		<style>
+			body {
+				font-family: 'Inter', sans-serif;
+			}
+		</style>
+		
+		<!-- Structured Data -->
+		<script type="application/ld+json">
+			{
+				"@context": "https://schema.org",
+				"@type": "EducationalOrganization",
+				"name": "Málaga Space Team",
+				"alternateName": "MST",
+				"url": "https://malagaspaceteam.uma.es",
+				"logo": "https://malagaspaceteam.uma.es/logo.png",
+				"description": "University of Málaga CubeSat Project - Advancing space technology education and research",
+				"email": "spaceteam@uma.es",
+				"address": {
+					"@type": "PostalAddress",
+					"streetAddress": "ETSI Telecomunicaciones, Campus de Teatinos, Blvr. Louis Pasteur, 35",
+					"addressLocality": "Málaga",
+					"postalCode": "29010",
+					"addressCountry": "ES"
+				},
+				"parentOrganization": {
+					"@type": "CollegeOrUniversity",
+					"name": "Universidad de Málaga",
+					"url": "https://www.uma.es"
+				},
+				"sameAs": [
+					"https://www.linkedin.com/company/malaga-space-team",
+					"https://www.instagram.com/malagaspaceteam"
+				]
+			}
+		</script>
+	</head>
+	<body>
+		<Navbar client:load />
+		<div class="min-h-screen pt-16">
+			<slot />
+		</div>
+		<Footer />
+		<script>
+			// Initialize theme from localStorage or system preference
+			const initTheme = () => {
+				const savedTheme = localStorage.getItem("theme");
+				const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+				
+				if (savedTheme === "light") {
+					document.documentElement.classList.remove("dark");
+				} else if (savedTheme === "dark" || prefersDark) {
+					document.documentElement.classList.add("dark");
+				}
+			};
+			
+			// Run on initial load
+			initTheme();
+		</script>
+	</body>
+</html>

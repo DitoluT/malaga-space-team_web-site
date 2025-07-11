@@ -1,4 +1,10 @@
-# Logs
+# generated types
+.astro/
+
+# dependencies
+node_modules/
+
+# logs
 logs
 *.log
 npm-debug.log*
@@ -7,10 +13,15 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-node_modules
+# dist
 dist
 dist-ssr
 *.local
+
+# environment variables
+.env
+.env.production
+.env.local
 
 # Editor directories and files
 .vscode/*
@@ -22,4 +33,11 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
-.env
+
+# macOS-specific files
+.DS_Store
+
+# Project specific
+GEMINI.md
+EMAIL_SETUP.md
+EMAILJS_CONFIG.md

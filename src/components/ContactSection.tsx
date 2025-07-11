@@ -29,7 +29,7 @@ export const ContactSection: React.FC = () => {
                   </div>
                   <div>
                     <h4 className="text-lg font-semibold text-white mb-2">Coordinación</h4>
-                    <p className="text-blue-300 font-semibold">cubesat@uma.es</p>
+                    <p className="text-blue-300 font-semibold">spaceteam@uma.es</p>
                   </div>
                 </div>
 

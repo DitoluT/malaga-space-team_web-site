@@ -1,0 +1,40 @@
+---
+import '@/styles/globals.css'
+import Layout from '../layouts/Layout.astro';
+import { HeroSection } from '@/components/HeroSection';
+import { MissionStatement } from '@/components/MissionStatement';
+import { ProjectStatus } from '@/components/ProjectStatus';
+import { SubsystemsGrid } from '@/components/SubsystemsGrid';
+import { TeamSection } from '@/components/TeamSection';
+import { NewsPreview } from '@/components/NewsPreview';
+import { PartnersSection } from '@/components/PartnersSection';
+import { CtaSection } from '@/components/CtaSection';
+---
+
+<Layout title="Home">
+	<main>
+		<HeroSection 
+			title="Exploring Space with CubeSat Technology" 
+			subtitle="The University of Málaga CubeSat Project is developing a state-of-the-art small satellite to advance research, education, and innovation in space technology."
+			cta={{
+				primary: { text: "Learn More", href: "/about" },
+				secondary: { text: "Join Our Team", href: "/contact" }
+			}}
+			client:load
+		/>
+		
+		<MissionStatement client:visible />
+		
+		<ProjectStatus client:visible />
+		
+		<SubsystemsGrid client:visible />
+		
+		<TeamSection client:visible />
+		
+		<!-- <NewsPreview client:visible /> -->
+		
+		<!-- <PartnersSection client:visible /> -->
+		
+		<CtaSection client:visible />
+	</main>
+</Layout>

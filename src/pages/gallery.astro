@@ -1,0 +1,107 @@
+---
+import '@/styles/globals.css'
+import Layout from '../layouts/Layout.astro';
+import { HeroSection } from '@/components/HeroSection';
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+---
+
+<Layout title="Gallery" description="View images and videos of the University of Málaga CubeSat project">
+	<main>
+		<HeroSection 
+			title="Project Gallery" 
+			subtitle="Explore images and videos documenting our CubeSat journey from design to deployment."
+			image="https://images.pexels.com/photos/1169754/pexels-photo-1169754.jpeg"
+			client:load
+		/>
+		
+		<section class="py-16 bg-background">
+			<div class="container mx-auto px-4">
+				<div class="flex flex-wrap justify-center gap-4 mb-12">
+					<Button variant="default" class="rounded-full">All</Button>
+					<Button variant="outline" class="rounded-full">Design</Button>
+					<Button variant="outline" class="rounded-full">Prototyping</Button>
+					<Button variant="outline" class="rounded-full">Testing</Button>
+					<Button variant="outline" class="rounded-full">Team</Button>
+					<Button variant="outline" class="rounded-full">Events</Button>
+				</div>
+				
+				<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+					{[
+						{
+							image: "https://images.pexels.com/photos/2159/flight-sky-earth-space.jpg",
+							title: "CubeSat Structure Design",
+							category: "Design",
+							date: "March 2023"
+						},
+						{
+							image: "https://images.pexels.com/photos/54198/pexels-photo-54198.jpeg",
+							title: "Solar Panel Testing",
+							category: "Testing",
+							date: "May 2023"
+						},
+						{
+							image: "https://images.pexels.com/photos/2146/sky-space-dark-galaxy.jpg",
+							title: "Circuit Board Assembly",
+							category: "Prototyping",
+							date: "June 2023"
+						},
+						{
+							image: "https://images.pexels.com/photos/73910/mars-mars-rover-space-travel-robot-73910.jpeg",
+							title: "Antenna Deployment Test",
+							category: "Testing",
+							date: "August 2023"
+						},
+						{
+							image: "https://images.pexels.com/photos/45230/spacecraft-space-shuttle-discovery-liftoff-45230.jpeg",
+							title: "Team Meeting",
+							category: "Team",
+							date: "September 2023"
+						},
+						{
+							image: "https://images.pexels.com/photos/23764/pexels-photo.jpg",
+							title: "Presentation at Space Conference",
+							category: "Events",
+							date: "November 2023"
+						},
+						{
+							image: "https://images.pexels.com/photos/87646/rocket-launch-rocket-take-off-nasa-87646.jpeg",
+							title: "Communication System Prototype",
+							category: "Prototyping",
+							date: "January 2024"
+						},
+						{
+							image: "https://images.pexels.com/photos/39896/space-station-moon-landing-apollo-15-james-irwin-39896.jpeg",
+							title: "Thermal Vacuum Testing",
+							category: "Testing",
+							date: "February 2024"
+						},
+						{
+							image: "https://images.pexels.com/photos/41952/neil-armstrong-armstrong-astronaut-space-suit-41952.jpeg",
+							title: "Project Review Meeting",
+							category: "Team",
+							date: "April 2024"
+						}
+					].map((item) => (
+						<div class="group relative overflow-hidden rounded-lg aspect-square">
+							<img 
+								src={item.image} 
+								alt={item.title} 
+								class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+							/>
+							<div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-4">
+								<Badge class="self-start mb-2">{item.category}</Badge>
+								<h3 class="text-white text-lg font-semibold">{item.title}</h3>
+								<p class="text-gray-300 text-sm">{item.date}</p>
+							</div>
+						</div>
+					))}
+				</div>
+				
+				<div class="text-center mt-12">
+					<Button size="lg">Load More</Button>
+				</div>
+			</div>
+		</section>
+	</main>
+</Layout>

@@ -2,7 +2,7 @@ import React from 'react';
 import { Users, GraduationCap, Clock, Cpu } from 'lucide-react';
 import { GlassContainer } from './GlassContainer';
 import { GlassButton } from './GlassButton';
-import { JoinTeamModal } from './JoinTeamModal';
+import { JoinTeamModalEmailJS } from './JoinTeamModalEmailJS';
 import { TeamTreeModal } from './TeamTreeModal';
 
 export const TeamSection: React.FC = () => {
@@ -135,7 +135,7 @@ export const TeamSection: React.FC = () => {
       </div>
       </section>
       
-      <JoinTeamModal 
+      <JoinTeamModalEmailJS 
         isOpen={isJoinModalOpen}
         onClose={() => setIsJoinModalOpen(false)}
       />

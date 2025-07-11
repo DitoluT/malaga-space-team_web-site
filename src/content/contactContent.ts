@@ -5,7 +5,7 @@ export const contactContent = {
     title: "Información de Contacto",
     coordination: {
       title: "Coordinación",
-      email: "cubesat@uma.es"
+      email: "spaceteam@uma.es"
     },
     phone: {
       title: "Teléfono",
