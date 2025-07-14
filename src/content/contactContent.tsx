@@ -1,8 +1,8 @@
 import React, { useState, useRef } from 'react';
-import emailjs from '@emailjs/browser';
 import { Mail, Phone, MapPin, Send } from 'lucide-react';
 import { GlassContainer } from '../components/GlassContainer';
 import { GlassButton } from '../components/GlassButton';
+import { sendEmail } from '../utils/emailService';
 
 // Static content data
 export const contactContent = {
@@ -91,22 +91,7 @@ export const ContactFormWithEmailJS: React.FC = () => {
     setErrorMessage('');
 
     try {
-      // Get environment variables
-      const serviceId = "service_2iu77at";
-      const templateId = "template_cpxlc8r";
-      const publicKey = "8HrjK7cb_trVMfQ6g";
-
-      if (!serviceId || !templateId || !publicKey) {
-        throw new Error('EmailJS configuration is missing. Please check environment variables.');
-      }
-
-      await emailjs.sendForm(
-        serviceId,
-        templateId,
-        formRef.current,
-        publicKey
-      );
-
+      await sendEmail(formRef.current);
       setStatus('success');
       setFormState({
         name: '',
