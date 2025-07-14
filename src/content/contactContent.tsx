@@ -92,9 +92,9 @@ export const ContactFormWithEmailJS: React.FC = () => {
 
     try {
       // Get environment variables
-      const serviceId = process.env.REACT_APP_EMAILJS_SERVICE_ID;
-      const templateId = process.env.REACT_APP_EMAILJS_TEMPLATE_ID;
-      const publicKey = process.env.REACT_APP_EMAILJS_PUBLIC_KEY;
+      const serviceId = "service_2iu77at";
+      const templateId = "template_cpxlc8r";
+      const publicKey = "8HrjK7cb_trVMfQ6g";
 
       if (!serviceId || !templateId || !publicKey) {
         throw new Error('EmailJS configuration is missing. Please check environment variables.');

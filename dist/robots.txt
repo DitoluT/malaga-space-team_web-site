@@ -1,0 +1,18 @@
+# Robots.txt for Málaga Space Team
+# https://malagaspaceteam.uma.es
+
+User-agent: *
+Disallow: /admin/
+Disallow: /private/
+Disallow: *.pdf$
+Allow: /
+
+# Sitemap
+Sitemap: https://malagaspaceteam.uma.es/sitemap-index.xml
+
+# Crawl-delay for slower bots
+User-agent: Slurp
+Crawl-delay: 1
+
+User-agent: BingBot
+Crawl-delay: 1
