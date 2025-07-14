@@ -1,6 +1,6 @@
 import React from 'react';
 import { SpaceBackground } from './components/SpaceBackground';
-import { Navigation, NavigationContext } from './components/Navigation';
+import { Navigation } from './components/Navigation';
 import { HeroSection } from './components/HeroSection';
 import { StatsSection } from './components/StatsSection';
 import { MissionSection } from './components/MissionSection';
