@@ -1,15 +1,10 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { X, User, Mail, GraduationCap, Cpu, Send } from 'lucide-react';
+import { X, User, GraduationCap, Cpu, Send } from 'lucide-react';
 import { GlassContainer } from './GlassContainer';
 import { GlassButton } from './GlassButton';
 import { useNavigation } from './Navigation';
 import { LiquidGlassToastCSS } from './LiquidGlassToastCSS';
-
-declare global {
-  interface Window {
-    emailjs: any;
-  }
-}
+import { sendEmailWithData, initializeEmailJS } from '../utils/emailService';
 
 interface JoinTeamModalProps {
   isOpen: boolean;
@@ -46,17 +41,6 @@ export const JoinTeamModalEmailJS: React.FC<JoinTeamModalProps> = ({ isOpen, onC
     'Información general'
   ];
 
-  const degrees = [
-    'Ingeniería de Telecomunicación',
-    'Ingeniería Informática',
-    'Ingeniería Aeroespacial',
-    'Ingeniería Eléctrica',
-    'Física',
-    'Matemáticas',
-    'Ingeniería Industrial',
-    'Otros estudios'
-  ];
-
   const years = [
     '1º Grado',
     '2º Grado', 
@@ -81,36 +65,7 @@ export const JoinTeamModalEmailJS: React.FC<JoinTeamModalProps> = ({ isOpen, onC
 
   useEffect(() => {
     // Initialize EmailJS when component mounts
-    const initEmailJS = () => {
-      if (window.emailjs) {
-        try {
-          window.emailjs.init("8HrjK7cb_trVMfQ6g");
-          console.log("EmailJS initialized successfully for JoinTeam");
-        } catch (error) {
-          console.error("Error initializing EmailJS:", error);
-        }
-      }
-    };
-
-    if (window.emailjs) {
-      initEmailJS();
-    } else {
-      // Wait for EmailJS to load
-      window.addEventListener('load', initEmailJS);
-      // Also check periodically
-      const checkInterval = setInterval(() => {
-        if (window.emailjs) {
-          initEmailJS();
-          clearInterval(checkInterval);
-        }
-      }, 100);
-
-      // Cleanup
-      return () => {
-        window.removeEventListener('load', initEmailJS);
-        clearInterval(checkInterval);
-      };
-    }
+    initializeEmailJS();
   }, []);
 
   const handleInterestChange = (interest: string) => {
@@ -129,9 +84,31 @@ export const JoinTeamModalEmailJS: React.FC<JoinTeamModalProps> = ({ isOpen, onC
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!window.emailjs) {
-      showToastMessage("Email service is not loaded. Please refresh the page.", "error");
+    // Validate required fields
+    if (!formData.name.trim() || !formData.email.trim() || !formData.contactReason.trim() || !formData.message.trim()) {
+      showToastMessage("Por favor, completa todos los campos obligatorios.", "error");
       return;
+    }
+
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.email)) {
+      showToastMessage("Por favor, ingresa un email válido.", "error");
+      return;
+    }
+
+    // Validate message length
+    if (formData.message.length < 50) {
+      showToastMessage("El mensaje debe tener al menos 50 caracteres.", "error");
+      return;
+    }
+
+    // Additional validation for join team requests
+    if (formData.contactReason === 'Unirse al equipo') {
+      if (!formData.degree.trim() || !formData.year.trim() || formData.interests.length === 0) {
+        showToastMessage("Por favor, completa la información académica y selecciona al menos un área de interés.", "error");
+        return;
+      }
     }
 
     setLoading(true);
@@ -154,46 +131,28 @@ ${formData.message}
     };
 
     try {
-      // Create a temporary form element with the correct field names
-      const tempForm = document.createElement('form');
-      Object.entries(emailData).forEach(([key, value]) => {
-        const input = document.createElement('input');
-        input.name = key;
-        input.value = value;
-        tempForm.appendChild(input);
+      await sendEmailWithData(emailData);
+      showToastMessage("¡Solicitud enviada con éxito! Te contactaremos pronto.", "success");
+      
+      // Reset form
+      setFormData({
+        name: '',
+        email: '',
+        contactReason: '',
+        degree: '',
+        year: '',
+        interests: [],
+        message: ''
       });
-
-      const result = await window.emailjs.sendForm(
-        "service_2iu77at",
-        "template_cpxlc8r",
-        tempForm
-      );
       
-      console.log("EmailJS Response:", result);
-      
-      if (result.text === "OK" || result.status === 200) {
-        showToastMessage("¡Solicitud enviada con éxito! Te contactaremos pronto.", "success");
-        // Reset form
-        setFormData({
-          name: '',
-          email: '',
-          contactReason: '',
-          degree: '',
-          year: '',
-          interests: [],
-          message: ''
-        });
-        // Close modal after showing success message
-        setTimeout(() => {
-          handleClose();
-        }, 2000);
-      } else {
-        showToastMessage("Error al enviar la solicitud. Por favor, intenta de nuevo.", "error");
-      }
-    } catch (error: any) {
-      console.error("EmailJS Error:", error);
+      // Close modal after showing success message
+      setTimeout(() => {
+        handleClose();
+      }, 2000);
+    } catch (error) {
+      console.error("Email sending error:", error);
       showToastMessage(
-        error?.text || error?.message || "Error al enviar la solicitud. Por favor, intenta de nuevo.",
+        error instanceof Error ? error.message : "Error al enviar la solicitud. Por favor, intenta de nuevo.",
         "error"
       );
     } finally {
