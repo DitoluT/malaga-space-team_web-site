@@ -33,13 +33,13 @@ export const teamTreeModalContent = {
       name: "Paco Muro Correro",
       role: "Coordinador del Proyecto",
       department: "",
-      title: "Programa de Doctorado en Ingeniería de Telecomunicación"
+      title: "PhD en Ingeniería de Telecomunicación"
     },
     {
       name: "Pepe Pulido Alegre",
       role: "Coordinador del Proyecto",
       department: "",
-      title: "Programa de Doctorado en Ingeniería de Telecomunicación"
+      title: "PhD en Ingeniería de Telecomunicación"
     }
   ],
   subsystemLeaders: [
