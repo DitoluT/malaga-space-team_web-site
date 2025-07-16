@@ -30,7 +30,7 @@ export const teamTreeModalContent = {
   ],
   coordinators: [
     {
-      name: "Francisco Muro Guerrero",
+      name: "Francisco Muro Correro",
       role: "Coordinador del Proyecto",
       department: "",
       title: "Programa de Doctorado en Ingeniería de Telecomunicación"
