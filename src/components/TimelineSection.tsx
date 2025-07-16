@@ -98,7 +98,7 @@ export const TimelineSection: React.FC = () => {
   ];
 
   return (
-    <section className="py-20 px-4" ref={timelineRef}>
+    <section id="cronograma" className="py-20 px-4" ref={timelineRef}>
       <div className="max-w-7xl mx-auto">
         <GlassContainer className="section-glass mb-16">
           <div className="p-8 text-center">
