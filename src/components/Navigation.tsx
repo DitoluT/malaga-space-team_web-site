@@ -77,8 +77,10 @@ export const Navigation: React.FC<NavigationProps> = ({ children }) => {
   const navItems = [
     { href: "#inicio", label: "Inicio" },
     { href: "#acerca", label: "Acerca de" },
+    { href: "#cronograma", label: "Cronograma" },
     { href: "#subsistemas", label: "Subsistemas" },
     { href: "#equipo", label: "Equipo" },
+    { href: "#patrocinadores", label: "Colaboradores" },
     { href: "#contacto", label: "Contacto" }
   ];
 
@@ -113,7 +115,7 @@ export const Navigation: React.FC<NavigationProps> = ({ children }) => {
       <>
         <nav className={`fixed top-0 left-0 right-0 z-50 transition-transform duration-300 ease-in-out ${
           shouldShowNav ? 'translate-y-0' : '-translate-y-full'
-        }`} data-mobile-nav>
+        }`} data-mobile-nav aria-label="Navegación principal">
           <div className="px-4 py-4">
             <div className="max-w-7xl mx-auto">
               <GlassContainer className="nav-glass">
@@ -125,6 +127,7 @@ export const Navigation: React.FC<NavigationProps> = ({ children }) => {
                         key={item.href}
                         onClick={() => handleNavClick(item.href)}
                         className="text-white/90 hover:text-white transition-colors duration-300 font-medium cursor-pointer px-4 py-2 rounded-lg hover:bg-white/10"
+                        aria-label={`Ir a la sección ${item.label}`}
                       >
                         {item.label}
                       </button>
@@ -136,6 +139,7 @@ export const Navigation: React.FC<NavigationProps> = ({ children }) => {
                         <button
                           onClick={() => handleNavClick('#equipo')}
                           className="px-6 py-2 text-white font-semibold rounded-full transition-all duration-300 hover:scale-105 bg-gradient-to-r from-blue-500/30 to-blue-600/30 border border-blue-400/50 hover:from-blue-400/40 hover:to-blue-500/40 hover:border-blue-300/60 relative overflow-hidden group"
+                          aria-label="Únete al equipo del Málaga Space Team"
                         >
                           <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -skew-x-12 transform -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
                           <span className="relative z-10 drop-shadow-lg">Únete al Equipo</span>
@@ -163,6 +167,8 @@ export const Navigation: React.FC<NavigationProps> = ({ children }) => {
                       onClick={handleMenuToggle}
                       className="w-10 h-10 flex items-center justify-center rounded-lg bg-white/10 hover:bg-white/20 transition-colors z-10 relative"
                       data-mobile-nav
+                      aria-label={isMenuOpen ? "Cerrar menú" : "Abrir menú"}
+                      aria-expanded={isMenuOpen}
                     >
                       {isMenuOpen ? (
                         <X className="w-5 h-5 text-white" />
@@ -179,7 +185,7 @@ export const Navigation: React.FC<NavigationProps> = ({ children }) => {
           {/* Mobile Menu Dropdown */}
           <div className={`md:hidden transition-all duration-300 ease-in-out overflow-hidden ${
             isMenuOpen ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'
-          }`} data-mobile-nav>
+          }`} data-mobile-nav role="menu" aria-label="Menú de navegación móvil">
             <div className="px-4 pb-6">
               <div className="max-w-7xl mx-auto">
                 <GlassContainer className="nav-glass">
@@ -190,6 +196,8 @@ export const Navigation: React.FC<NavigationProps> = ({ children }) => {
                         onClick={() => handleNavClick(item.href)}
                         className="w-full text-left text-white/90 hover:text-white transition-colors duration-300 font-medium cursor-pointer px-4 py-3 rounded-lg hover:bg-white/10 text-base"
                         data-mobile-nav
+                        role="menuitem"
+                        aria-label={`Ir a la sección ${item.label}`}
                       >
                         {item.label}
                       </button>
@@ -202,6 +210,8 @@ export const Navigation: React.FC<NavigationProps> = ({ children }) => {
                           onClick={() => handleNavClick('#equipo')}
                           className="w-full text-center text-white font-semibold px-4 py-4 rounded-lg transition-all duration-300 bg-gradient-to-r from-blue-500/30 to-blue-600/30 border border-blue-400/50 hover:from-blue-400/40 hover:to-blue-500/40 hover:border-blue-300/60 relative overflow-hidden group"
                           data-mobile-nav
+                          role="menuitem"
+                          aria-label="Únete al equipo del Málaga Space Team"
                         >
                           <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -skew-x-12 transform -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
                           <span className="relative z-10 drop-shadow-lg text-base">🚀 Únete al Equipo</span>

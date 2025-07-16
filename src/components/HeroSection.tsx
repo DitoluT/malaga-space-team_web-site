@@ -56,12 +56,9 @@ export const HeroSection: React.FC = () => {
                   ? 'translate-y-0 opacity-100' 
                   : 'translate-y-6 opacity-0'
               }`}>
-                <h3 className="text-3xl md:text-4xl font-bold text-white mb-4">
-                  Explorando el Espacio
-                </h3>
-                <p className="text-2xl text-blue-300 mb-6">
-                  con Tecnología CubeSat
-                </p>
+                <h1 className="text-3xl md:text-4xl font-bold text-white mb-4">
+                  Málaga Space Team - Explorando el Espacio con Tecnología CubeSat
+                </h1>
                 <p className="text-lg text-white/80 max-w-4xl mx-auto leading-relaxed">
                   Desarrollando satélites de nueva generación para avanzar en la investigación espacial, 
                   educación e innovación tecnológica desde la Universidad de Málaga.

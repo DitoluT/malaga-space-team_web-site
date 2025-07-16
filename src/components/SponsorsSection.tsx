@@ -53,7 +53,7 @@ export const SponsorsSection: React.FC = () => {
   ];
 
   return (
-    <section className="py-20 px-4">
+    <section id="patrocinadores" className="py-20 px-4">
       <div className="max-w-7xl mx-auto">
         <GlassContainer className="section-glass mb-16">
           <div className="p-8 text-center">
