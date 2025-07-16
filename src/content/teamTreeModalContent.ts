@@ -36,7 +36,7 @@ export const teamTreeModalContent = {
       title: "Programa de Doctorado en Ingeniería de Telecomunicación"
     },
     {
-      name: "José Pulido Alegre",
+      name: "Pepe Pulido Alegre",
       role: "Coordinador del Proyecto",
       department: "",
       title: "Programa de Doctorado en Ingeniería de Telecomunicación"
