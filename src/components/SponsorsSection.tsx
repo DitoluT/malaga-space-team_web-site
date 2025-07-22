@@ -1,65 +1,68 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { ExternalLink, Users, Lightbulb, Link as LinkIcon } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { GlassContainer } from './GlassContainer';
 import { GlassButton } from './GlassButton';
 
 export const SponsorsSection: React.FC = () => {
-  const collaborators = [
+  const { t } = useTranslation();
+
+  const collaborators = useMemo(() => [
     {
-      name: "Universidad de Málaga",
-      shortName: "UMA",
-      description: "Institución pública española fundada en 1972 que ofrece más de 60 titulaciones de grado y más de 100 de posgrado, con cerca de 40,000 estudiantes y 2,450 profesores distribuidos en 19 centros universitarios.",
-      role: "Institución Principal",
+      name: t('sponsors.collaborators.uma.name'),
+      shortName: t('sponsors.collaborators.uma.shortName'),
+      description: t('sponsors.collaborators.uma.description'),
+      role: t('sponsors.collaborators.uma.role'),
       icon: Users,
       color: "from-blue-400 to-blue-600",
       website: "https://www.uma.es/",
-      contribution: "Apoyo institucional, infraestructura y recursos académicos"
+      contribution: t('sponsors.collaborators.uma.contribution')
     },
     {
-      name: "Mobile & Aerospace Networks Lab",
-      shortName: "MobileNet",
-      description: "Grupo de investigación especializado en redes de próxima generación e inteligencia artificial aplicada a redes inalámbricas. Cuenta con más de 30 investigadores y una infraestructura avanzada para el desarrollo tecnológico.",
-      role: "Laboratorio de Investigación",
+      name: t('sponsors.collaborators.mobilenet.name'),
+      shortName: t('sponsors.collaborators.mobilenet.shortName'),
+      description: t('sponsors.collaborators.mobilenet.description'),
+      role: t('sponsors.collaborators.mobilenet.role'),
       icon: Lightbulb,
       color: "from-green-400 to-green-600",
       website: "https://mobilenet.uma.es/",
-      contribution: "Expertise técnico, investigación y desarrollo tecnológico"
+      contribution: t('sponsors.collaborators.mobilenet.contribution')
     },
     {
-      name: "LINK by UMA-ATech",
-      shortName: "Link Bayuma",
-      description: "Espacio de encuentro real entre la Universidad de Málaga y las empresas, dedicado a la innovación y el emprendimiento. Facilita la colaboración universidad-industria.",
-      role: "Hub de Innovación",
+      name: t('sponsors.collaborators.link.name'),
+      shortName: t('sponsors.collaborators.link.shortName'),
+      description: t('sponsors.collaborators.link.description'),
+      role: t('sponsors.collaborators.link.role'),
       icon: LinkIcon,
       color: "from-purple-400 to-purple-600",
       website: "https://www.link.uma.es/",
-      contribution: "Conexión industrial, transferencia de conocimiento y emprendimiento"
+      contribution: t('sponsors.collaborators.link.contribution')
     }
-  ];
+  ], [t]);
 
-  const collaborationBenefits = [
+  const collaborationBenefits = useMemo(() => [
     {
-      title: "Investigación Avanzada",
-      description: "Acceso a infraestructura de investigación de vanguardia"
+      title: t('sponsors.benefits.advancedResearch.title'),
+      description: t('sponsors.benefits.advancedResearch.description')
     },
     {
-      title: "Transferencia Tecnológica",
-      description: "Puente entre universidad e industria espacial"
+      title: t('sponsors.benefits.techTransfer.title'),
+      description: t('sponsors.benefits.techTransfer.description')
     },
     {
-      title: "Formación Especializada",
-      description: "Desarrollo de talento en tecnología espacial"
+      title: t('sponsors.benefits.specializedTraining.title'),
+      description: t('sponsors.benefits.specializedTraining.description')
     }
-  ];
+  ], [t]);
 
   return (
     <section id="patrocinadores" className="py-20 px-4">
       <div className="max-w-7xl mx-auto">
         <GlassContainer className="section-glass mb-16">
           <div className="p-8 text-center">
-            <h2 className="text-4xl font-bold text-white mb-6">Nuestros Colaboradores</h2>
+            <h2 className="text-4xl font-bold text-white mb-6">{t('sponsors.title')}</h2>
             <p className="text-lg text-white/80">
-              El proyecto CubeSat cuenta con el apoyo de instituciones líderes de la Universidad de Málaga
+              {t('sponsors.description')}
             </p>
           </div>
         </GlassContainer>
@@ -78,7 +81,7 @@ export const SponsorsSection: React.FC = () => {
                 
                 <div className="bg-white/5 rounded-lg p-3 mb-4">
                   <h4 className="text-white font-semibold mb-2 flex items-center justify-center text-sm">
-                    🤝 Contribución
+                    {t('sponsors.contributionLabel')}
                   </h4>
                   <p className="text-white/80 text-xs">{collaborator.contribution}</p>
                 </div>
@@ -91,7 +94,7 @@ export const SponsorsSection: React.FC = () => {
                   className="inline-flex items-center space-x-2 text-white/80 hover:text-white transition-colors group text-sm"
                   >
                   <ExternalLink className="w-4 h-4 group-hover:scale-110 transition-transform" />
-                  <span className="text-sm">Visitar sitio web</span>
+                  <span className="text-sm">{t('sponsors.visitWebsite')}</span>
                   </a>
                 </div>
               </div>
