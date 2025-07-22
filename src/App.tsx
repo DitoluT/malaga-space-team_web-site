@@ -10,10 +10,12 @@ import { TeamSection } from './components/TeamSection';
 import { SponsorsSection } from './components/SponsorsSection';
 import { ContactFormWithEmailJS } from './content/contactContent';
 import { Footer } from './components/Footer';
+import { SEOMetaTags } from './components/SEOMetaTags';
 
 function App() {
   return (
     <div className="relative w-full min-h-screen overflow-x-hidden">
+      <SEOMetaTags />
       <SpaceBackground />
       <Navigation>
         <main className="relative z-10">

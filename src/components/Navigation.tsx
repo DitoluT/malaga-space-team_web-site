@@ -1,6 +1,8 @@
 import React, { useState, useEffect, createContext, useContext } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Menu, X } from 'lucide-react';
 import { GlassContainer } from './GlassContainer';
+import { LanguageSelector } from './LanguageSelector';
 
 interface NavigationContextType {
   hideNavigation: () => void;
@@ -22,6 +24,7 @@ interface NavigationProps {
 }
 
 export const Navigation: React.FC<NavigationProps> = ({ children }) => {
+  const { t } = useTranslation();
   const [isVisible, setIsVisible] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -75,13 +78,13 @@ export const Navigation: React.FC<NavigationProps> = ({ children }) => {
   }, [isMenuOpen]);
 
   const navItems = [
-    { href: "#inicio", label: "Inicio" },
-    { href: "#acerca", label: "Acerca de" },
-    { href: "#cronograma", label: "Cronograma" },
-    { href: "#subsistemas", label: "Subsistemas" },
-    { href: "#equipo", label: "Equipo" },
-    { href: "#patrocinadores", label: "Colaboradores" },
-    { href: "#contacto", label: "Contacto" }
+    { href: "#inicio", label: t('navigation.home') },
+    { href: "#acerca", label: t('navigation.about') },
+    { href: "#cronograma", label: t('navigation.timeline') },
+    { href: "#subsistemas", label: t('navigation.subsystems') },
+    { href: "#equipo", label: t('navigation.team') },
+    { href: "#patrocinadores", label: t('navigation.sponsors') },
+    { href: "#contacto", label: t('navigation.contact') }
   ];
 
   const handleNavClick = (href: string) => {
@@ -121,30 +124,36 @@ export const Navigation: React.FC<NavigationProps> = ({ children }) => {
               <GlassContainer className="nav-glass">
                 <div className="px-6 py-4">
                   {/* Desktop Navigation */}
-                  <div className="hidden md:flex items-center justify-center space-x-8">
-                    {navItems.map((item) => (
-                      <button
-                        key={item.href}
-                        onClick={() => handleNavClick(item.href)}
-                        className="text-white/90 hover:text-white transition-colors duration-300 font-medium cursor-pointer px-4 py-2 rounded-lg hover:bg-white/10"
-                        aria-label={`Ir a la sección ${item.label}`}
-                      >
-                        {item.label}
-                      </button>
-                    ))}
-                    
-                    {/* CTA Button */}
-                    <div className="ml-6">
-                      <GlassContainer className="nav-cta-glass">
+                  <div className="hidden md:flex items-center justify-between w-full">
+                    <div className="flex items-center space-x-8">
+                      {navItems.map((item) => (
                         <button
-                          onClick={() => handleNavClick('#equipo')}
-                          className="px-6 py-2 text-white font-semibold rounded-full transition-all duration-300 hover:scale-105 bg-gradient-to-r from-blue-500/30 to-blue-600/30 border border-blue-400/50 hover:from-blue-400/40 hover:to-blue-500/40 hover:border-blue-300/60 relative overflow-hidden group"
-                          aria-label="Únete al equipo del Málaga Space Team"
+                          key={item.href}
+                          onClick={() => handleNavClick(item.href)}
+                          className="text-white/90 hover:text-white transition-colors duration-300 font-medium cursor-pointer px-4 py-2 rounded-lg hover:bg-white/10"
+                          aria-label={`Ir a la sección ${item.label}`}
                         >
-                          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -skew-x-12 transform -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
-                          <span className="relative z-10 drop-shadow-lg">Únete al Equipo</span>
+                          {item.label}
                         </button>
-                      </GlassContainer>
+                      ))}
+                    </div>
+                    
+                    <div className="flex items-center space-x-4">
+                      <LanguageSelector />
+                      
+                      {/* CTA Button */}
+                      <div>
+                        <GlassContainer className="nav-cta-glass">
+                          <button
+                            onClick={() => handleNavClick('#equipo')}
+                            className="px-6 py-2 text-white font-semibold rounded-full transition-all duration-300 hover:scale-105 bg-gradient-to-r from-blue-500/30 to-blue-600/30 border border-blue-400/50 hover:from-blue-400/40 hover:to-blue-500/40 hover:border-blue-300/60 relative overflow-hidden group"
+                            aria-label={t('navigation.joinTeam')}
+                          >
+                            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -skew-x-12 transform -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
+                            <span className="relative z-10 drop-shadow-lg">{t('navigation.joinTeam')}</span>
+                          </button>
+                        </GlassContainer>
+                      </div>
                     </div>
                   </div>
 
@@ -159,23 +168,26 @@ export const Navigation: React.FC<NavigationProps> = ({ children }) => {
                         />
                       </div>
                       <div>
-                        <span className="text-white font-bold text-lg">MST</span>
-                        <div className="text-xs text-white/70 leading-none">Málaga Space Team</div>
+                        <span className="text-white font-bold text-lg">{t('navigation.mobileTitle')}</span>
+                        <div className="text-xs text-white/70 leading-none">{t('navigation.mobileSubtitle')}</div>
                       </div>
                     </div>
-                    <button
-                      onClick={handleMenuToggle}
-                      className="w-10 h-10 flex items-center justify-center rounded-lg bg-white/10 hover:bg-white/20 transition-colors z-10 relative"
-                      data-mobile-nav
-                      aria-label={isMenuOpen ? "Cerrar menú" : "Abrir menú"}
-                      aria-expanded={isMenuOpen}
-                    >
-                      {isMenuOpen ? (
-                        <X className="w-5 h-5 text-white" />
-                      ) : (
-                        <Menu className="w-5 h-5 text-white" />
-                      )}
-                    </button>
+                    <div className="flex items-center space-x-3">
+                      <LanguageSelector />
+                      <button
+                        onClick={handleMenuToggle}
+                        className="w-10 h-10 flex items-center justify-center rounded-lg bg-white/10 hover:bg-white/20 transition-colors z-10 relative"
+                        data-mobile-nav
+                        aria-label={isMenuOpen ? "Cerrar menú" : "Abrir menú"}
+                        aria-expanded={isMenuOpen}
+                      >
+                        {isMenuOpen ? (
+                          <X className="w-5 h-5 text-white" />
+                        ) : (
+                          <Menu className="w-5 h-5 text-white" />
+                        )}
+                      </button>
+                    </div>
                   </div>
                 </div>
               </GlassContainer>
@@ -211,10 +223,10 @@ export const Navigation: React.FC<NavigationProps> = ({ children }) => {
                           className="w-full text-center text-white font-semibold px-4 py-4 rounded-lg transition-all duration-300 bg-gradient-to-r from-blue-500/30 to-blue-600/30 border border-blue-400/50 hover:from-blue-400/40 hover:to-blue-500/40 hover:border-blue-300/60 relative overflow-hidden group"
                           data-mobile-nav
                           role="menuitem"
-                          aria-label="Únete al equipo del Málaga Space Team"
+                          aria-label={t('navigation.joinTeam')}
                         >
                           <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -skew-x-12 transform -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
-                          <span className="relative z-10 drop-shadow-lg text-base">🚀 Únete al Equipo</span>
+                          <span className="relative z-10 drop-shadow-lg text-base">{t('navigation.mobileJoinTeam')}</span>
                         </button>
                       </GlassContainer>
                     </div>

@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Rocket, ArrowDown } from 'lucide-react';
 import { GlassContainer } from './GlassContainer';
 import { GlassButton } from './GlassButton';
 
 export const HeroSection: React.FC = () => {
+  const { t } = useTranslation();
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
