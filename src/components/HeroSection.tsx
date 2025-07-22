@@ -48,7 +48,7 @@ export const HeroSection: React.FC = () => {
                   : 'translate-y-6 opacity-0'
               }`}>
                 <p className="text-xl text-white/80 mb-12 max-w-3xl mx-auto leading-relaxed">
-                  {t('hero.university')}
+                  Universidad de Málaga
                 </p>
               </div>
               
@@ -59,10 +59,11 @@ export const HeroSection: React.FC = () => {
                   : 'translate-y-6 opacity-0'
               }`}>
                 <h1 className="text-3xl md:text-4xl font-bold text-white mb-4">
-                  {t('hero.mainTitle')} - {t('hero.subtitle')}
+                  Málaga Space Team - Explorando el Espacio con Tecnología CubeSat
                 </h1>
                 <p className="text-lg text-white/80 max-w-4xl mx-auto leading-relaxed">
-                  {t('hero.description')}
+                  Desarrollando satélites de nueva generación para avanzar en la investigación espacial, 
+                  educación e innovación tecnológica desde la Universidad de Málaga.
                 </p>
               </div>
               
@@ -73,11 +74,11 @@ export const HeroSection: React.FC = () => {
                   : 'translate-y-6 opacity-0'
               }`}>
                 <GlassButton variant="primary" size="lg" onClick={() => document.getElementById('acerca')?.scrollIntoView({ behavior: 'smooth' })}>
-                  {t('hero.primaryButton')}
+                  Descubrir el Proyecto
                 </GlassButton>
                 
                 <GlassButton variant="secondary" size="lg" onClick={() => document.getElementById('equipo')?.scrollIntoView({ behavior: 'smooth' })}>
-                  {t('hero.secondaryButton')}
+                  Únete a la Misión
                 </GlassButton>
               </div>
             </div>
