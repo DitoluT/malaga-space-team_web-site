@@ -80,10 +80,10 @@ export const Navigation: React.FC<NavigationProps> = ({ children }) => {
   const navItems = [
     { href: "#inicio", label: t('navigation.home') },
     { href: "#acerca", label: t('navigation.about') },
-    { href: "#cronograma", label: "Cronograma" },
+    { href: "#cronograma", label: t('navigation.timeline') },
     { href: "#subsistemas", label: t('navigation.subsystems') },
     { href: "#equipo", label: t('navigation.team') },
-    { href: "#patrocinadores", label: "Colaboradores" },
+    { href: "#patrocinadores", label: t('navigation.sponsors') },
     { href: "#contacto", label: t('navigation.contact') }
   ];
 

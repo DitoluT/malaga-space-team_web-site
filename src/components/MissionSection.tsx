@@ -1,28 +1,31 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { Satellite, BookOpen, Users, Globe } from 'lucide-react';
 import { GlassContainer } from './GlassContainer';
 
 export const MissionSection: React.FC = () => {
+  const { t } = useTranslation();
+  
   const missions = [
     {
       icon: Satellite,
-      title: "Innovación Tecnológica",
-      description: "Desarrollando tecnología CubeSat de vanguardia para avanzar en el campo de la ingeniería aeroespacial y comunicaciones satelitales."
+      title: t('mission.technologicalInnovation.title'),
+      description: t('mission.technologicalInnovation.description')
     },
     {
       icon: BookOpen,
-      title: "Excelencia Educativa",
-      description: "Proporcionando oportunidades de aprendizaje práctico para estudiantes de ingeniería, informática y campos relacionados."
+      title: t('mission.educationalExcellence.title'),
+      description: t('mission.educationalExcellence.description')
     },
     {
       icon: Users,
-      title: "Investigación Colaborativa",
-      description: "Fomentando la colaboración entre departamentos académicos, socios industriales y agencias espaciales."
+      title: t('mission.collaborativeResearch.title'),
+      description: t('mission.collaborativeResearch.description')
     },
     {
       icon: Globe,
-      title: "Impacto Global",
-      description: "Contribuyendo con datos significativos para abordar el monitoreo ambiental, respuesta a desastres y desafíos de comunicación global."
+      title: t('mission.globalImpact.title'),
+      description: t('mission.globalImpact.description')
     }
   ];
 
@@ -31,11 +34,9 @@ export const MissionSection: React.FC = () => {
       <div className="max-w-7xl mx-auto">
         <GlassContainer className="section-glass mb-16">
           <div className="p-8 text-center">
-            <h2 className="text-4xl font-bold text-white mb-6">Nuestra Misión</h2>
+            <h2 className="text-4xl font-bold text-white mb-6">{t('mission.title')}</h2>
             <p className="text-lg text-white/80 max-w-4xl mx-auto leading-relaxed">
-              El Proyecto CubeSat de la Universidad de Málaga tiene como objetivo diseñar, 
-              construir y lanzar un CubeSat totalmente funcional para avanzar en la investigación, 
-              educación e innovación en tecnología espacial.
+              {t('mission.description')}
             </p>
           </div>
         </GlassContainer>

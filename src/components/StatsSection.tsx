@@ -1,32 +1,35 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { Users, Cpu, Calendar, TrendingUp } from 'lucide-react';
 import { GlassContainer } from './GlassContainer';
 
 export const StatsSection: React.FC = () => {
+  const { t } = useTranslation();
+  
   const stats = [
     {
       icon: Users,
       number: "25+",
-      label: "Miembros del Equipo",
-      description: "Estudiantes e investigadores"
+      label: t('stats.teamMembers'),
+      description: t('stats.teamMembersDesc')
     },
     {
       icon: Cpu,
       number: "6",
-      label: "Subsistemas CubeSat",
-      description: "Sistemas integrados"
+      label: t('stats.subsystems'),
+      description: t('stats.subsystemsDesc')
     },
     {
       icon: Calendar,
       number: "2º Año",
-      label: "Proyecto en Desarrollo",
-      description: "Progreso continuo"
+      label: t('stats.projectYear'),
+      description: t('stats.projectYearDesc')
     },
     {
       icon: TrendingUp,
       number: "6",
-      label: "Departamentos",
-      description: "Colaboración interdisciplinar"
+      label: t('stats.knowledgeAreas'),
+      description: t('stats.knowledgeAreasDesc')
     }
   ];
 

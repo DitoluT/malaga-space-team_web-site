@@ -2,8 +2,10 @@
   "navigation": {
     "home": "Home",
     "about": "About",
-    "subsystems": "Subsystems",
+    "timeline": "Timeline",
+    "subsystems": "Subsystems", 
     "team": "Team",
+    "sponsors": "Sponsors",
     "contact": "Contact",
     "joinTeam": "Join the Team",
     "mobileJoinTeam": "🚀 Join the Team",
@@ -23,7 +25,7 @@
     "teamMembersDesc": "Students and researchers",
     "subsystems": "CubeSat Subsystems",
     "subsystemsDesc": "Integrated systems",
-    "projectYear": "Project in Development",
+    "projectYear": "2nd Year Project",
     "projectYearDesc": "Continuous progress",
     "knowledgeAreas": "Knowledge Areas",
     "knowledgeAreasDesc": "Interdisciplinary collaboration"
@@ -150,5 +152,9 @@
       "messagePlaceholder": "Write your message here...",
       "submit": "Send Message"
     }
+  },
+  "meta": {
+    "title": "Málaga Space Team - CubeSat Project University of Málaga",
+    "description": "2U CubeSat project from the University of Málaga. Developing cutting-edge space technology for research, education and innovation."
   }
 }
