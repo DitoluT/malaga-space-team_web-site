@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Rocket, ArrowDown } from 'lucide-react';
 import { GlassContainer } from './GlassContainer';
 import { GlassButton } from './GlassButton';
 
 export const HeroSection: React.FC = () => {
+  const { t } = useTranslation();
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
@@ -46,7 +48,7 @@ export const HeroSection: React.FC = () => {
                   : 'translate-y-6 opacity-0'
               }`}>
                 <p className="text-xl text-white/80 mb-12 max-w-3xl mx-auto leading-relaxed">
-                  Universidad de Málaga
+                  {t('hero.university')}
                 </p>
               </div>
               
@@ -57,11 +59,10 @@ export const HeroSection: React.FC = () => {
                   : 'translate-y-6 opacity-0'
               }`}>
                 <h1 className="text-3xl md:text-4xl font-bold text-white mb-4">
-                  Málaga Space Team - Explorando el Espacio con Tecnología CubeSat
+                  {t('hero.mainTitle')} - {t('hero.subtitle')}
                 </h1>
                 <p className="text-lg text-white/80 max-w-4xl mx-auto leading-relaxed">
-                  Desarrollando satélites de nueva generación para avanzar en la investigación espacial, 
-                  educación e innovación tecnológica desde la Universidad de Málaga.
+                  {t('hero.description')}
                 </p>
               </div>
               
@@ -72,11 +73,11 @@ export const HeroSection: React.FC = () => {
                   : 'translate-y-6 opacity-0'
               }`}>
                 <GlassButton variant="primary" size="lg" onClick={() => document.getElementById('acerca')?.scrollIntoView({ behavior: 'smooth' })}>
-                  Descubrir el Proyecto
+                  {t('hero.primaryButton')}
                 </GlassButton>
                 
                 <GlassButton variant="secondary" size="lg" onClick={() => document.getElementById('equipo')?.scrollIntoView({ behavior: 'smooth' })}>
-                  Únete a la Misión
+                  {t('hero.secondaryButton')}
                 </GlassButton>
               </div>
             </div>

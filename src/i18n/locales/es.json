@@ -1,0 +1,154 @@
+{
+  "navigation": {
+    "home": "Inicio",
+    "about": "Acerca de",
+    "subsystems": "Subsistemas",
+    "team": "Equipo",
+    "contact": "Contacto",
+    "joinTeam": "Únete al Equipo",
+    "mobileJoinTeam": "🚀 Únete al Equipo",
+    "mobileTitle": "MST",
+    "mobileSubtitle": "Málaga Space Team"
+  },
+  "hero": {
+    "university": "Universidad de Málaga",
+    "mainTitle": "EL EQUIPO DE ESTUDIANTES MALAGUEÑO",
+    "subtitle": "PARA LA INVESTIGACIÓN ESPACIAL", 
+    "description": "Nuestro objetivo es desarrollar y poner en órbita el primer satélite malagueño, para demostrar las capacidades de la tecnología SDR y de virtualización en el espacio",
+    "primaryButton": "Descubrir el Proyecto",
+    "secondaryButton": "Únete a la Misión"
+  },
+  "stats": {
+    "teamMembers": "Miembros del Equipo",
+    "teamMembersDesc": "Estudiantes e investigadores",
+    "subsystems": "Subsistemas CubeSat",
+    "subsystemsDesc": "Sistemas integrados",
+    "projectYear": "Proyecto en Desarrollo",
+    "projectYearDesc": "Progreso continuo",
+    "knowledgeAreas": "Áreas de conocimiento",
+    "knowledgeAreasDesc": "Colaboración interdisciplinar"
+  },
+  "mission": {
+    "title": "Nuestra Misión",
+    "description": "El proyecto de Málaga Space Team de la Universidad de Málaga tiene como objetivo desarrollar, construir y poner en órbita un CubeSat orientado a comunicaciones, presentando soluciones innovadoras sobre los diferentes componentes del satélite, para habilitar la tecnología SDR y de virtualización, con el fin de demostrar su viabilidad y aplicabilidad en el espacio.",
+    "technologicalInnovation": {
+      "title": "Innovación Tecnológica",
+      "description": "Desarrollando tecnología CubeSat de última generación, con soluciones creativas, eficientes e innovadoras para el sector aeroespacial y de comunicaciones."
+    },
+    "educationalExcellence": {
+      "title": "Excelencia Educativa", 
+      "description": "Proporcionando una oportunidad única a estudiantes de aprender practicando de manera colaborativa junto con compañeros de múltiples sectores de la ingeniería, aportando todos hacia la construcción y posterior lanzamiento del primer satélite malagueño."
+    },
+    "collaborativeResearch": {
+      "title": "Investigación Colaborativa",
+      "description": "Fomentando la colaboración entre departamentos académicos, socios industriales y agencias espaciales, mediante networking asistiendo a eventos internacionales y participando en programas educativos impartidos por referentes en el sector."
+    },
+    "globalImpact": {
+      "title": "Impacto Global",
+      "description": "Contribuyendo la prueba de concepto tecnológica, para dar respuesta a desastres y desafíos de comunicación global."
+    }
+  },
+  "timeline": {
+    "title": "Cronología del Proyecto",
+    "description": "Seguimiento del progreso desde la concepción hasta el lanzamiento del CubeSat 2U",
+    "phase1": {
+      "phase": "Fase 1",
+      "title": "Iniciación del Proyecto",
+      "description": "Proyecto CubeSat 2U aprobado por la Junta Universitaria y primera adquisición financiera destinada al desarrollo del proyecto.",
+      "status": "Completado con Éxito",
+      "year": "2023"
+    },
+    "phase2": {
+      "phase": "Fase 2", 
+      "title": "Fase de Diseño",
+      "description": "Planteamiento y diseño del CubeSat 2U finalizado, habiendo elegido los componentes que forman el payload reconfigurable, y maquetación 3D de la estructura y arquitectura de subsistemas.",
+      "status": "Completado con Éxito",
+      "year": "2023-2024"
+    },
+    "phase3": {
+      "phase": "Fase 3",
+      "title": "Adquisición de Componentes", 
+      "description": "Adquisición de componentes especializados para cada subsistema: sensores, procesadores, baterías y elementos de comunicación.",
+      "status": "En Progreso",
+      "details": "Procesadores, sensores, baterías y componentes de comunicación",
+      "year": "2024"
+    },
+    "phase4": {
+      "phase": "Fase 4",
+      "title": "Desarrollo de Subsistemas",
+      "description": "Diseño, desarrollo e integración individual de los 6 subsistemas principales correspondientes al satélite en los distintos equipos de trabajo",
+      "status": "6 Subsistemas Integrados",
+      "details": "Estructura • Energía • ADCS • CDHS • Payload Reconfigurable • Comunicaciones",
+      "year": "2025"
+    },
+    "phase5": {
+      "phase": "Fase 5",
+      "title": "Pruebas y Verificación",
+      "description": "Pruebas orientadas a un correcto funcionamiento del CubeSat en el espacio, así como la verificación de funcionamiento de todos los subsistemas en conjunto, del cumplimiento de distintos estándares y de protocolos.",
+      "status": "Próximo",
+      "details": "Prueba de vibración • Prueba térmica • Prueba de vacío • Test de compatibilidad entre subsistemas …",
+      "year": "2025-2026"
+    },
+    "phase6": {
+      "phase": "Fase 6",
+      "title": "Preparación para Lanzamiento",
+      "description": "Verificaciones finales, integración con el lanzador y activación del payload reconfigurable para la misión.",
+      "status": "Destino: Órbita Terrestre Baja",
+      "year": "2026"
+    }
+  },
+  "team": {
+    "title": "Conoce al Equipo",
+    "description": "Un equipo multidisciplinario de más de 25 estudiantes e investigadores apasionados por la tecnología espacial y la innovación.",
+    "activeMembers": "Miembros Activos",
+    "departments": "Departamentos", 
+    "yearsExperience": "Años de Experiencia",
+    "subsystems": "Subsistemas",
+    "joinTeam": {
+      "title": "Únete al Equipo",
+      "subtitle": "Un Proyecto Colaborativo e Innovador",
+      "description": "Nuestro equipo reúne estudiantes e investigadores de múltiples disciplinas: ingeniería aeroespacial, telecomunicaciones, informática, física y más. Trabajamos juntos para desarrollar un CubeSat 2U completamente funcional.",
+      "callToAction": "🚀 ¿Listo para la Aventura Espacial?",
+      "callToActionDescription": "Únete a nosotros y sé parte de la próxima generación de innovadores espaciales. Buscamos estudiantes motivados de todas las disciplinas así como colaboraciones externas.",
+      "primaryButton": "Ver Equipo Completo",
+      "secondaryButton": "Únete o Colabora"
+    },
+    "benefits": {
+      "practicalExperience": {
+        "title": "Experiencia Práctica",
+        "description": "Aplicación directa de conocimientos teóricos en un proyecto real"
+      },
+      "interdisciplinaryCollaboration": {
+        "title": "Colaboración Interdisciplinar", 
+        "description": "Trabajo en equipo entre diferentes áreas de conocimiento"
+      },
+      "technologicalInnovation": {
+        "title": "Innovación Tecnológica",
+        "description": "Desarrollo de tecnologías avanzadas para aplicaciones espaciales"
+      }
+    },
+    "disciplines": ["Ingeniería", "Informática", "Física", "Matemáticas", "Gestión", "Electrónica", "Mecánica", "Diseño Industrial"]
+  },
+  "contact": {
+    "title": "Contacto",
+    "description": "¿Tienes preguntas sobre el proyecto? ¿Quieres unirte al equipo? ¡Contáctanos!",
+    "contactInfo": "Información de Contacto",
+    "coordination": "Coordinación",
+    "phone": "Teléfono",
+    "location": "Ubicación",
+    "address": "Universidad de Málaga",
+    "city": "29071 Málaga, España",
+    "form": {
+      "title": "Envíanos un Mensaje",
+      "name": "Nombre",
+      "namePlaceholder": "Tu nombre",
+      "email": "Email",
+      "emailPlaceholder": "tu@email.com",
+      "subject": "Asunto",
+      "subjectPlaceholder": "Asunto del mensaje",
+      "message": "Mensaje",
+      "messagePlaceholder": "Escribe tu mensaje aquí...",
+      "submit": "Enviar Mensaje"
+    }
+  }
+}
