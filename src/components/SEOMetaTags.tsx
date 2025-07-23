@@ -44,7 +44,7 @@ export const SEOMetaTags: React.FC = () => {
     if (twitterDescription) {
       twitterDescription.setAttribute('content', t('meta.description'));
     }
-  }, [i18n.language, t]);
+  }, [i18n.language]); // Remove 't' from dependencies to prevent infinite loop
 
   return null; // This component doesn't render anything
 };

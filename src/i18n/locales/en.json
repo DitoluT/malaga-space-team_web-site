@@ -50,9 +50,76 @@
       "description": "Contributing to the technological proof of concept, to respond to disasters and global communication challenges."
     }
   },
+  "subsystems": {
+    "title": "2U CubeSat Subsystems",
+    "description": "Six integrated subsystems with reconfigurable payload for maximum flexibility in orbit",
+    "viewDetails": "View Details →",
+    "items": {
+      "structure": {
+        "title": "Structure",
+        "description": "Mechanical design, material selection and structural analysis to ensure the CubeSat can withstand launch and space conditions.",
+        "components": ["6061-T6 aluminum chassis", "Deployable panels", "Release mechanisms", "Internal connectors"],
+        "specifications": ["Dimensions: 10×10×22.7 cm", "Mass: <2.66 kg", "Resistance: 25G vibration", "Temperature: -40°C to +85°C"],
+        "status": "CAD design completed, FEM analysis in progress. Structural prototype in manufacturing.",
+        "challenges": ["Weight vs resistance optimization", "CubeSat standard compatibility", "Subsystem integration"]
+      },
+      "power": {
+        "title": "Power",
+        "description": "Power generation, storage and distribution systems to provide electricity to all subsystems during the mission.",
+        "components": ["GaAs solar panels", "Li-ion batteries", "Voltage regulators", "Distribution system"],
+        "specifications": ["Generation: 8-12W (panels)", "Storage: 40Wh (batteries)", "Voltages: 3.3V, 5V, 12V", "Efficiency: >85%"],
+        "status": "Component selection finalized, laboratory integration tests.",
+        "challenges": ["Battery thermal management", "Energy optimization", "System redundancy"]
+      },
+      "adcs": {
+        "title": "ADCS",
+        "description": "Attitude Determination and Control System for satellite orientation and stability in orbit.",
+        "components": ["Magnetometers", "Gyroscopes", "Solar sensors", "Magnetorquers", "Reaction wheels"],
+        "specifications": ["Accuracy: ±1°", "Angular velocity: <0.1°/s", "Response time: <10s", "Consumption: <2W"],
+        "status": "Control algorithms developed, sensor calibration in progress.",
+        "challenges": ["In-orbit calibration", "Magnetic interference", "Autonomous control algorithms"]
+      },
+      "cdhs": {
+        "title": "CDHS",
+        "description": "Command and Data Handling System that processes commands, manages data flow and controls satellite operations.",
+        "components": ["ARM Cortex-M7 processor", "1GB flash memory", "512MB RAM", "Communication interfaces"],
+        "specifications": ["Frequency: 400MHz", "Consumption: <1.5W", "Redundancy: Dual processor", "OS: FreeRTOS"],
+        "status": "Hardware selected, flight software development at 60%.",
+        "challenges": ["Radiation tolerance", "Memory management", "Communication protocols"]
+      },
+      "payload": {
+        "title": "Payload",
+        "description": "Scientific instruments and experimental equipment designed to fulfill the CubeSat mission objectives.",
+        "components": ["Multispectral camera", "Environmental sensors", "Materials experiment", "Reconfigurable system"],
+        "specifications": ["Resolution: 5m/pixel", "Spectral bands: 4", "Data: 100MB/day", "Reconfiguration: Remote"],
+        "status": "Conceptual design approved, sensor selection in progress.",
+        "challenges": ["Miniaturization", "Remote calibration", "Onboard data processing"]
+      },
+      "communications": {
+        "title": "Communications",
+        "description": "Telecommunications systems for data transmission between the satellite and ground stations on Earth.",
+        "components": ["UHF/VHF transceiver", "Deployable antennas", "Amplifiers", "Digital modem"],
+        "specifications": ["Frequency: 435-438 MHz", "Power: 2W", "Speed: 9600 bps", "Range: 2000 km"],
+        "status": "Communication link tests completed, integration with control system.",
+        "challenges": ["Doppler effect", "Communication windows", "Error protocols"]
+      }
+    },
+    "modal": {
+      "components": "Main Components",
+      "specifications": "Specifications",
+      "status": "Development Status",
+      "challenges": "Technical Challenges", 
+      "close": "Close Details"
+    }
+  },
   "timeline": {
     "title": "Project Timeline",
     "description": "Tracking progress from conception to launch of the 2U CubeSat",
+    "statusLabels": {
+      "completed": "Completed",
+      "inProgress": "In Progress",
+      "upcoming": "Upcoming"
+    },
     "phase1": {
       "phase": "Phase 1",
       "title": "Project Initiation",

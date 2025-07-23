@@ -50,9 +50,76 @@
       "description": "Contribuyendo la prueba de concepto tecnológica, para dar respuesta a desastres y desafíos de comunicación global."
     }
   },
+  "subsystems": {
+    "title": "Subsistemas CubeSat 2U",
+    "description": "Seis subsistemas integrados con payload reconfigurable para máxima flexibilidad en órbita",
+    "viewDetails": "Ver Detalles →",
+    "items": {
+      "structure": {
+        "title": "Estructura",
+        "description": "Diseño mecánico, selección de materiales y análisis estructural para asegurar que el CubeSat pueda soportar las condiciones de lanzamiento y espacio.",
+        "components": ["Chasis de aluminio 6061-T6", "Paneles desplegables", "Mecanismos de liberación", "Conectores internos"],
+        "specifications": ["Dimensiones: 10×10×22.7 cm", "Masa: <2.66 kg", "Resistencia: 25G vibración", "Temperatura: -40°C a +85°C"],
+        "status": "Diseño CAD completado, análisis FEM en progreso. Prototipo estructural en fabricación.",
+        "challenges": ["Optimización peso vs resistencia", "Compatibilidad con estándar CubeSat", "Integración de subsistemas"]
+      },
+      "power": {
+        "title": "Energía",
+        "description": "Sistemas de generación, almacenamiento y distribución de energía para proporcionar electricidad a todos los subsistemas durante la misión.",
+        "components": ["Paneles solares GaAs", "Baterías Li-ion", "Reguladores de voltaje", "Sistema de distribución"],
+        "specifications": ["Generación: 8-12W (paneles)", "Almacenamiento: 40Wh (baterías)", "Voltajes: 3.3V, 5V, 12V", "Eficiencia: >85%"],
+        "status": "Selección de componentes finalizada, pruebas de integración en laboratorio.",
+        "challenges": ["Gestión térmica de baterías", "Optimización energética", "Redundancia del sistema"]
+      },
+      "adcs": {
+        "title": "ADCS",
+        "description": "Sistema de Determinación y Control de Actitud para la orientación y estabilidad del satélite en órbita.",
+        "components": ["Magnetómetros", "Giroscopios", "Sensores solares", "Magnetorqueadores", "Ruedas de reacción"],
+        "specifications": ["Precisión: ±1°", "Velocidad angular: <0.1°/s", "Tiempo de respuesta: <10s", "Consumo: <2W"],
+        "status": "Algoritmos de control desarrollados, calibración de sensores en progreso.",
+        "challenges": ["Calibración en órbita", "Interferencias magnéticas", "Algoritmos de control autónomo"]
+      },
+      "cdhs": {
+        "title": "CDHS",
+        "description": "Sistema de Comando y Manejo de Datos que procesa comandos, gestiona el flujo de datos y controla las operaciones del satélite.",
+        "components": ["Procesador ARM Cortex-M7", "Memoria flash 1GB", "RAM 512MB", "Interfaces de comunicación"],
+        "specifications": ["Frecuencia: 400MHz", "Consumo: <1.5W", "Redundancia: Dual processor", "SO: FreeRTOS"],
+        "status": "Hardware seleccionado, desarrollo de software de vuelo al 60%.",
+        "challenges": ["Tolerancia a radiación", "Gestión de memoria", "Protocolos de comunicación"]
+      },
+      "payload": {
+        "title": "Carga Útil",
+        "description": "Instrumentos científicos y equipos experimentales diseñados para cumplir los objetivos de misión del CubeSat.",
+        "components": ["Cámara multiespectral", "Sensores ambientales", "Experimento de materiales", "Sistema reconfigurable"],
+        "specifications": ["Resolución: 5m/pixel", "Bandas espectrales: 4", "Datos: 100MB/día", "Reconfiguración: Remota"],
+        "status": "Diseño conceptual aprobado, selección de sensores en curso.",
+        "challenges": ["Miniaturización", "Calibración remota", "Procesamiento de datos a bordo"]
+      },
+      "communications": {
+        "title": "Comunicaciones",
+        "description": "Sistemas de telecomunicaciones para transmisión de datos entre el satélite y estaciones terrestres en la Tierra.",
+        "components": ["Transceptor UHF/VHF", "Antenas desplegables", "Amplificadores", "Modem digital"],
+        "specifications": ["Frecuencia: 435-438 MHz", "Potencia: 2W", "Velocidad: 9600 bps", "Alcance: 2000 km"],
+        "status": "Pruebas de enlace de comunicación completadas, integración con sistema de control.",
+        "challenges": ["Efecto Doppler", "Ventanas de comunicación", "Protocolos de error"]
+      }
+    },
+    "modal": {
+      "components": "Componentes Principales",
+      "specifications": "Especificaciones",
+      "status": "Estado del Desarrollo", 
+      "challenges": "Desafíos Técnicos",
+      "close": "Cerrar Detalles"
+    }
+  },
   "timeline": {
     "title": "Cronología del Proyecto",
     "description": "Seguimiento del progreso desde la concepción hasta el lanzamiento del CubeSat 2U",
+    "statusLabels": {
+      "completed": "Completado",
+      "inProgress": "En Progreso", 
+      "upcoming": "Próximo"
+    },
     "phase1": {
       "phase": "Fase 1",
       "title": "Iniciación del Proyecto",

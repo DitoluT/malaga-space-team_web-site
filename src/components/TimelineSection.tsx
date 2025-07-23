@@ -1,8 +1,10 @@
 import React, { useEffect, useState, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import { CheckCircle, Clock, ArrowRight } from 'lucide-react';
 import { GlassContainer } from './GlassContainer';
 
 export const TimelineSection: React.FC = () => {
+  const { t } = useTranslation();
   const [scrollProgress, setScrollProgress] = useState(0);
   const [visiblePhases, setVisiblePhases] = useState<Set<number>>(new Set());
   const timelineRef = useRef<HTMLDivElement>(null);
@@ -44,67 +46,31 @@ export const TimelineSection: React.FC = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, [visiblePhases]);
 
-  const phases = [
-    {
-      phase: "Fase 1",
-      title: "Iniciación del Proyecto",
-      description: "Proyecto CubeSat 2U aprobado por la Junta Universitaria y financiamiento inicial asegurado para desarrollo completo.",
-      status: "completed",
-      statusText: "Completado con Éxito",
-      year: "2023"
-    },
-    {
-      phase: "Fase 2",
-      title: "Fase de Diseño",
-      description: "Diseño completo del CubeSat 2U finalizado, incluyendo arquitectura de subsistemas y payload reconfigurable.",
-      status: "completed",
-      statusText: "Completado con Éxito",
-      year: "2023-2024"
-    },
-    {
-      phase: "Fase 3",
-      title: "Adquisición de Componentes",
-      description: "Adquisición de componentes especializados para cada subsistema: sensores, procesadores, baterías y elementos de comunicación.",
-      status: "in-progress",
-      statusText: "En Progreso",
-      details: "Procesadores, sensores, baterías y componentes de comunicación",
-      year: "2024"
-    },
-    {
-      phase: "Fase 4",
-      title: "Desarrollo de Subsistemas",
-      description: "Desarrollo e integración individual de los 6 subsistemas principales: estructura, energía, ADCS, CDHS, payload y comunicaciones.",
-      status: "upcoming",
-      statusText: "6 Subsistemas Integrados",
-      details: "Estructura • Energía • ADCS • CDHS • Payload Reconfigurable • Comunicaciones",
-      year: "2025"
-    },
-    {
-      phase: "Fase 5",
-      title: "Pruebas y Verificación",
-      description: "Pruebas ambientales completas, verificación de funcionalidad del payload reconfigurable y validación de todos los sistemas.",
-      status: "upcoming",
-      statusText: "Próximo",
-      year: "2025-2026"
-    },
-    {
-      phase: "Fase 6",
-      title: "Preparación para Lanzamiento",
-      description: "Verificaciones finales, integración con el lanzador y activación del payload reconfigurable para la misión.",
-      status: "upcoming",
-      statusText: "Destino: Órbita Terrestre Baja",
-      year: "2026"
+  const phaseKeys = ['phase1', 'phase2', 'phase3', 'phase4', 'phase5', 'phase6'];
+
+  const getStatusTranslation = (phaseKey: string) => {
+    const status = t(`timeline.${phaseKey}.status`);
+    if (status.includes('Completado')) return 'completed';
+    if (status.includes('Progreso') || status.includes('Progress')) return 'in-progress';
+    return 'upcoming';
+  };
+
+  const getStatusText = (status: string) => {
+    switch (status) {
+      case 'completed': return t('timeline.statusLabels.completed', 'Completado');
+      case 'in-progress': return t('timeline.statusLabels.inProgress', 'En Progreso');
+      default: return t('timeline.statusLabels.upcoming', 'Próximo');
     }
-  ];
+  };
 
   return (
     <section id="cronograma" className="py-20 px-4" ref={timelineRef}>
       <div className="max-w-7xl mx-auto">
         <GlassContainer className="section-glass mb-16">
           <div className="p-8 text-center">
-            <h2 className="text-4xl font-bold text-white mb-6">Cronología del Proyecto</h2>
+            <h2 className="text-4xl font-bold text-white mb-6">{t('timeline.title')}</h2>
             <p className="text-lg text-white/80">
-              Seguimiento del progreso desde la concepción hasta el lanzamiento del CubeSat 2U
+              {t('timeline.description')}
             </p>
           </div>
         </GlassContainer>
@@ -124,9 +90,10 @@ export const TimelineSection: React.FC = () => {
 
           {/* Timeline items */}
           <div className="space-y-16">
-            {phases.map((phase, index) => {
+            {phaseKeys.map((phaseKey, index) => {
               const isLeft = index % 2 === 0 && window.innerWidth >= 768;
               const isVisible = visiblePhases.has(index);
+              const status = getStatusTranslation(phaseKey);
 
               return (
                 <div key={index} className="relative flex items-center" data-phase={index}>
@@ -135,17 +102,17 @@ export const TimelineSection: React.FC = () => {
                     <div 
                       className={`w-16 h-16 rounded-full flex items-center justify-center transition-all duration-700 backdrop-blur-sm border ${
                         isVisible 
-                          ? phase.status === 'completed' 
+                          ? status === 'completed' 
                             ? 'bg-green-500/20 border-green-500/40 shadow-lg shadow-green-500/30 scale-100' 
-                            : phase.status === 'in-progress' 
+                            : status === 'in-progress' 
                             ? 'bg-blue-500/20 border-blue-500/40 shadow-lg shadow-blue-500/30 scale-100' 
                             : 'bg-white/10 border-white/20 shadow-lg shadow-white/20 scale-100'
                           : 'bg-gray-700/20 border-gray-700/40 scale-75'
                       } ${isVisible ? 'opacity-100' : 'opacity-50'}`}
                     >
-                      {phase.status === 'completed' ? (
+                      {status === 'completed' ? (
                         <CheckCircle className="w-8 h-8 text-white/90" />
-                      ) : phase.status === 'in-progress' ? (
+                      ) : status === 'in-progress' ? (
                         <Clock className="w-8 h-8 text-white/90" />
                       ) : (
                         <ArrowRight className="w-8 h-8 text-white/90" />
@@ -174,27 +141,26 @@ export const TimelineSection: React.FC = () => {
                           {/* Year badge */}
                           <div className={`mb-4 ${(isLeft && window.innerWidth >= 768) ? 'text-left' : window.innerWidth >= 768 ? 'text-right' : 'text-left'}`}>
                             <span className="inline-block px-3 py-1 bg-blue-500/20 text-blue-300 rounded-full text-sm font-semibold">
-                              {phase.year}
+                              {t(`timeline.${phaseKey}.year`)}
                             </span>
                           </div>
 
                           <div className={`${(isLeft && window.innerWidth >= 768) ? 'text-left' : window.innerWidth >= 768 ? 'text-right' : 'text-left'}`}>
                             <span className={`inline-block px-3 py-1 rounded-full text-sm font-semibold mb-4 ${
-                              phase.status === 'completed' ? 'bg-green-500/20 text-green-300' :
-                              phase.status === 'in-progress' ? 'bg-blue-500/20 text-blue-300' :
+                              status === 'completed' ? 'bg-green-500/20 text-green-300' :
+                              status === 'in-progress' ? 'bg-blue-500/20 text-blue-300' :
                               'bg-gray-500/20 text-gray-300'
                             }`}>
-                              {phase.status === 'completed' ? 'Completado' :
-                               phase.status === 'in-progress' ? 'En Progreso' : 'Próximo'}
+                              {getStatusText(status)}
                             </span>
                             
-                            <h3 className="text-sm font-semibold text-blue-300 mb-2">{phase.phase}</h3>
-                            <h4 className="text-2xl font-bold text-white mb-4">{phase.title}</h4>
-                            <p className="text-white/80 mb-4 leading-relaxed">{phase.description}</p>
+                            <h3 className="text-sm font-semibold text-blue-300 mb-2">{t(`timeline.${phaseKey}.phase`)}</h3>
+                            <h4 className="text-2xl font-bold text-white mb-4">{t(`timeline.${phaseKey}.title`)}</h4>
+                            <p className="text-white/80 mb-4 leading-relaxed">{t(`timeline.${phaseKey}.description`)}</p>
                             
-                            {phase.details && (
+                            {t(`timeline.${phaseKey}.details`, { defaultValue: '' }) && (
                               <div className="bg-white/5 rounded-lg p-4">
-                                <p className="text-white/70 text-sm">{phase.details}</p>
+                                <p className="text-white/70 text-sm">{t(`timeline.${phaseKey}.details`)}</p>
                               </div>
                             )}
                           </div>
