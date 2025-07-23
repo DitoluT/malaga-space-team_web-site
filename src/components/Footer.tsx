@@ -1,15 +1,18 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Rocket, Mail, Phone, MapPin } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { GlassContainer } from './GlassContainer';
 
 export const Footer: React.FC = () => {
-  const quickLinks = [
-    { name: "Inicio", href: "#inicio" },
-    { name: "Acerca de", href: "#acerca" },
-    { name: "Subsistemas", href: "#subsistemas" },
-    { name: "Equipo", href: "#equipo" },
-    { name: "Contacto", href: "#contacto" }
-  ];
+  const { t } = useTranslation();
+
+  const quickLinks = useMemo(() => [
+    { name: t('footer.quickLinksItems.home'), href: "#inicio" },
+    { name: t('footer.quickLinksItems.about'), href: "#acerca" },
+    { name: t('footer.quickLinksItems.subsystems'), href: "#subsistemas" },
+    { name: t('footer.quickLinksItems.team'), href: "#equipo" },
+    { name: t('footer.quickLinksItems.contact'), href: "#contacto" }
+  ], [t]);
 
   return (
     <footer className="py-16 px-4">
@@ -28,14 +31,13 @@ export const Footer: React.FC = () => {
                   </div>
                 </div>
                 <p className="text-white/80 leading-relaxed">
-                  Desarrollando tecnología CubeSat de vanguardia para avanzar en la investigación, 
-                  educación e innovación en tecnología espacial desde la Universidad de Málaga.
+                  {t('footer.description')}
                 </p>
               </div>
 
               {/* Quick Links */}
               <div>
-                <h4 className="text-xl font-bold text-white mb-6">Enlaces Rápidos</h4>
+                <h4 className="text-xl font-bold text-white mb-6">{t('footer.quickLinks')}</h4>
                 <ul className="space-y-3">
                   {quickLinks.map((link, index) => (
                     <li key={index}>
@@ -52,7 +54,7 @@ export const Footer: React.FC = () => {
 
               {/* Contact Info */}
               <div>
-                <h4 className="text-xl font-bold text-white mb-6">Contacto</h4>
+                <h4 className="text-xl font-bold text-white mb-6">{t('footer.contactInfo')}</h4>
                 <div className="space-y-4">
                   <div className="flex items-center space-x-3">
                     <Mail className="w-5 h-5 text-blue-300" />
@@ -65,8 +67,8 @@ export const Footer: React.FC = () => {
                   <div className="flex items-start space-x-3">
                     <MapPin className="w-5 h-5 text-purple-300 mt-1" />
                     <div>
-                      <p className="text-white/80">Universidad de Málaga</p>
-                      <p className="text-white/60">29071 Málaga, España</p>
+                      <p className="text-white/80">{t('contact.address')}</p>
+                      <p className="text-white/60">{t('contact.city')}</p>
                     </div>
                   </div>
                 </div>
@@ -75,7 +77,7 @@ export const Footer: React.FC = () => {
 
             <div className="border-t border-white/20 mt-12 pt-8 text-center">
               <p className="text-white/60">
-                © 2025 Málaga Space Team - Universidad de Málaga. Todos los derechos reservados.
+                {t('footer.copyright')}
               </p>
             </div>
           </div>

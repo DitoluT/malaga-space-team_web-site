@@ -156,5 +156,61 @@
   "meta": {
     "title": "Málaga Space Team - CubeSat Project University of Málaga",
     "description": "2U CubeSat project from the University of Málaga. Developing cutting-edge space technology for research, education and innovation."
+  },
+  "footer": {
+    "description": "Developing cutting-edge CubeSat technology to advance research, education and innovation in space technology from the University of Málaga.",
+    "quickLinks": "Quick Links",
+    "quickLinksItems": {
+      "home": "Home",
+      "about": "About",
+      "subsystems": "Subsystems",
+      "team": "Team",
+      "contact": "Contact"
+    },
+    "contactInfo": "Contact",
+    "copyright": "© 2025 Málaga Space Team - University of Málaga. All rights reserved."
+  },
+  "sponsors": {
+    "title": "Our Collaborators",
+    "description": "The CubeSat project is supported by leading institutions from the University of Málaga",
+    "collaborators": {
+      "uma": {
+        "name": "University of Málaga",
+        "shortName": "UMA",
+        "description": "Spanish public institution founded in 1972 that offers more than 60 undergraduate degrees and more than 100 postgraduate degrees, with nearly 40,000 students and 2,450 professors distributed across 19 university centers.",
+        "role": "Main Institution",
+        "contribution": "Institutional support, infrastructure and academic resources"
+      },
+      "mobilenet": {
+        "name": "Mobile & Aerospace Networks Lab",
+        "shortName": "MobileNet",
+        "description": "Research group specialized in next-generation networks and artificial intelligence applied to wireless networks. It has more than 30 researchers and advanced infrastructure for technological development.",
+        "role": "Research Laboratory",
+        "contribution": "Technical expertise, research and technological development"
+      },
+      "link": {
+        "name": "LINK by UMA-ATech",
+        "shortName": "Link Bayuma",
+        "description": "Real meeting space between the University of Málaga and companies, dedicated to innovation and entrepreneurship. Facilitates university-industry collaboration.",
+        "role": "Innovation Hub",
+        "contribution": "Industrial connection, knowledge transfer and entrepreneurship"
+      }
+    },
+    "contributionLabel": "🤝 Contribution",
+    "visitWebsite": "Visit website",
+    "benefits": {
+      "advancedResearch": {
+        "title": "Advanced Research",
+        "description": "Access to cutting-edge research infrastructure"
+      },
+      "techTransfer": {
+        "title": "Technology Transfer",
+        "description": "Bridge between university and space industry"
+      },
+      "specializedTraining": {
+        "title": "Specialized Training",
+        "description": "Development of talent in space technology"
+      }
+    }
   }
 }
