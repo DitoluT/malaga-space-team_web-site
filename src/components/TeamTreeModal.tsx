@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { X, Users, GraduationCap, Briefcase } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { GlassContainer } from './GlassContainer';
 import { GlassButton } from './GlassButton';
 import { useNavigation } from './Navigation';
@@ -18,6 +19,7 @@ interface TeamMember {
 }
 
 export const TeamTreeModal: React.FC<TeamTreeModalProps> = ({ isOpen, onClose }) => {
+  const { t } = useTranslation();
   const { hideNavigation, showNavigation } = useNavigation();
   const [isClosing, setIsClosing] = useState(false);
 
@@ -90,7 +92,7 @@ export const TeamTreeModal: React.FC<TeamTreeModalProps> = ({ isOpen, onClose })
             {member.department && (
               <div className="bg-white/5 rounded-md px-2 py-1">
                 <p className="text-white/80 font-medium text-xs">
-                  {departmentNames[member.department as keyof typeof departmentNames] || member.department}
+                  {t(`team.treeModal.departments.${member.department}`) || member.department}
                 </p>
               </div>
             )}
@@ -152,10 +154,10 @@ export const TeamTreeModal: React.FC<TeamTreeModalProps> = ({ isOpen, onClose })
           <div className="flex justify-between items-start mb-8">
             <div>
               <h2 className="text-2xl md:text-3xl font-bold text-white drop-shadow-lg mb-2">
-                {teamTreeModalContent.title}
+                {t('team.treeModal.title')}
               </h2>
               <p className="text-white/80 drop-shadow text-base">
-                {teamTreeModalContent.description}
+                {t('team.treeModal.description')}
               </p>
             </div>
             <button 
@@ -169,7 +171,7 @@ export const TeamTreeModal: React.FC<TeamTreeModalProps> = ({ isOpen, onClose })
           <div className="space-y-12">
             {/* Dirección del Proyecto */}
             <div>
-              <SectionTitle>{teamTreeModalContent.sections.directors}</SectionTitle>
+              <SectionTitle>{t('team.treeModal.sections.directors')}</SectionTitle>
               <div className="flex flex-wrap justify-center gap-6">
                 {directors.map((director, index) => (
                   <MemberCard key={index} member={director} variant="director" />
@@ -180,7 +182,7 @@ export const TeamTreeModal: React.FC<TeamTreeModalProps> = ({ isOpen, onClose })
 
             {/* Coordinadores del Proyecto */}
             <div>
-              <SectionTitle>{teamTreeModalContent.sections.coordinators}</SectionTitle>
+              <SectionTitle>{t('team.treeModal.sections.coordinators')}</SectionTitle>
               <div className="flex flex-wrap justify-center gap-6">
                 {coordinators.map((coordinator, index) => (
                   <MemberCard key={index} member={coordinator} variant="coordinator" />
@@ -191,7 +193,7 @@ export const TeamTreeModal: React.FC<TeamTreeModalProps> = ({ isOpen, onClose })
 
             {/* Líderes de Subsistema */}
             <div>
-              <SectionTitle>{teamTreeModalContent.sections.subsystemLeaders}</SectionTitle>
+              <SectionTitle>{t('team.treeModal.sections.subsystemLeaders')}</SectionTitle>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 justify-items-center">
                 {subsystemLeaders.map((leader, index) => (
                   <MemberCard key={index} member={leader} variant="leader" />
@@ -202,12 +204,12 @@ export const TeamTreeModal: React.FC<TeamTreeModalProps> = ({ isOpen, onClose })
 
             {/* Equipo de Ingenieros por Subsistema */}
             <div>
-              <SectionTitle>{teamTreeModalContent.sections.developmentTeam}</SectionTitle>
+              <SectionTitle>{t('team.treeModal.sections.developmentTeam')}</SectionTitle>
               <div className="space-y-8">
                 {Object.entries(developmentTeamBySubsystem).map(([subsystem, members]) => (
                   <div key={subsystem}>
                     <h4 className="text-lg font-bold text-white mb-4 text-center">
-                      {departmentNames[subsystem as keyof typeof departmentNames] || subsystem}
+                      {t(`team.treeModal.departments.${subsystem}`) || subsystem}
                     </h4>
                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 justify-items-center">
                       {members.map((member, index) => (
@@ -225,24 +227,24 @@ export const TeamTreeModal: React.FC<TeamTreeModalProps> = ({ isOpen, onClose })
             <GlassContainer className="stats-glass">
               <div className="p-6">
                 <h4 className="text-white font-semibold mb-4 text-lg">
-                  📊 Estadísticas del Equipo
+                  {t('team.treeModal.stats.title')}
                 </h4>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
                   <div>
                     <div className="text-2xl font-bold text-blue-300">{directors.length + coordinators.length + subsystemLeaders.length + filteredDevelopmentTeam.length}</div>
-                    <div className="text-white/80 text-sm">{teamTreeModalContent.stats.members}</div>
+                    <div className="text-white/80 text-sm">{t('team.treeModal.stats.members')}</div>
                   </div>
                   <div>
                     <div className="text-2xl font-bold text-green-300">5</div>
-                    <div className="text-white/80 text-sm">{teamTreeModalContent.stats.departments}</div>
+                    <div className="text-white/80 text-sm">{t('team.treeModal.stats.departments')}</div>
                   </div>
                   <div>
                     <div className="text-2xl font-bold text-purple-300">8</div>
-                    <div className="text-white/80 text-sm">{teamTreeModalContent.stats.disciplines}</div>
+                    <div className="text-white/80 text-sm">{t('team.treeModal.stats.disciplines')}</div>
                   </div>
                   <div>
                     <div className="text-2xl font-bold text-orange-300">2+</div>
-                    <div className="text-white/80 text-sm">{teamTreeModalContent.stats.years}</div>
+                    <div className="text-white/80 text-sm">{t('team.treeModal.stats.years')}</div>
                   </div>
                 </div>
               </div>
@@ -250,7 +252,7 @@ export const TeamTreeModal: React.FC<TeamTreeModalProps> = ({ isOpen, onClose })
             
             <div className="mt-6">
               <GlassButton onClick={handleClose} variant="primary" size="md">
-                {teamTreeModalContent.closeButton}
+                {t('team.treeModal.closeButton')}
               </GlassButton>
             </div>
           </div>

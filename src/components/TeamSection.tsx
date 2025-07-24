@@ -1,11 +1,13 @@
 import React from 'react';
 import { Users, GraduationCap, Clock, Cpu } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { GlassContainer } from './GlassContainer';
 import { GlassButton } from './GlassButton';
 import { JoinTeamModalEmailJS } from './JoinTeamModalEmailJS';
 import { TeamTreeModal } from './TeamTreeModal';
 
 export const TeamSection: React.FC = () => {
+  const { t } = useTranslation();
   const [isJoinModalOpen, setIsJoinModalOpen] = React.useState(false);
   const [isTreeModalOpen, setIsTreeModalOpen] = React.useState(false);
 
@@ -13,43 +15,41 @@ export const TeamSection: React.FC = () => {
     {
       icon: Users,
       number: "25+",
-      label: "Miembros Activos"
+      label: t('team.activeMembers')
     },
     {
       icon: GraduationCap,
       number: "6",
-      label: "Departamentos"
+      label: t('team.departments')
     },
     {
       icon: Clock,
       number: "2+",
-      label: "Años de Experiencia"
+      label: t('team.yearsExperience')
     },
     {
       icon: Cpu,
       number: "6",
-      label: "Subsistemas"
+      label: t('team.subsystems')
     }
   ];
 
   const benefits = [
     {
-      title: "Experiencia Práctica",
-      description: "Aplicación directa de conocimientos teóricos en un proyecto real"
+      title: t('team.benefits.practicalExperience.title'),
+      description: t('team.benefits.practicalExperience.description')
     },
     {
-      title: "Colaboración Interdisciplinar",
-      description: "Trabajo en equipo entre diferentes áreas de conocimiento"
+      title: t('team.benefits.interdisciplinaryCollaboration.title'),
+      description: t('team.benefits.interdisciplinaryCollaboration.description')
     },
     {
-      title: "Innovación Tecnológica",
-      description: "Desarrollo de tecnologías avanzadas para aplicaciones espaciales"
+      title: t('team.benefits.technologicalInnovation.title'),
+      description: t('team.benefits.technologicalInnovation.description')
     }
   ];
 
-  const disciplines = [
-    "Ingeniería", "Informática", "Física", "Matemáticas", "Gestión"
-  ];
+  const disciplines = t('team.disciplines', { returnObjects: true }) as string[];
 
   return (
     <>
@@ -57,10 +57,9 @@ export const TeamSection: React.FC = () => {
       <div className="max-w-7xl mx-auto">
         <GlassContainer className="section-glass mb-16">
           <div className="p-8 text-center">
-            <h2 className="text-4xl font-bold text-white mb-6">Conoce al Equipo</h2>
+            <h2 className="text-4xl font-bold text-white mb-6">{t('team.title')}</h2>
             <p className="text-lg text-white/80 max-w-4xl mx-auto">
-              Un equipo multidisciplinario de más de 25 estudiantes e investigadores 
-              apasionados por la tecnología espacial y la innovación.
+              {t('team.description')}
             </p>
           </div>
         </GlassContainer>
@@ -86,12 +85,10 @@ export const TeamSection: React.FC = () => {
         <GlassContainer className="join-team-glass mb-16">
           <div className="p-8">
             <div className="text-center mb-12">
-              <h3 className="text-3xl font-bold text-white mb-4">Únete al Equipo</h3>
-              <h4 className="text-xl font-semibold text-blue-300 mb-4">Un Proyecto Colaborativo e Innovador</h4>
+              <h3 className="text-3xl font-bold text-white mb-4">{t('team.joinTeam.title')}</h3>
+              <h4 className="text-xl font-semibold text-blue-300 mb-4">{t('team.joinTeam.subtitle')}</h4>
               <p className="text-base text-white/80 max-w-4xl mx-auto leading-relaxed">
-                Nuestro equipo reúne estudiantes e investigadores de múltiples disciplinas: 
-                ingeniería aeroespacial, telecomunicaciones, informática, física y más. 
-                Trabajamos juntos para desarrollar un CubeSat 2U completamente funcional.
+                {t('team.joinTeam.description')}
               </p>
             </div>
 
@@ -106,10 +103,9 @@ export const TeamSection: React.FC = () => {
 
             <div className="text-center">
               <div className="mb-8">
-                <h4 className="text-xl font-bold text-white mb-3">🚀 ¿Listo para la Aventura Espacial?</h4>
+                <h4 className="text-xl font-bold text-white mb-3">{t('team.joinTeam.callToAction')}</h4>
                 <p className="text-base text-white/80 mb-4">
-                  Únete a nosotros y sé parte de la próxima generación de innovadores espaciales. 
-                  Buscamos estudiantes motivados de todas las disciplinas así como colaboraciones externas.
+                  {t('team.joinTeam.callToActionDescription')}
                 </p>
               </div>
 
@@ -122,11 +118,11 @@ export const TeamSection: React.FC = () => {
               </div>
               <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
                 <GlassButton variant="primary" size="lg" onClick={() => setIsTreeModalOpen(true)}>
-                  Ver Equipo Completo
+                  {t('team.joinTeam.primaryButton')}
                 </GlassButton>
                 
                 <GlassButton variant="secondary" size="lg" onClick={() => setIsJoinModalOpen(true)}>
-                  Únete o Colabora
+                  {t('team.joinTeam.secondaryButton')}
                 </GlassButton>
               </div>
             </div>

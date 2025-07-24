@@ -196,7 +196,149 @@
         "description": "Development of advanced technologies for space applications"
       }
     },
-    "disciplines": ["Engineering", "Computer Science", "Physics", "Mathematics", "Management", "Electronics", "Mechanics", "Industrial Design"]
+    "disciplines": ["Engineering", "Computer Science", "Physics", "Mathematics", "Management", "Electronics", "Mechanics", "Industrial Design"],
+    "roles": {
+      "associateProfessor": "Associate Professor",
+      "technicalLead": "Technical Lead",
+      "communicationsLead": "Communications Lead", 
+      "softwareLead": "Software Lead",
+      "engineer": "Engineer",
+      "projectDirector": "Project Director",
+      "coDirector": "Co-Director",
+      "projectCoordinator": "Project Coordinator",
+      "subsystemLeader": "Subsystem Leader"
+    },
+    "treeModal": {
+      "title": "Team Organization Chart",
+      "description": "Organizational structure of Málaga Space Team",
+      "sections": {
+        "directors": "Project Direction",
+        "coordinators": "Project Coordinators",
+        "subsystemLeaders": "Subsystem Leaders",
+        "developmentTeam": "Engineering Team"
+      },
+      "departments": {
+        "OBDH": "Command and Data Handling System",
+        "Comms": "Communications",
+        "EPS": "Electrical Power System",
+        "Estructura": "Structure",
+        "EstacionTerrena": "Ground Station"
+      },
+      "stats": {
+        "title": "📊 Team Statistics",
+        "members": "Engineers",
+        "departments": "Departments",
+        "disciplines": "Disciplines",
+        "years": "Years"
+      },
+      "closeButton": "Close Organization Chart"
+    },
+    "joinModal": {
+      "title": "Join or Collaborate",
+      "description": "Be part of the CubeSat Project at the University of Málaga or collaborate with us",
+      "personalInfo": {
+        "title": "Personal Information",
+        "name": "Full Name *",
+        "namePlaceholder": "E.g: John Smith",
+        "email": "Email Address *",
+        "emailPlaceholder": "john.smith@uma.es"
+      },
+      "contactReason": {
+        "title": "Contact Reason",
+        "label": "Why do you want to contact us? *",
+        "placeholder": "Select contact reason",
+        "reasons": {
+          "joinTeam": "Join the team",
+          "academicCollaboration": "Academic collaboration",
+          "sponsorship": "Sponsorship",
+          "generalInfo": "General information"
+        }
+      },
+      "academicInfo": {
+        "title": "Academic Information",
+        "degree": "Degree/Program you are studying *",
+        "degreePlaceholder": "E.g: Telecommunications Engineering",
+        "year": "Current year *",
+        "yearPlaceholder": "Select your year",
+        "years": {
+          "firstGrade": "1st Undergraduate",
+          "secondGrade": "2nd Undergraduate",
+          "thirdGrade": "3rd Undergraduate",
+          "fourthGrade": "4th Undergraduate",
+          "firstMaster": "1st Master's",
+          "secondMaster": "2nd Master's",
+          "phd": "PhD",
+          "graduate": "Graduate"
+        }
+      },
+      "interests": {
+        "title": "Area of Interest",
+        "label": "In which areas of the project would you like to work? * (you can select multiple)",
+        "showInfo": "ℹ️ Show subsystem information",
+        "hideInfo": "ℹ️ Hide subsystem information",
+        "subsystems": {
+          "structure": {
+            "name": "Structure",
+            "description": "Mechanical design and materials"
+          },
+          "power": {
+            "name": "Power",
+            "description": "Solar panels and batteries"
+          },
+          "adcs": {
+            "name": "ADCS (Attitude Control)",
+            "description": "Orientation and stability control"
+          },
+          "cdhs": {
+            "name": "CDHS (Command and Data Handling)",
+            "description": "Data processing and storage"
+          },
+          "payload": {
+            "name": "Payload / Scientific Instruments",
+            "description": "Scientific instruments"
+          },
+          "communications": {
+            "name": "Communications",
+            "description": "Link with ground stations"
+          },
+          "projectManagement": {
+            "name": "Project Management",
+            "description": "Coordination and administration"
+          },
+          "other": {
+            "name": "Other",
+            "description": "Specify in message"
+          }
+        }
+      },
+      "message": {
+        "title": "Message",
+        "labelJoin": "Tell us about your motivation to join the team *",
+        "labelDefault": "Tell us more about your inquiry *",
+        "placeholderJoin": "Describe your experience, motivation and how you would like to contribute to the CubeSat project...",
+        "placeholderDefault": "Describe your inquiry...",
+        "counterText": "Minimum 50 characters"
+      },
+      "importantInfo": {
+        "title": "📋 Important Information",
+        "joinItems": [
+          "The project is open to students from all disciplines",
+          "Commitment and dedication are required for CubeSat 2U development", 
+          "Practical learning opportunity in space technology"
+        ],
+        "generalItem": "We will contact you within 3-5 business days"
+      },
+      "submitButton": "Send Application",
+      "loading": "Sending...",
+      "validation": {
+        "requiredFields": "Please complete all required fields.",
+        "invalidEmail": "Please enter a valid email address.",
+        "messageLength": "Message must be at least 50 characters long.",
+        "academicInfo": "Please complete academic information and select at least one area of interest.",
+        "success": "Application sent successfully! We will contact you soon.",
+        "error": "Error sending application. Please try again."
+      }
+    }
   },
   "contact": {
     "title": "Contact",
@@ -217,7 +359,14 @@
       "subjectPlaceholder": "Message subject",
       "message": "Message",
       "messagePlaceholder": "Write your message here...",
-      "submit": "Send Message"
+      "submit": "Send Message",
+      "loading": "Sending...",
+      "success": "Message sent successfully! We will reply soon.",
+      "error": "Error sending message. Please try again.",
+      "validation": {
+        "required": "Please complete all fields.",
+        "invalidEmail": "Please enter a valid email address."
+      }
     }
   },
   "meta": {
