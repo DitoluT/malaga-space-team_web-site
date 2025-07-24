@@ -1,42 +1,9 @@
 import React, { useState, useRef } from 'react';
 import { Mail, Phone, MapPin, Send } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { GlassContainer } from '../components/GlassContainer';
 import { GlassButton } from '../components/GlassButton';
 import { sendEmail } from '../utils/emailService';
-
-// Static content data
-export const contactContent = {
-  title: "Contacto",
-  description: "¿Tienes preguntas sobre el proyecto? ¿Quieres unirte al equipo? ¡Contáctanos!",
-  contactInfo: {
-    title: "Información de Contacto",
-    coordination: {
-      title: "Coordinación",
-      email: "spaceteam@uma.es"
-    },
-    phone: {
-      title: "Teléfono",
-      number: "+34 952 13 71 00"
-    },
-    location: {
-      title: "Ubicación",
-      address: "Universidad de Málaga",
-      city: "29071 Málaga, España"
-    }
-  },
-  form: {
-    title: "Envíanos un Mensaje",
-    name: "Nombre",
-    namePlaceholder: "Tu nombre",
-    email: "Email",
-    emailPlaceholder: "tu@email.com",
-    subject: "Asunto",
-    subjectPlaceholder: "Asunto del mensaje",
-    message: "Mensaje",
-    messagePlaceholder: "Escribe tu mensaje aquí...",
-    submit: "Enviar Mensaje"
-  }
-};
 
 // Form state interface
 interface FormState {
@@ -50,6 +17,7 @@ interface FormState {
 type FormStatus = 'idle' | 'loading' | 'success' | 'error';
 
 export const ContactFormWithEmailJS: React.FC = () => {
+  const { t } = useTranslation();
   const formRef = useRef<HTMLFormElement>(null);
   const [formState, setFormState] = useState<FormState>({
     name: '',
@@ -81,7 +49,7 @@ export const ContactFormWithEmailJS: React.FC = () => {
     
     if (!validateForm()) {
       setStatus('error');
-      setErrorMessage('Por favor, completa todos los campos.');
+      setErrorMessage(t('contact.form.validation.required'));
       return;
     }
 
@@ -101,7 +69,7 @@ export const ContactFormWithEmailJS: React.FC = () => {
       });
     } catch (error) {
       setStatus('error');
-      setErrorMessage(error instanceof Error ? error.message : 'Error al enviar el mensaje. Inténtalo de nuevo.');
+      setErrorMessage(error instanceof Error ? error.message : t('contact.form.error'));
       console.error('EmailJS error:', error);
     }
   };
@@ -111,9 +79,9 @@ export const ContactFormWithEmailJS: React.FC = () => {
       <div className="max-w-7xl mx-auto">
         <GlassContainer className="section-glass mb-16">
           <div className="p-8 text-center">
-            <h2 className="text-4xl font-bold text-white mb-6">{contactContent.title}</h2>
+            <h2 className="text-4xl font-bold text-white mb-6">{t('contact.title')}</h2>
             <p className="text-lg text-white/80">
-              {contactContent.description}
+              {t('contact.description')}
             </p>
           </div>
         </GlassContainer>
@@ -122,7 +90,7 @@ export const ContactFormWithEmailJS: React.FC = () => {
           {/* Contact Info */}
           <GlassContainer className="contact-info-glass">
             <div className="p-8">
-              <h3 className="text-2xl font-bold text-white mb-6">{contactContent.contactInfo.title}</h3>
+              <h3 className="text-2xl font-bold text-white mb-6">{t('contact.contactInfo')}</h3>
               
               <div className="space-y-6">
                 <div className="flex items-start space-x-6">
@@ -130,8 +98,8 @@ export const ContactFormWithEmailJS: React.FC = () => {
                     <Mail className="w-6 h-6 text-white/90" />
                   </div>
                   <div>
-                    <h4 className="text-lg font-semibold text-white mb-2">{contactContent.contactInfo.coordination.title}</h4>
-                    <p className="text-blue-300 font-semibold">{contactContent.contactInfo.coordination.email}</p>
+                    <h4 className="text-lg font-semibold text-white mb-2">{t('contact.coordination')}</h4>
+                    <p className="text-blue-300 font-semibold">spaceteam@uma.es</p>
                   </div>
                 </div>
 
@@ -140,8 +108,8 @@ export const ContactFormWithEmailJS: React.FC = () => {
                     <Phone className="w-6 h-6 text-white/90" />
                   </div>
                   <div>
-                    <h4 className="text-lg font-semibold text-white mb-2">{contactContent.contactInfo.phone.title}</h4>
-                    <p className="text-green-300 font-semibold">{contactContent.contactInfo.phone.number}</p>
+                    <h4 className="text-lg font-semibold text-white mb-2">{t('contact.phone')}</h4>
+                    <p className="text-green-300 font-semibold">+34 952 13 71 00</p>
                   </div>
                 </div>
 
@@ -150,9 +118,9 @@ export const ContactFormWithEmailJS: React.FC = () => {
                     <MapPin className="w-6 h-6 text-white/90" />
                   </div>
                   <div>
-                    <h4 className="text-lg font-semibold text-white mb-2">{contactContent.contactInfo.location.title}</h4>
-                    <p className="text-purple-300 font-semibold">{contactContent.contactInfo.location.address}</p>
-                    <p className="text-white/70">{contactContent.contactInfo.location.city}</p>
+                    <h4 className="text-lg font-semibold text-white mb-2">{t('contact.location')}</h4>
+                    <p className="text-purple-300 font-semibold">{t('contact.address')}</p>
+                    <p className="text-white/70">{t('contact.city')}</p>
                   </div>
                 </div>
               </div>
@@ -162,58 +130,58 @@ export const ContactFormWithEmailJS: React.FC = () => {
           {/* Contact Form */}
           <GlassContainer className="contact-form-glass">
             <div className="p-8">
-              <h3 className="text-2xl font-bold text-white mb-6">{contactContent.form.title}</h3>
+              <h3 className="text-2xl font-bold text-white mb-6">{t('contact.form.title')}</h3>
               
               <form ref={formRef} onSubmit={handleSubmit} className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
-                    <label className="block text-white/80 text-sm font-semibold mb-2">{contactContent.form.name}</label>
+                    <label className="block text-white/80 text-sm font-semibold mb-2">{t('contact.form.name')}</label>
                     <input 
                       type="text" 
                       name="name"
                       value={formState.name}
                       onChange={handleInputChange}
                       className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/50 focus:outline-none focus:border-blue-400 transition-colors"
-                      placeholder={contactContent.form.namePlaceholder}
+                      placeholder={t('contact.form.namePlaceholder')}
                       required
                     />
                   </div>
                   <div>
-                    <label className="block text-white/80 text-sm font-semibold mb-2">{contactContent.form.email}</label>
+                    <label className="block text-white/80 text-sm font-semibold mb-2">{t('contact.form.email')}</label>
                     <input 
                       type="email" 
                       name="email"
                       value={formState.email}
                       onChange={handleInputChange}
                       className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/50 focus:outline-none focus:border-blue-400 transition-colors"
-                      placeholder={contactContent.form.emailPlaceholder}
+                      placeholder={t('contact.form.emailPlaceholder')}
                       required
                     />
                   </div>
                 </div>
                 
                 <div>
-                  <label className="block text-white/80 text-sm font-semibold mb-2">{contactContent.form.subject}</label>
+                  <label className="block text-white/80 text-sm font-semibold mb-2">{t('contact.form.subject')}</label>
                   <input 
                     type="text" 
                     name="subject"
                     value={formState.subject}
                     onChange={handleInputChange}
                     className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/50 focus:outline-none focus:border-blue-400 transition-colors"
-                    placeholder={contactContent.form.subjectPlaceholder}
+                    placeholder={t('contact.form.subjectPlaceholder')}
                     required
                   />
                 </div>
                 
                 <div>
-                  <label className="block text-white/80 text-sm font-semibold mb-2">{contactContent.form.message}</label>
+                  <label className="block text-white/80 text-sm font-semibold mb-2">{t('contact.form.message')}</label>
                   <textarea 
                     rows={4}
                     name="message"
                     value={formState.message}
                     onChange={handleInputChange}
                     className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/50 focus:outline-none focus:border-blue-400 transition-colors resize-none"
-                    placeholder={contactContent.form.messagePlaceholder}
+                    placeholder={t('contact.form.messagePlaceholder')}
                     required
                   />
                 </div>
@@ -221,7 +189,7 @@ export const ContactFormWithEmailJS: React.FC = () => {
                 {/* Status Messages */}
                 {status === 'success' && (
                   <div className="p-4 bg-green-500/20 border border-green-500/30 rounded-lg text-green-300 text-sm">
-                    ¡Mensaje enviado exitosamente! Te responderemos pronto.
+                    {t('contact.form.success')}
                   </div>
                 )}
                 
@@ -240,7 +208,7 @@ export const ContactFormWithEmailJS: React.FC = () => {
                   <div className="flex items-center justify-center space-x-3">
                     <Send className="w-5 h-5" />
                     <span>
-                      {status === 'loading' ? 'Enviando...' : contactContent.form.submit}
+                      {status === 'loading' ? t('contact.form.loading') : t('contact.form.submit')}
                     </span>
                   </div>
                 </GlassButton>

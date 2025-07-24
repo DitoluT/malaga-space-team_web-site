@@ -196,7 +196,150 @@
         "description": "Desarrollo de tecnologías avanzadas para aplicaciones espaciales"
       }
     },
-    "disciplines": ["Ingeniería", "Informática", "Física", "Matemáticas", "Gestión", "Electrónica", "Mecánica", "Diseño Industrial"]
+    "disciplines": ["Ingeniería", "Informática", "Física", "Matemáticas", "Gestión", "Electrónica", "Mecánica", "Diseño Industrial"],
+    "roles": {
+      "associateProfessor": "Profesor Asociado",
+      "associateProffessor": "Profesor Asociado",
+      "technicalLead": "Líder Técnico",
+      "communicationsLead": "Líder de Comunicaciones",
+      "softwareLead": "Líder de Software",
+      "engineer": "Ingeniero",
+      "projectDirector": "IP y Co-Director del Proyecto",
+      "coDirector": "Co-Director",
+      "projectCoordinator": "Coordinador del Proyecto",
+      "subsystemLeader": "Líder de Subsistema"
+    },
+    "treeModal": {
+      "title": "Organigrama del Equipo",
+      "description": "Estructura organizacional del Málaga Space Team",
+      "sections": {
+        "directors": "Dirección del Proyecto",
+        "coordinators": "Coordinadores del Proyecto",
+        "subsystemLeaders": "Líderes de Subsistema",
+        "developmentTeam": "Equipo de Ingenieros"
+      },
+      "departments": {
+        "OBDH": "Sistema de Control y Manejo de Datos",
+        "Comms": "Comunicaciones",
+        "EPS": "Sistema de Energía",
+        "Estructura": "Estructura",
+        "EstacionTerrena": "Estación Terrena"
+      },
+      "stats": {
+        "title": "📊 Estadísticas del Equipo",
+        "members": "Ingenieros",
+        "departments": "Departamentos",
+        "disciplines": "Disciplinas",
+        "years": "Años"
+      },
+      "closeButton": "Cerrar Organigrama"
+    },
+    "joinModal": {
+      "title": "Únete o Colabora",
+      "description": "Forma parte del Proyecto CubeSat de la Universidad de Málaga o colabora con nosotros",
+      "personalInfo": {
+        "title": "Información Personal",
+        "name": "Nombre Completo *",
+        "namePlaceholder": "Ej: Juan Pérez García",
+        "email": "Correo Electrónico *",
+        "emailPlaceholder": "juan.perez@uma.es"
+      },
+      "contactReason": {
+        "title": "Motivo del Contacto",
+        "label": "¿Por qué quieres contactar con nosotros? *",
+        "placeholder": "Selecciona el motivo de contacto",
+        "reasons": {
+          "joinTeam": "Unirse al equipo",
+          "academicCollaboration": "Colaboración académica",
+          "sponsorship": "Patrocinio",
+          "generalInfo": "Información general"
+        }
+      },
+      "academicInfo": {
+        "title": "Información Académica",
+        "degree": "Grado/Carrera que estudias *",
+        "degreePlaceholder": "Ej: Ingeniería de Telecomunicación",
+        "year": "Curso actual *",
+        "yearPlaceholder": "Selecciona tu curso",
+        "years": {
+          "firstGrade": "1º Grado",
+          "secondGrade": "2º Grado",
+          "thirdGrade": "3º Grado",
+          "fourthGrade": "4º Grado",
+          "firstMaster": "1º Máster",
+          "secondMaster": "2º Máster",
+          "phd": "Doctorado",
+          "graduate": "Egresado"
+        }
+      },
+      "interests": {
+        "title": "Área de Interés",
+        "label": "¿En qué áreas del proyecto te gustaría trabajar? * (puedes seleccionar varias)",
+        "showInfo": "ℹ️ Ver información sobre los subsistemas",
+        "hideInfo": "ℹ️ Ocultar información sobre los subsistemas",
+        "subsystems": {
+          "structure": {
+            "name": "Estructura",
+            "description": "Diseño mecánico y materiales"
+          },
+          "power": {
+            "name": "Energía",
+            "description": "Paneles solares y baterías"
+          },
+          "adcs": {
+            "name": "ADCS (Control de Actitud)",
+            "description": "Control de orientación y estabilidad"
+          },
+          "cdhs": {
+            "name": "CDHS (Comando y Manejo de Datos)",
+            "description": "Procesamiento y almacenamiento de datos"
+          },
+          "payload": {
+            "name": "Payload / Carga Útil",
+            "description": "Instrumentos científicos"
+          },
+          "communications": {
+            "name": "Comunicaciones",
+            "description": "Enlace con estaciones terrestres"
+          },
+          "projectManagement": {
+            "name": "Gestión de Proyectos",
+            "description": "Coordinación y administración"
+          },
+          "other": {
+            "name": "Otro",
+            "description": "Especificar en el mensaje"
+          }
+        }
+      },
+      "message": {
+        "title": "Mensaje",
+        "labelJoin": "Cuéntanos sobre tu motivación para unirte al equipo *",
+        "labelDefault": "Cuéntanos más sobre tu consulta *",
+        "placeholderJoin": "Describe tu experiencia, motivación y cómo te gustaría contribuir al proyecto CubeSat...",
+        "placeholderDefault": "Describe tu consulta...",
+        "counterText": "Mínimo 50 caracteres"
+      },
+      "importantInfo": {
+        "title": "📋 Información Importante",
+        "joinItems": [
+          "El proyecto está abierto a estudiantes de todas las disciplinas",
+          "Se requiere compromiso y dedicación para el desarrollo del CubeSat 2U",
+          "Oportunidad de aprendizaje práctico en tecnología espacial"
+        ],
+        "generalItem": "Contactaremos contigo en un plazo de 3-5 días laborables"
+      },
+      "submitButton": "Enviar Solicitud",
+      "loading": "Enviando...",
+      "validation": {
+        "requiredFields": "Por favor, completa todos los campos obligatorios.",
+        "invalidEmail": "Por favor, ingresa un email válido.",
+        "messageLength": "El mensaje debe tener al menos 50 caracteres.",
+        "academicInfo": "Por favor, completa la información académica y selecciona al menos un área de interés.",
+        "success": "¡Solicitud enviada con éxito! Te contactaremos pronto.",
+        "error": "Error al enviar la solicitud. Por favor, intenta de nuevo."
+      }
+    }
   },
   "contact": {
     "title": "Contacto",
@@ -217,7 +360,14 @@
       "subjectPlaceholder": "Asunto del mensaje",
       "message": "Mensaje",
       "messagePlaceholder": "Escribe tu mensaje aquí...",
-      "submit": "Enviar Mensaje"
+      "submit": "Enviar Mensaje",
+      "loading": "Enviando...",
+      "success": "¡Mensaje enviado exitosamente! Te responderemos pronto.",
+      "error": "Error al enviar el mensaje. Inténtalo de nuevo.",
+      "validation": {
+        "required": "Por favor, completa todos los campos.",
+        "invalidEmail": "Por favor, ingresa un email válido."
+      }
     }
   },
   "meta": {
