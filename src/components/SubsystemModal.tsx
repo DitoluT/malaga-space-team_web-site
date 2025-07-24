@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { X } from 'lucide-react';
 import { GlassContainer } from './GlassContainer';
 import { GlassButton } from './GlassButton';
@@ -8,6 +9,7 @@ interface SubsystemModalProps {
   isOpen: boolean;
   onClose: () => void;
   subsystem: {
+    key?: string;
     title: string;
     description: string;
     details: {
@@ -20,6 +22,7 @@ interface SubsystemModalProps {
 }
 
 export const SubsystemModal: React.FC<SubsystemModalProps> = ({ isOpen, onClose, subsystem }) => {
+  const { t } = useTranslation();
   const { hideNavigation, showNavigation } = useNavigation();
   const [isClosing, setIsClosing] = useState(false);
 
@@ -70,7 +73,7 @@ export const SubsystemModal: React.FC<SubsystemModalProps> = ({ isOpen, onClose,
           
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 lg:gap-8">
             <div>
-              <h3 className="text-base sm:text-lg md:text-xl font-bold text-white mb-3 sm:mb-4 drop-shadow">Componentes Principales</h3>
+              <h3 className="text-base sm:text-lg md:text-xl font-bold text-white mb-3 sm:mb-4 drop-shadow">{t('subsystems.modal.components')}</h3>
               <ul className="space-y-2">
                 {subsystem.details.components.map((component, index) => (
                   <li key={index} className="text-white/80 drop-shadow flex items-center text-sm sm:text-base">
@@ -82,7 +85,7 @@ export const SubsystemModal: React.FC<SubsystemModalProps> = ({ isOpen, onClose,
             </div>
             
             <div>
-              <h3 className="text-base sm:text-lg md:text-xl font-bold text-white mb-3 sm:mb-4 drop-shadow">Especificaciones</h3>
+              <h3 className="text-base sm:text-lg md:text-xl font-bold text-white mb-3 sm:mb-4 drop-shadow">{t('subsystems.modal.specifications')}</h3>
               <ul className="space-y-2">
                 {subsystem.details.specifications.map((spec, index) => (
                   <li key={index} className="text-white/80 drop-shadow flex items-center text-sm sm:text-base">
@@ -95,10 +98,10 @@ export const SubsystemModal: React.FC<SubsystemModalProps> = ({ isOpen, onClose,
           </div>
           
           <div className="mt-4 sm:mt-6 lg:mt-8">
-            <h3 className="text-base sm:text-lg md:text-xl font-bold text-white mb-3 sm:mb-4 drop-shadow">Estado del Desarrollo</h3>
+            <h3 className="text-base sm:text-lg md:text-xl font-bold text-white mb-3 sm:mb-4 drop-shadow">{t('subsystems.modal.status')}</h3>
             <p className="text-white/80 mb-3 sm:mb-4 lg:mb-6 drop-shadow text-sm sm:text-base">{subsystem.details.status}</p>
             
-            <h3 className="text-base sm:text-lg md:text-xl font-bold text-white mb-3 sm:mb-4 drop-shadow">Desafíos Técnicos</h3>
+            <h3 className="text-base sm:text-lg md:text-xl font-bold text-white mb-3 sm:mb-4 drop-shadow">{t('subsystems.modal.challenges')}</h3>
             <ul className="space-y-2 mb-4 sm:mb-6 lg:mb-8">
               {subsystem.details.challenges.map((challenge, index) => (
                 <li key={index} className="text-white/80 drop-shadow flex items-center text-sm sm:text-base">
@@ -111,7 +114,7 @@ export const SubsystemModal: React.FC<SubsystemModalProps> = ({ isOpen, onClose,
           
           <div className="text-center">
             <GlassButton onClick={handleClose} variant="primary" size="md">
-              Cerrar Detalles
+              {t('subsystems.modal.close')}
             </GlassButton>
           </div>
         </div>
