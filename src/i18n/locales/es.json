@@ -199,6 +199,7 @@
     "disciplines": ["Ingeniería", "Informática", "Física", "Matemáticas", "Gestión", "Electrónica", "Mecánica", "Diseño Industrial"],
     "roles": {
       "associateProfessor": "Profesor Asociado",
+      "associateProffessor": "Profesor Asociado",
       "technicalLead": "Líder Técnico",
       "communicationsLead": "Líder de Comunicaciones",
       "softwareLead": "Líder de Software",

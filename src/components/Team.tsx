@@ -1,6 +1,7 @@
 import React from "react";
 import { motion } from "framer-motion";
 import { Github, Linkedin, Mail } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import {
   Card,
   CardContent,
@@ -11,6 +12,15 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+
+// Helper function for role translation
+const useTranslatedRole = () => {
+  const { t } = useTranslation();
+  return (role: string) => {
+    const key = role.toLowerCase().replace(/\s+/g, '').replace('proffessor', 'professor');
+    return t(`team.roles.${key}`) || role;
+  };
+};
 
 interface TeamMemberProps {
   name: string;
@@ -401,12 +411,17 @@ const structMembers: TeamMemberProps[] = [
 ];
 
 export function LeaderTeam() {
+  const { t } = useTranslation();
+  const getTranslatedRole = useTranslatedRole();
+  const { t } = useTranslation();
+  const getTranslatedRole = useTranslatedRole();
+  
   return (
     <section className="py-16 bg-card">
       <div className="container mx-auto px-4">
         <div className="text-center mb-12">
-          <Badge variant="outline" className="mb-4">Our Team</Badge>
-          <h2 className="text-3xl font-bold mb-4">Academic Supervisors</h2>
+          <Badge variant="outline" className="mb-4">{t('team.title')}</Badge>
+          <h2 className="text-3xl font-bold mb-4">{t('team.treeModal.sections.directors')}</h2>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
@@ -428,7 +443,7 @@ export function LeaderTeam() {
                 </div>
                 <CardHeader>
                   <CardTitle>{member.name}</CardTitle>
-                  <CardDescription>{member.role}</CardDescription>
+                  <CardDescription>{getTranslatedRole(member.role)}</CardDescription>
                 </CardHeader>
                 <CardContent className="flex-grow">
                   <Badge variant="secondary" className="mb-2">{member.department}</Badge>
@@ -466,6 +481,8 @@ export function LeaderTeam() {
 }
 
 export function LeaderStudentTeam() {
+  const { t } = useTranslation();
+  const getTranslatedRole = useTranslatedRole();
   return (
     <section className="py-16 bg-card">
       <div className="container mx-auto px-4">
@@ -492,7 +509,7 @@ export function LeaderStudentTeam() {
                 </div>
                 <CardHeader>
                   <CardTitle>{member.name}</CardTitle>
-                  <CardDescription>{member.role}</CardDescription>
+                  <CardDescription>{getTranslatedRole(member.role)}</CardDescription>
                 </CardHeader>
                 <CardContent className="flex-grow">
                   <Badge variant="secondary" className="mb-2">{member.department}</Badge>
@@ -530,6 +547,8 @@ export function LeaderStudentTeam() {
 }
 
 export function GSTeam() {
+  const { t } = useTranslation();
+  const getTranslatedRole = useTranslatedRole();
   return (
     <section className="py-16 bg-card">
       <div className="container mx-auto px-4">
@@ -556,7 +575,7 @@ export function GSTeam() {
                 </div>
                 <CardHeader>
                   <CardTitle>{member.name}</CardTitle>
-                  <CardDescription>{member.role}</CardDescription>
+                  <CardDescription>{getTranslatedRole(member.role)}</CardDescription>
                 </CardHeader>
                 <CardContent className="flex-grow">
                   <Badge variant="secondary" className="mb-2">{member.department}</Badge>
@@ -594,6 +613,8 @@ export function GSTeam() {
 }
 
 export function CommsTeam() {
+  const { t } = useTranslation();
+  const getTranslatedRole = useTranslatedRole();
   return (
     <section className="py-16 bg-card">
       <div className="container mx-auto px-4">
@@ -620,7 +641,7 @@ export function CommsTeam() {
                 </div>
                 <CardHeader>
                   <CardTitle>{member.name}</CardTitle>
-                  <CardDescription>{member.role}</CardDescription>
+                  <CardDescription>{getTranslatedRole(member.role)}</CardDescription>
                 </CardHeader>
                 <CardContent className="flex-grow">
                   <Badge variant="secondary" className="mb-2">{member.department}</Badge>
@@ -658,6 +679,8 @@ export function CommsTeam() {
 }
 
 export function ADCSTeam() {
+  const { t } = useTranslation();
+  const getTranslatedRole = useTranslatedRole();
   return (
     <section className="py-16 bg-card">
       <div className="container mx-auto px-4">
@@ -684,7 +707,7 @@ export function ADCSTeam() {
                 </div>
                 <CardHeader>
                   <CardTitle>{member.name}</CardTitle>
-                  <CardDescription>{member.role}</CardDescription>
+                  <CardDescription>{getTranslatedRole(member.role)}</CardDescription>
                 </CardHeader>
                 <CardContent className="flex-grow">
                   <Badge variant="secondary" className="mb-2">{member.department}</Badge>
@@ -722,6 +745,8 @@ export function ADCSTeam() {
 }
 
 export function StructureTeam() {
+  const { t } = useTranslation();
+  const getTranslatedRole = useTranslatedRole();
   return (
     <section className="py-16 bg-card">
       <div className="container mx-auto px-4">
@@ -748,7 +773,7 @@ export function StructureTeam() {
                 </div>
                 <CardHeader>
                   <CardTitle>{member.name}</CardTitle>
-                  <CardDescription>{member.role}</CardDescription>
+                  <CardDescription>{getTranslatedRole(member.role)}</CardDescription>
                 </CardHeader>
                 <CardContent className="flex-grow">
                   <Badge variant="secondary" className="mb-2">{member.department}</Badge>
@@ -786,6 +811,8 @@ export function StructureTeam() {
 }
 
 export function EPSTeam() {
+  const { t } = useTranslation();
+  const getTranslatedRole = useTranslatedRole();
   return (
     <section className="py-16 bg-card">
       <div className="container mx-auto px-4">
@@ -812,7 +839,7 @@ export function EPSTeam() {
                 </div>
                 <CardHeader>
                   <CardTitle>{member.name}</CardTitle>
-                  <CardDescription>{member.role}</CardDescription>
+                  <CardDescription>{getTranslatedRole(member.role)}</CardDescription>
                 </CardHeader>
                 <CardContent className="flex-grow">
                   <Badge variant="secondary" className="mb-2">{member.department}</Badge>
@@ -850,6 +877,8 @@ export function EPSTeam() {
 }
 
 export function OBSoftTeam() {
+  const { t } = useTranslation();
+  const getTranslatedRole = useTranslatedRole();
   return (
     <section className="py-16 bg-card">
       <div className="container mx-auto px-4">
@@ -876,7 +905,7 @@ export function OBSoftTeam() {
                 </div>
                 <CardHeader>
                   <CardTitle>{member.name}</CardTitle>
-                  <CardDescription>{member.role}</CardDescription>
+                  <CardDescription>{getTranslatedRole(member.role)}</CardDescription>
                 </CardHeader>
                 <CardContent className="flex-grow">
                   <Badge variant="secondary" className="mb-2">{member.department}</Badge>

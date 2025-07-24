@@ -199,6 +199,7 @@
     "disciplines": ["Engineering", "Computer Science", "Physics", "Mathematics", "Management", "Electronics", "Mechanics", "Industrial Design"],
     "roles": {
       "associateProfessor": "Associate Professor",
+      "associateProffessor": "Associate Professor",
       "technicalLead": "Technical Lead",
       "communicationsLead": "Communications Lead", 
       "softwareLead": "Software Lead",
