@@ -2,6 +2,23 @@
 
 Sitio web oficial del Málaga Space Team, un proyecto CubeSat 2U desarrollado por la Universidad de Málaga.
 
+---
+
+## 📝 ¿Quieres editar el contenido de la web?
+
+### Para Editores de Contenido (No técnicos):
+
+1. **📖 Lee la guía completa:** [`GUIA-EDICION-CONTENIDO.md`](./GUIA-EDICION-CONTENIDO.md)
+2. **🚀 Guía rápida:** [`GUIA-RAPIDA.md`](./GUIA-RAPIDA.md)
+3. **👥 Añadir participantes:** [`PLANTILLA-PARTICIPANTES.md`](./PLANTILLA-PARTICIPANTES.md)
+4. **📋 Índice de contenidos:** [`src/content/index.ts`](./src/content/index.ts)
+
+### Para Desarrolladores:
+
+Continúa leyendo esta documentación técnica.
+
+---
+
 ## Descripción
 
 Este sitio web presenta el proyecto CubeSat del Málaga Space Team, desarrollado con React/TypeScript y Vite. El sitio incluye información sobre:

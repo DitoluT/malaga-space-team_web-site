@@ -38,7 +38,7 @@ export const TeamTreeModal: React.FC<TeamTreeModalProps> = ({ isOpen, onClose })
     };
   }, [isOpen, hideNavigation, showNavigation]);
 
-  const { directors, coordinators, subsystemLeaders, developmentTeam, departmentNames } = teamTreeModalContent;
+  const { directors, coordinators, subsystemLeaders, developmentTeam } = teamTreeModalContent;
 
   // Obtener los nombres de los líderes para filtrarlos del equipo de desarrollo
   const leaderNames = new Set(subsystemLeaders.map(leader => leader.name));
@@ -60,29 +60,43 @@ export const TeamTreeModal: React.FC<TeamTreeModalProps> = ({ isOpen, onClose })
     member, 
     variant = 'member' 
   }) => {
-    // Todas las cards tienen el mismo tamaño, un poco más anchas
-    const cardSize = 'w-[200px] min-h-[280px]';
+    // Tarjetas con mejor espaciado y tamaño adaptativo
+    const cardSize = variant === 'director' || variant === 'coordinator' 
+      ? 'w-full max-w-[280px] min-h-[300px]' 
+      : 'w-full max-w-[240px] min-h-[280px]';
 
     return (
       <GlassContainer className="mission-glass">
-        <div className={`p-4 text-center h-full flex flex-col justify-between ${cardSize}`}>
+        <div className={`p-5 text-center h-full flex flex-col justify-between ${cardSize}`}>
           {/* Avatar */}
-          <div className="flex flex-col items-center mb-3">
-            <div className="w-14 h-14 bg-white/10 border border-white/20 rounded-full flex items-center justify-center backdrop-blur-sm shadow-lg mb-3">
-              <Users className="w-7 h-7 text-white/90" />
+          <div className="flex flex-col items-center mb-4">
+            <div className={`${
+              variant === 'director' ? 'w-20 h-20' : 
+              variant === 'coordinator' ? 'w-16 h-16' : 
+              'w-14 h-14'
+            } bg-gradient-to-br from-blue-500/20 to-purple-500/20 border-2 border-white/30 rounded-full flex items-center justify-center backdrop-blur-sm shadow-lg mb-3`}>
+              <Users className={`${
+                variant === 'director' ? 'w-10 h-10' : 
+                variant === 'coordinator' ? 'w-8 h-8' : 
+                'w-7 h-7'
+              } text-white`} />
             </div>
             
             {/* Nombre */}
-            <h4 className="font-bold text-white leading-tight mb-2 text-sm">
+            <h4 className={`font-bold text-white leading-tight mb-2 ${
+              variant === 'director' ? 'text-base' : 
+              variant === 'coordinator' ? 'text-sm' : 
+              'text-sm'
+            }`}>
               {member.name}
             </h4>
           </div>
           
           {/* Información */}
-          <div className="space-y-2 flex-1">
+          <div className="space-y-2.5 flex-1">
             {/* Rol */}
             <div className="flex items-start justify-center space-x-2">
-              <Briefcase className="w-3 h-3 text-blue-400 mt-1 flex-shrink-0" />
+              <Briefcase className="w-3.5 h-3.5 text-blue-400 mt-0.5 flex-shrink-0" />
               <p className="text-blue-300 font-medium leading-tight text-xs">
                 {member.role}
               </p>
@@ -90,17 +104,19 @@ export const TeamTreeModal: React.FC<TeamTreeModalProps> = ({ isOpen, onClose })
             
             {/* Departamento */}
             {member.department && (
-              <div className="bg-white/5 rounded-md px-2 py-1">
-                <p className="text-white/80 font-medium text-xs">
-                  {t(`team.treeModal.departments.${member.department}`) || member.department}
+              <div className="bg-gradient-to-r from-white/5 to-white/10 rounded-lg px-3 py-2 border border-white/10">
+                <p className="text-white/90 font-semibold text-xs leading-tight">
+                  {t(`team.treeModal.departments.${member.department}`) !== `team.treeModal.departments.${member.department}` 
+                    ? t(`team.treeModal.departments.${member.department}`)
+                    : member.department}
                 </p>
               </div>
             )}
             
             {/* Título académico */}
             {member.title && (
-              <div className="flex items-start justify-center space-x-2">
-                <GraduationCap className="w-3 h-3 text-green-400 mt-1 flex-shrink-0" />
+              <div className="flex items-start justify-center space-x-2 pt-1">
+                <GraduationCap className="w-3.5 h-3.5 text-green-400 mt-0.5 flex-shrink-0" />
                 <p className="text-white/70 leading-tight text-xs">
                   {member.title}
                 </p>
@@ -172,7 +188,7 @@ export const TeamTreeModal: React.FC<TeamTreeModalProps> = ({ isOpen, onClose })
             {/* Dirección del Proyecto */}
             <div>
               <SectionTitle>{t('team.treeModal.sections.directors')}</SectionTitle>
-              <div className="flex flex-wrap justify-center gap-6">
+              <div className="flex flex-wrap justify-center gap-6 max-w-3xl mx-auto">
                 {directors.map((director, index) => (
                   <MemberCard key={index} member={director} variant="director" />
                 ))}
@@ -183,7 +199,7 @@ export const TeamTreeModal: React.FC<TeamTreeModalProps> = ({ isOpen, onClose })
             {/* Coordinadores del Proyecto */}
             <div>
               <SectionTitle>{t('team.treeModal.sections.coordinators')}</SectionTitle>
-              <div className="flex flex-wrap justify-center gap-6">
+              <div className="flex flex-wrap justify-center gap-6 max-w-3xl mx-auto">
                 {coordinators.map((coordinator, index) => (
                   <MemberCard key={index} member={coordinator} variant="coordinator" />
                 ))}
@@ -194,7 +210,7 @@ export const TeamTreeModal: React.FC<TeamTreeModalProps> = ({ isOpen, onClose })
             {/* Líderes de Subsistema */}
             <div>
               <SectionTitle>{t('team.treeModal.sections.subsystemLeaders')}</SectionTitle>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 justify-items-center">
+              <div className="flex flex-wrap justify-center gap-4 max-w-5xl mx-auto">
                 {subsystemLeaders.map((leader, index) => (
                   <MemberCard key={index} member={leader} variant="leader" />
                 ))}
@@ -205,13 +221,15 @@ export const TeamTreeModal: React.FC<TeamTreeModalProps> = ({ isOpen, onClose })
             {/* Equipo de Ingenieros por Subsistema */}
             <div>
               <SectionTitle>{t('team.treeModal.sections.developmentTeam')}</SectionTitle>
-              <div className="space-y-8">
+              <div className="space-y-10">
                 {Object.entries(developmentTeamBySubsystem).map(([subsystem, members]) => (
                   <div key={subsystem}>
-                    <h4 className="text-lg font-bold text-white mb-4 text-center">
-                      {t(`team.treeModal.departments.${subsystem}`) || subsystem}
+                    <h4 className="text-lg font-bold text-white mb-6 text-center bg-white/5 border border-white/10 rounded-lg py-3 px-6 inline-block mx-auto">
+                      {t(`team.treeModal.departments.${subsystem}`) !== `team.treeModal.departments.${subsystem}` 
+                        ? t(`team.treeModal.departments.${subsystem}`)
+                        : subsystem}
                     </h4>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 justify-items-center">
+                    <div className="flex flex-wrap justify-center gap-4 mt-4">
                       {members.map((member, index) => (
                         <MemberCard key={index} member={member} variant="member" />
                       ))}

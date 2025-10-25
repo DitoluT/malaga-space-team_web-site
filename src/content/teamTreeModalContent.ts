@@ -12,7 +12,7 @@ export const teamTreeModalContent = {
     "Comms": "Comunicaciones",
     "EPS": "Sistema de Energía",
     "Estructura": "Estructura",
-    "Estación Terrena": "Estación Terrena"
+    "EstacionTerrena": "Estación Terrena"
   },
   directors: [
     {
@@ -52,7 +52,7 @@ export const teamTreeModalContent = {
     {
       name: "Ramón Montoro Mazuela",
       role: "Líder Equipo de Estación Terrena",
-      department: "Estación Terrena",
+      department: "EstacionTerrena",
       title: "Ing. Tecnologías de Telecomunicación"
     },
     {
@@ -108,25 +108,25 @@ export const teamTreeModalContent = {
     {
       name: "Ramón Montoro Mazuela",
       role: "Ingeniero",
-      department: "Estación Terrena",
+      department: "EstacionTerrena",
       title: "Ing. Tecnologías de Telecomunicación"
     },
     {
       name: "David Ruiz Del Castillo",
       role: "Ingeniero",
-      department: "Estación Terrena",
+      department: "EstacionTerrena",
       title: "Ing. Tecnologías de Telecomunicación"
     },
     {
       name: "Lola Ruiz Verdugo",
       role: "Ingeniero",
-      department: "Estación Terrena",
+      department: "EstacionTerrena",
       title: "Ing. Sistemas de Telecomunicación"
     },
     {
       name: "Juan Antonio García Molina",
       role: "Ingeniero",
-      department: "Estación Terrena",
+      department: "EstacionTerrena",
       title: "Ing. Sistemas de Telecomunicación"
     },
     {

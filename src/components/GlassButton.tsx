@@ -8,6 +8,7 @@ interface GlassButtonProps {
   variant?: 'primary' | 'secondary' | 'accent';
   size?: 'sm' | 'md' | 'lg';
   type?: 'button' | 'submit' | 'reset';
+  disabled?: boolean;
 }
 
 export const GlassButton: React.FC<GlassButtonProps> = ({ 
@@ -16,7 +17,8 @@ export const GlassButton: React.FC<GlassButtonProps> = ({
   className = "", 
   variant = 'primary',
   size = 'md',
-  type = 'button'
+  type = 'button',
+  disabled = false
 }) => {
   const variantStyles = {
     primary: 'from-blue-500/30 to-blue-600/30 border-blue-400/50 hover:from-blue-400/40 hover:to-blue-500/40',
@@ -35,18 +37,19 @@ export const GlassButton: React.FC<GlassButtonProps> = ({
       <button 
         type={type}
         onClick={onClick}
+        disabled={disabled}
         className={`
           relative w-full rounded-full font-bold text-white
           bg-gradient-to-r ${variantStyles[variant]}
           border border-solid transition-all duration-300
           hover:scale-105 hover:shadow-lg
           focus:outline-none focus:ring-2 focus:ring-white/20
-          cursor-pointer
+          ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
           ${sizeStyles[size]}
         `}
       >
         <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -skew-x-12 transform -translate-x-full hover:translate-x-full transition-transform duration-700 rounded-full"></div>
-        <span className="relative z-10 drop-shadow-lg">{children}</span>
+        <span className="relative z-10 drop-shadow-lg flex items-center justify-center">{children}</span>
       </button>
     </GlassContainer>
   );

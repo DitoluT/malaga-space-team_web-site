@@ -37,3 +37,10 @@ lerna-debug.log*
 GEMINI.md
 EMAIL_SETUP.md
 EMAILJS_CONFIG.md
+
+# Inventory System
+src/database/
+*.db
+*.db-journal
+*.db-wal
+*.db-shm

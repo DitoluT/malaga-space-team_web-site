@@ -1,17 +1,32 @@
 import { Users, GraduationCap, Clock, Cpu } from 'lucide-react';
+import { getTotalActiveMembers, getUniqueDepartments, getUniqueSubsystems } from './teamMembers';
+
+/**
+ * ====================================
+ * 👥 CONFIGURACIÓN DEL EQUIPO
+ * ====================================
+ * 
+ * NOTA: Para añadir o editar miembros del equipo, ve a:
+ * src/content/teamMembers.ts
+ * 
+ * Este archivo contiene solo el texto general y configuración
+ * de la sección de equipo.
+ */
 
 export const teamContent = {
   title: "Conoce al Equipo",
   description: "Un equipo multidisciplinario de más de 25 estudiantes e investigadores apasionados por la tecnología espacial y la innovación.",
+  
+  // Las estadísticas se calculan automáticamente desde teamMembers.ts
   teamStats: [
     {
       icon: Users,
-      number: "25+",
+      number: `${getTotalActiveMembers()}+`,
       label: "Miembros Activos"
     },
     {
       icon: GraduationCap,
-      number: "6",
+      number: `${getUniqueDepartments().length}`,
       label: "Departamentos"
     },
     {
@@ -21,7 +36,7 @@ export const teamContent = {
     },
     {
       icon: Cpu,
-      number: "6",
+      number: `${getUniqueSubsystems().length}`,
       label: "Subsistemas"
     }
   ],
