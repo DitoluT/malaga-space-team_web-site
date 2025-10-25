@@ -15,6 +15,7 @@ import { GlassContainer } from '../GlassContainer';
 import { GlassButton } from '../GlassButton';
 import { ItemModal } from './ItemModal';
 import { DeleteConfirmModal } from './DeleteConfirmModal';
+import { API_ENDPOINTS } from '../../config/api';
 
 interface User {
   id: number;
@@ -59,7 +60,7 @@ export const InventoryDashboard: React.FC<DashboardProps> = ({ user, onLogout })
   const fetchItems = async () => {
     setLoading(true);
     try {
-      const response = await fetch('http://localhost:3001/api/inventory/items', {
+      const response = await fetch(API_ENDPOINTS.items, {
         credentials: 'include',
       });
       const data = await response.json();
@@ -77,7 +78,7 @@ export const InventoryDashboard: React.FC<DashboardProps> = ({ user, onLogout })
   // Cargar estadísticas
   const fetchStats = async () => {
     try {
-      const response = await fetch('http://localhost:3001/api/inventory/stats', {
+      const response = await fetch(API_ENDPOINTS.stats, {
         credentials: 'include',
       });
       const data = await response.json();
@@ -122,7 +123,7 @@ export const InventoryDashboard: React.FC<DashboardProps> = ({ user, onLogout })
 
   const handleLogout = async () => {
     try {
-      await fetch('http://localhost:3001/api/inventory/logout', {
+      await fetch(API_ENDPOINTS.logout, {
         method: 'POST',
         credentials: 'include',
       });
@@ -150,8 +151,8 @@ export const InventoryDashboard: React.FC<DashboardProps> = ({ user, onLogout })
   const handleSaveItem = async (itemData: any) => {
     try {
       const url = selectedItem
-        ? `http://localhost:3001/api/inventory/items/${selectedItem.id}`
-        : 'http://localhost:3001/api/inventory/items';
+        ? API_ENDPOINTS.itemById(selectedItem.id)
+        : API_ENDPOINTS.items;
       
       const method = selectedItem ? 'PUT' : 'POST';
 
@@ -178,7 +179,7 @@ export const InventoryDashboard: React.FC<DashboardProps> = ({ user, onLogout })
 
     try {
       const response = await fetch(
-        `http://localhost:3001/api/inventory/items/${selectedItem.id}`,
+        API_ENDPOINTS.itemById(selectedItem.id),
         {
           method: 'DELETE',
           credentials: 'include',

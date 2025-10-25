@@ -7,6 +7,7 @@
 import React, { useState, useEffect } from 'react';
 import { InventoryLogin } from './InventoryLogin';
 import { InventoryDashboard } from './InventoryDashboard';
+import { API_ENDPOINTS } from '../../config/api';
 import { Loader2 } from 'lucide-react';
 
 interface User {
@@ -27,7 +28,7 @@ export const InventoryApp: React.FC = () => {
 
   const checkSession = async () => {
     try {
-      const response = await fetch('http://localhost:3001/api/inventory/verify', {
+      const response = await fetch(API_ENDPOINTS.verify, {
         credentials: 'include',
       });
       

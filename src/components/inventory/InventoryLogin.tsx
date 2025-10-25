@@ -11,6 +11,7 @@ import React, { useState } from 'react';
 import { Lock, User, AlertCircle, Loader2 } from 'lucide-react';
 import { GlassContainer } from '../GlassContainer';
 import { GlassButton } from '../GlassButton';
+import { API_ENDPOINTS } from '../../config/api';
 
 interface LoginProps {
   onLoginSuccess: (user: any) => void;
@@ -28,7 +29,7 @@ export const InventoryLogin: React.FC<LoginProps> = ({ onLoginSuccess }) => {
     setLoading(true);
 
     try {
-      const response = await fetch('http://localhost:3001/api/inventory/login', {
+      const response = await fetch(API_ENDPOINTS.login, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

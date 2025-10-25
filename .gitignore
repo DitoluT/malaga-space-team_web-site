@@ -44,3 +44,4 @@ src/database/
 *.db-journal
 *.db-wal
 *.db-shm
+apache-proxy-config.conf
