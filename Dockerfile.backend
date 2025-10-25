@@ -1,0 +1,26 @@
+FROM python:3.11-slim
+
+# Establecer directorio de trabajo
+WORKDIR /app
+
+# Copiar requirements
+COPY requirements.txt .
+
+# Instalar dependencias
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copiar el código del servidor
+COPY src/server/ ./src/server/
+
+# Crear directorio para la base de datos
+RUN mkdir -p /app/data
+
+# Exponer puerto
+EXPOSE 3001
+
+# Variables de entorno
+ENV PYTHONUNBUFFERED=1
+ENV DATABASE_PATH=/app/data/inventory.db
+
+# Comando para iniciar el servidor
+CMD ["python", "src/server/inventory_server.py"]

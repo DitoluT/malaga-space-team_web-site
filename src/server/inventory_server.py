@@ -26,11 +26,11 @@ app = Flask(__name__)
 
 # Configuración
 app.config['SECRET_KEY'] = os.environ.get('JWT_SECRET', 'malaga-space-team-secret-key-change-in-production')
-DATABASE_PATH = os.path.join(os.path.dirname(__file__), '../database/inventory.db')
+DATABASE_PATH = os.environ.get('DATABASE_PATH', os.path.join(os.path.dirname(__file__), '../database/inventory.db'))
 
 # CORS configuración
 CORS(app, 
-     origins=['http://localhost:5173'],
+     origins=['http://localhost:5173', 'http://localhost', os.environ.get('FRONTEND_URL', '*')],
      supports_credentials=True,
      allow_headers=['Content-Type', 'Authorization'],
      methods=['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'])

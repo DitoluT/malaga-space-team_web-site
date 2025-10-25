@@ -8,7 +8,22 @@ import sys
 import sqlite3
 import os
 
-DATABASE_PATH = './src/database/inventory.db'
+# Buscar base de datos en varias ubicaciones posibles
+DATABASE_PATHS = [
+    './data/inventory.db',           # Docker volume
+    './inventario.db',                # Local antiguo
+    './src/database/inventory.db',   # Local nuevo
+]
+
+def find_database():
+    """Encontrar la base de datos en las ubicaciones posibles"""
+    for path in DATABASE_PATHS:
+        if os.path.exists(path):
+            return path
+    # Si no existe, usar la ubicación de Docker
+    return DATABASE_PATHS[0]
+
+DATABASE_PATH = find_database()
 
 def get_db_connection():
     """Conectar a la base de datos"""

@@ -1,0 +1,25 @@
+version: '3.8'
+
+services:
+  inventory-backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    container_name: malaga-inventory-backend
+    ports:
+      - "3001:3001"
+    volumes:
+      # Montar la base de datos para persistencia
+      - ./data:/app/data
+      # Opcional: montar el código para desarrollo en caliente
+      # - ./src/server:/app/src/server
+    environment:
+      - JWT_SECRET=malaga-space-team-secret-key-change-in-production
+      - FLASK_ENV=production
+    restart: unless-stopped
+    networks:
+      - malaga-network
+
+networks:
+  malaga-network:
+    driver: bridge
