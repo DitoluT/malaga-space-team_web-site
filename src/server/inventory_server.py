@@ -116,9 +116,9 @@ def init_database():
     if not cursor.fetchone():
         hashed_password = bcrypt.hashpw('admin123'.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
         cursor.execute('''
-            INSERT INTO usuarios (username, password, nombre_completo, email, rol)
-            VALUES (?, ?, ?, ?, ?)
-        ''', ('admin', hashed_password, 'Administrador', 'admin@malagaspaceteam.uma.es', 'admin'))
+            INSERT INTO usuarios (username, password, nombre_completo, email, rol, requiere_cambio_password)
+            VALUES (?, ?, ?, ?, ?, ?)
+        ''', ('admin', hashed_password, 'Administrador', 'admin@malagaspaceteam.uma.es', 'admin', 0))
         print('✅ Usuario admin creado: admin/admin123')
     
     conn.commit()
