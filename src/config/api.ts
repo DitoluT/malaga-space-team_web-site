@@ -9,6 +9,7 @@ export const API_ENDPOINTS = {
   login: `${API_BASE_URL}/api/inventory/login`,
   logout: `${API_BASE_URL}/api/inventory/logout`,
   verify: `${API_BASE_URL}/api/inventory/verify`,
+  changePassword: `${API_BASE_URL}/api/inventory/change-password`,
   items: `${API_BASE_URL}/api/inventory/items`,
   stats: `${API_BASE_URL}/api/inventory/stats`,
   itemById: (id: number) => `${API_BASE_URL}/api/inventory/items/${id}`,

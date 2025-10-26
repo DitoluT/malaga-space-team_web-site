@@ -7,6 +7,7 @@
 import React, { useState, useEffect } from 'react';
 import { InventoryLogin } from './InventoryLogin';
 import { InventoryDashboard } from './InventoryDashboard';
+import { ChangePasswordModal } from './ChangePasswordModal';
 import { API_ENDPOINTS } from '../../config/api';
 import { Loader2 } from 'lucide-react';
 
@@ -15,11 +16,13 @@ interface User {
   username: string;
   nombre_completo: string;
   rol: 'viewer' | 'manager' | 'admin';
+  requiere_cambio_password?: boolean;
 }
 
 export const InventoryApp: React.FC = () => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [showChangePassword, setShowChangePassword] = useState(false);
 
   // Verificar sesión al cargar
   useEffect(() => {
@@ -36,6 +39,10 @@ export const InventoryApp: React.FC = () => {
         const data = await response.json();
         if (data.success && data.user) {
           setUser(data.user);
+          // Si requiere cambio de contraseña, mostrar modal
+          if (data.user.requiere_cambio_password) {
+            setShowChangePassword(true);
+          }
         }
       }
     } catch (error) {
@@ -45,12 +52,24 @@ export const InventoryApp: React.FC = () => {
     }
   };
 
-  const handleLoginSuccess = (userData: User) => {
+  const handleLoginSuccess = (userData: User, requiresPasswordChange: boolean) => {
     setUser(userData);
+    if (requiresPasswordChange) {
+      setShowChangePassword(true);
+    }
+  };
+
+  const handlePasswordChangeSuccess = () => {
+    setShowChangePassword(false);
+    // Actualizar estado del usuario
+    if (user) {
+      setUser({ ...user, requiere_cambio_password: false });
+    }
   };
 
   const handleLogout = () => {
     setUser(null);
+    setShowChangePassword(false);
   };
 
   if (loading) {
@@ -69,7 +88,15 @@ export const InventoryApp: React.FC = () => {
       {!user ? (
         <InventoryLogin onLoginSuccess={handleLoginSuccess} />
       ) : (
-        <InventoryDashboard user={user} onLogout={handleLogout} />
+        <>
+          <InventoryDashboard user={user} onLogout={handleLogout} />
+          {showChangePassword && (
+            <ChangePasswordModal
+              isFirstTime={true}
+              onSuccess={handlePasswordChangeSuccess}
+            />
+          )}
+        </>
       )}
     </>
   );

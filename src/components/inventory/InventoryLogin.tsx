@@ -14,7 +14,7 @@ import { GlassButton } from '../GlassButton';
 import { API_ENDPOINTS } from '../../config/api';
 
 interface LoginProps {
-  onLoginSuccess: (user: any) => void;
+  onLoginSuccess: (user: any, requiresPasswordChange: boolean) => void;
 }
 
 export const InventoryLogin: React.FC<LoginProps> = ({ onLoginSuccess }) => {
@@ -41,7 +41,7 @@ export const InventoryLogin: React.FC<LoginProps> = ({ onLoginSuccess }) => {
       const data = await response.json();
 
       if (response.ok && data.success) {
-        onLoginSuccess(data.user);
+        onLoginSuccess(data.user, data.requiere_cambio_password || false);
       } else {
         setError(data.error || 'Error al iniciar sesión');
       }

@@ -62,10 +62,18 @@ def init_database():
             email TEXT,
             rol TEXT NOT NULL DEFAULT 'viewer',
             activo INTEGER DEFAULT 1,
+            requiere_cambio_password INTEGER DEFAULT 0,
             fecha_creacion TEXT DEFAULT (DATETIME('now')),
             ultimo_acceso TEXT
         )
     ''')
+    
+    # Agregar columna requiere_cambio_password si no existe (para bases de datos existentes)
+    cursor.execute("PRAGMA table_info(usuarios)")
+    columns = [column[1] for column in cursor.fetchall()]
+    if 'requiere_cambio_password' not in columns:
+        cursor.execute('ALTER TABLE usuarios ADD COLUMN requiere_cambio_password INTEGER DEFAULT 0')
+        print('✅ Columna requiere_cambio_password agregada a la tabla usuarios')
     
     # Tabla de inventario
     cursor.execute('''
@@ -189,17 +197,22 @@ def login():
     if not bcrypt.checkpw(password.encode('utf-8'), user['password'].encode('utf-8')):
         return jsonify({'error': 'Credenciales inválidas'}), 401
     
+    # Verificar si requiere cambio de contraseña
+    requiere_cambio = bool(user['requiere_cambio_password'])
+    
     # Generar token JWT
     token = jwt.encode({
         'id': user['id'],
         'username': user['username'],
         'rol': user['rol'],
+        'requiere_cambio_password': requiere_cambio,
         'exp': datetime.datetime.utcnow() + datetime.timedelta(hours=8)
     }, app.config['SECRET_KEY'], algorithm='HS256')
     
     # Crear respuesta con cookie
     response = make_response(jsonify({
         'success': True,
+        'requiere_cambio_password': requiere_cambio,
         'user': {
             'id': user['id'],
             'username': user['username'],
@@ -231,13 +244,57 @@ def logout():
 def verify():
     """Verificar sesión activa"""
     conn = get_db_connection()
-    user = conn.execute('SELECT id, username, nombre_completo, rol FROM usuarios WHERE id = ?', 
+    user = conn.execute('SELECT id, username, nombre_completo, rol, requiere_cambio_password FROM usuarios WHERE id = ?', 
                        (request.user['id'],)).fetchone()
     conn.close()
     
     return jsonify({
         'success': True,
         'user': dict(user)
+    })
+
+@app.route('/api/inventory/change-password', methods=['POST'])
+@token_required
+def change_password():
+    """Cambiar contraseña de usuario"""
+    data = request.get_json()
+    current_password = data.get('current_password')
+    new_password = data.get('new_password')
+    
+    if not current_password or not new_password:
+        return jsonify({'error': 'Contraseña actual y nueva son requeridas'}), 400
+    
+    if len(new_password) < 6:
+        return jsonify({'error': 'La contraseña debe tener al menos 6 caracteres'}), 400
+    
+    conn = get_db_connection()
+    user = conn.execute('SELECT password FROM usuarios WHERE id = ?', (request.user['id'],)).fetchone()
+    
+    if not user:
+        conn.close()
+        return jsonify({'error': 'Usuario no encontrado'}), 404
+    
+    # Verificar contraseña actual
+    if not bcrypt.checkpw(current_password.encode('utf-8'), user['password'].encode('utf-8')):
+        conn.close()
+        return jsonify({'error': 'Contraseña actual incorrecta'}), 401
+    
+    # Hash de la nueva contraseña
+    hashed_password = bcrypt.hashpw(new_password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+    
+    # Actualizar contraseña y quitar flag de cambio obligatorio
+    conn.execute('''
+        UPDATE usuarios 
+        SET password = ?, requiere_cambio_password = 0 
+        WHERE id = ?
+    ''', (hashed_password, request.user['id']))
+    
+    conn.commit()
+    conn.close()
+    
+    return jsonify({
+        'success': True,
+        'message': 'Contraseña actualizada correctamente'
     })
 
 # ====================================
