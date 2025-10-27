@@ -8,15 +8,15 @@ export const timelineContent = {
       description: "Proyecto CubeSat 2U aprobado por la Junta Universitaria y primera adquisición financiera destinada al desarrollo del proyecto.",
       status: "completed",
       statusText: "Completado con Éxito",
-      year: "2023"
+      year: "2025"
     },
     {
       phase: "Fase 2",
       title: "Fase de Diseño",
       description: "Planteamiento y diseño del CubeSat 2U finalizado, habiendo elegido los componentes que forman el payload reconfigurable, y maquetación 3D de la estructura y arquitectura de subsistemas.",
       status: "completed",
-      statusText: "Completado con Éxito",
-      year: "2023-2024"
+      statusText: "En Progreso",
+      year: "2025-2026"
     },
     {
       phase: "Fase 3",
@@ -25,7 +25,7 @@ export const timelineContent = {
       status: "in-progress",
       statusText: "En Progreso",
       details: "Procesadores, sensores, baterías y componentes de comunicación",
-      year: "2024"
+      year: "2026"
     },
     {
       phase: "Fase 4",
@@ -34,7 +34,7 @@ export const timelineContent = {
       status: "upcoming",
       statusText: "6 Subsistemas Integrados",
       details: "Estructura • Energía • ADCS • CDHS • Payload Reconfigurable • Comunicaciones",
-      year: "2025"
+      year: "2027"
     },
     {
       phase: "Fase 5",
@@ -43,7 +43,7 @@ export const timelineContent = {
       status: "upcoming",
       statusText: "Próximo",
       details: "Prueba de vibración • Prueba térmica • Prueba de vacío • Test de compatibilidad entre subsistemas …",
-      year: "2025-2026"
+      year: "2027-2028"
     },
     {
       phase: "Fase 6",
@@ -51,7 +51,7 @@ export const timelineContent = {
       description: "Verificaciones finales, integración con el lanzador y activación del payload reconfigurable para la misión.",
       status: "upcoming",
       statusText: "Destino: Órbita Terrestre Baja",
-      year: "2026"
+      year: "2028-2029"
     }
   ]
 };
