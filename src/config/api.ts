@@ -13,6 +13,8 @@ export const API_ENDPOINTS = {
   items: `${API_BASE_URL}/api/inventory/items`,
   stats: `${API_BASE_URL}/api/inventory/stats`,
   itemById: (id: number) => `${API_BASE_URL}/api/inventory/items/${id}`,
+  users: `${API_BASE_URL}/api/inventory/users`,
+  userById: (id: number) => `${API_BASE_URL}/api/inventory/users/${id}`,
 };
 
 export default API_BASE_URL;

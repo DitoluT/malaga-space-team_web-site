@@ -570,6 +570,81 @@ def create_user():
     
     return jsonify({'success': True, 'id': user_id}), 201
 
+@app.route('/api/inventory/users/<int:user_id>', methods=['PUT'])
+@token_required
+@role_required(['admin'])
+def update_user(user_id):
+    """Actualizar usuario"""
+    data = request.get_json()
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    # Verificar si el usuario existe
+    user = cursor.execute('SELECT * FROM usuarios WHERE id = ?', (user_id,)).fetchone()
+    if not user:
+        conn.close()
+        return jsonify({'error': 'Usuario no encontrado'}), 404
+
+    # Si se actualiza el password
+    if 'password' in data and data['password']:
+        hashed_password = bcrypt.hashpw(data['password'].encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+        cursor.execute('UPDATE usuarios SET password = ? WHERE id = ?', (hashed_password, user_id))
+
+    # Actualizar otros campos
+    campos = []
+    valores = []
+
+    if 'nombre_completo' in data:
+        campos.append('nombre_completo = ?')
+        valores.append(data['nombre_completo'])
+
+    if 'email' in data:
+        campos.append('email = ?')
+        valores.append(data['email'])
+
+    if 'rol' in data:
+        campos.append('rol = ?')
+        valores.append(data['rol'])
+
+    if 'activo' in data:
+        campos.append('activo = ?')
+        valores.append(data['activo'])
+
+    if campos:
+        valores.append(user_id)
+        cursor.execute(f'UPDATE usuarios SET {", ".join(campos)} WHERE id = ?', tuple(valores))
+
+    conn.commit()
+    conn.close()
+
+    return jsonify({'success': True})
+
+@app.route('/api/inventory/users/<int:user_id>', methods=['DELETE'])
+@token_required
+@role_required(['admin'])
+def delete_user(user_id):
+    """Eliminar usuario"""
+    # Evitar eliminar al propio usuario admin actual
+    if user_id == request.user['id']:
+         return jsonify({'error': 'No puedes eliminar tu propio usuario'}), 400
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    # Verificar si el usuario existe
+    user = cursor.execute('SELECT * FROM usuarios WHERE id = ?', (user_id,)).fetchone()
+    if not user:
+        conn.close()
+        return jsonify({'error': 'Usuario no encontrado'}), 404
+
+    cursor.execute('DELETE FROM usuarios WHERE id = ?', (user_id,))
+
+    conn.commit()
+    conn.close()
+
+    return jsonify({'success': True})
+
 # ====================================
 # INICIALIZACIÓN
 # ====================================
