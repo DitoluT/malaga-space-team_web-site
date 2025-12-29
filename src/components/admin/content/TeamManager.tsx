@@ -7,21 +7,30 @@ interface TeamMember {
   id: number;
   name: string;
   role: string;
+  title?: string;
   image_url: string;
   linkedin_url: string;
-  category: string;
+  category: string; // director, coordinator, leader, member
+  department: string;
   display_order: number;
 }
 
 const CATEGORIES = [
-  { value: 'academicSupervisors', label: 'Supervisión Académica (Academic Supervisors)' },
-  { value: 'studentLeaders', label: 'Líderes Estudiantes (Team Leaders)' },
-  { value: 'groundStation', label: 'Estación Terrena (Ground Station)' },
-  { value: 'communications', label: 'Comunicaciones (Communications)' },
+  { value: 'director', label: 'Director' },
+  { value: 'coordinator', label: 'Coordinador' },
+  { value: 'leader', label: 'Líder de Subsistema' },
+  { value: 'member', label: 'Miembro' },
+];
+
+const DEPARTMENTS = [
+  { value: 'management', label: 'Gestión / Management' },
+  { value: 'systems', label: 'Ingeniería de Sistemas' },
+  { value: 'software', label: 'Software (OBSw)' },
   { value: 'adcs', label: 'ADCS' },
-  { value: 'eps', label: 'Sistemas de Potencia (EPS)' },
-  { value: 'software', label: 'Software de Vuelo (On-Board Software)' },
-  { value: 'structure', label: 'Estructura (Structure)' },
+  { value: 'eps', label: 'EPS (Potencia)' },
+  { value: 'comms', label: 'Comunicaciones' },
+  { value: 'structure', label: 'Estructura y Térmico' },
+  { value: 'groundStation', label: 'Estación Terrena' },
 ];
 
 export const TeamManager: React.FC = () => {
@@ -33,9 +42,11 @@ export const TeamManager: React.FC = () => {
   const [formData, setFormData] = useState({
     name: '',
     role: '',
+    title: '',
     image_url: '',
     linkedin_url: '',
-    category: 'studentLeaders'
+    category: 'member',
+    department: 'software'
   });
 
   const fetchMembers = async () => {
@@ -68,7 +79,7 @@ export const TeamManager: React.FC = () => {
 
       setShowModal(false);
       setEditingMember(null);
-      setFormData({ name: '', role: '', image_url: '', linkedin_url: '', category: 'generalCoordination' });
+      setFormData({ name: '', role: '', title: '', image_url: '', linkedin_url: '', category: 'member', department: 'software' });
       fetchMembers();
     } catch (e) {
       console.error(e);
@@ -90,21 +101,24 @@ export const TeamManager: React.FC = () => {
     setEditingMember(m);
     setFormData({
         name: m.name,
-        role: m.role,
+        role: m.role || '',
+        title: m.title || '',
         image_url: m.image_url || '',
         linkedin_url: m.linkedin_url || '',
-        category: m.category
+        category: m.category || 'member',
+        department: m.department || 'software'
     });
     setShowModal(true);
   };
 
   const openAdd = () => {
     setEditingMember(null);
-    setFormData({ name: '', role: '', image_url: '', linkedin_url: '', category: 'studentLeaders' });
+    setFormData({ name: '', role: '', title: '', image_url: '', linkedin_url: '', category: 'member', department: 'software' });
     setShowModal(true);
   };
 
   const getCategoryLabel = (cat: string) => CATEGORIES.find(c => c.value === cat)?.label || cat;
+  const getDepartmentLabel = (dep: string) => DEPARTMENTS.find(d => d.value === dep)?.label || dep;
 
   return (
     <div>
@@ -118,13 +132,13 @@ export const TeamManager: React.FC = () => {
       ) : members.length === 0 ? (
          <div className="text-center text-white/40 p-8 border border-white/10 rounded-lg">No hay miembros en el equipo.</div>
       ) : (
-        <div className="space-y-6">
+        <div className="space-y-8">
             {CATEGORIES.map(cat => {
                 const catMembers = members.filter(m => m.category === cat.value);
                 if (catMembers.length === 0) return null;
                 return (
                     <div key={cat.value}>
-                        <h4 className="text-white/80 font-bold mb-3 border-b border-white/10 pb-1">{cat.label}</h4>
+                        <h4 className="text-blue-300 font-bold mb-4 text-lg border-b border-white/10 pb-2">{cat.label}</h4>
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                             {catMembers.map(m => (
                                 <div key={m.id} className="bg-white/5 border border-white/10 rounded-lg p-4 flex items-start space-x-4 hover:bg-white/10 transition-colors">
@@ -133,7 +147,8 @@ export const TeamManager: React.FC = () => {
                                     </div>
                                     <div className="flex-1 min-w-0">
                                         <h5 className="text-white font-bold truncate">{m.name}</h5>
-                                        <p className="text-blue-400 text-xs mb-1 truncate">{m.role}</p>
+                                        <p className="text-blue-400 text-xs mb-0.5 truncate">{m.role}</p>
+                                        <p className="text-white/50 text-[10px] mb-1 truncate">{getDepartmentLabel(m.department)}</p>
                                         {m.linkedin_url && <a href={m.linkedin_url} target="_blank" className="text-white/40 hover:text-white"><Linkedin className="w-4 h-4" /></a>}
                                     </div>
                                     <div className="flex flex-col space-y-2">
@@ -158,21 +173,36 @@ export const TeamManager: React.FC = () => {
               <div>
                 <label className="block text-white/70 text-sm mb-1">Nombre *</label>
                 <input className="w-full bg-black/40 border border-white/10 rounded-lg p-2.5 text-white focus:border-blue-500 focus:outline-none"
-                      value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} required />
+                      value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} required placeholder="Nombre Completo" />
               </div>
 
               <div>
                 <label className="block text-white/70 text-sm mb-1">Rol / Cargo *</label>
                 <input className="w-full bg-black/40 border border-white/10 rounded-lg p-2.5 text-white focus:border-blue-500 focus:outline-none"
-                      value={formData.role} onChange={e => setFormData({...formData, role: e.target.value})} required />
+                      value={formData.role} onChange={e => setFormData({...formData, role: e.target.value})} required placeholder="Ej: Ingeniero de Software" />
               </div>
 
               <div>
-                <label className="block text-white/70 text-sm mb-1">Categoría</label>
-                <select className="w-full bg-black/40 border border-white/10 rounded-lg p-2.5 text-white focus:border-blue-500 focus:outline-none"
-                    value={formData.category} onChange={e => setFormData({...formData, category: e.target.value})}>
-                    {CATEGORIES.map(c => <option key={c.value} value={c.value} className="bg-slate-800">{c.label}</option>)}
-                </select>
+                <label className="block text-white/70 text-sm mb-1">Título Académico</label>
+                <input className="w-full bg-black/40 border border-white/10 rounded-lg p-2.5 text-white focus:border-blue-500 focus:outline-none"
+                      value={formData.title} onChange={e => setFormData({...formData, title: e.target.value})} placeholder="Ej: PhD, Estudiante de Máster..." />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                    <label className="block text-white/70 text-sm mb-1">Nivel Jerárquico</label>
+                    <select className="w-full bg-black/40 border border-white/10 rounded-lg p-2.5 text-white focus:border-blue-500 focus:outline-none"
+                        value={formData.category} onChange={e => setFormData({...formData, category: e.target.value})}>
+                        {CATEGORIES.map(c => <option key={c.value} value={c.value} className="bg-slate-800">{c.label}</option>)}
+                    </select>
+                </div>
+                <div>
+                    <label className="block text-white/70 text-sm mb-1">Departamento</label>
+                    <select className="w-full bg-black/40 border border-white/10 rounded-lg p-2.5 text-white focus:border-blue-500 focus:outline-none"
+                        value={formData.department} onChange={e => setFormData({...formData, department: e.target.value})}>
+                        {DEPARTMENTS.map(d => <option key={d.value} value={d.value} className="bg-slate-800">{d.label}</option>)}
+                    </select>
+                </div>
               </div>
 
               <div>

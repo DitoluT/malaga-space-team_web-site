@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { X, Users, GraduationCap, Briefcase } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { GlassContainer } from './GlassContainer';
 import { GlassButton } from './GlassButton';
 import { useNavigation } from './Navigation';
-import { teamTreeModalContent } from '../content/teamTreeModalContent';
+import { API_ENDPOINTS } from '../config/api';
 
 interface TeamTreeModalProps {
   isOpen: boolean;
@@ -12,22 +12,27 @@ interface TeamTreeModalProps {
 }
 
 interface TeamMember {
+  id: number;
   name: string;
   role: string;
+  title?: string;
   department: string;
-  title: string;
+  category: string;
 }
 
 export const TeamTreeModal: React.FC<TeamTreeModalProps> = ({ isOpen, onClose }) => {
   const { t } = useTranslation();
   const { hideNavigation, showNavigation } = useNavigation();
   const [isClosing, setIsClosing] = useState(false);
+  const [members, setMembers] = useState<TeamMember[]>([]);
+  const [loading, setLoading] = useState(true);
 
   React.useEffect(() => {
     if (isOpen) {
       hideNavigation();
       setIsClosing(false);
       document.body.style.overflow = 'hidden';
+      fetchMembers();
     } else {
       showNavigation();
       document.body.style.overflow = 'unset';
@@ -38,16 +43,29 @@ export const TeamTreeModal: React.FC<TeamTreeModalProps> = ({ isOpen, onClose })
     };
   }, [isOpen, hideNavigation, showNavigation]);
 
-  const { directors, coordinators, subsystemLeaders, developmentTeam } = teamTreeModalContent;
+  const fetchMembers = async () => {
+    try {
+        const res = await fetch(`${API_ENDPOINTS.webTeam}`);
+        const data = await res.json();
+        if (data.success) {
+            setMembers(data.data);
+        }
+    } catch (e) {
+        console.error("Failed to fetch team", e);
+    } finally {
+        setLoading(false);
+    }
+  };
 
-  // Obtener los nombres de los líderes para filtrarlos del equipo de desarrollo
-  const leaderNames = new Set(subsystemLeaders.map(leader => leader.name));
-
-  // Filtrar el equipo de desarrollo para evitar duplicados con los líderes
-  const filteredDevelopmentTeam = developmentTeam.filter(member => !leaderNames.has(member.name));
+  const directors = members.filter(m => m.category === 'director');
+  const coordinators = members.filter(m => m.category === 'coordinator');
+  const subsystemLeaders = members.filter(m => m.category === 'leader');
+  // Filter members, and also exclude any that might be leaders (if category is mixed, but here we assume strict category)
+  // Actually, 'member' category is explicit.
+  const developmentTeam = members.filter(m => m.category === 'member');
 
   // Agrupar el equipo de desarrollo filtrado por departamento
-  const developmentTeamBySubsystem = filteredDevelopmentTeam.reduce((acc, member) => {
+  const developmentTeamBySubsystem = developmentTeam.reduce((acc, member) => {
     const { department } = member;
     if (!acc[department]) {
       acc[department] = [];
@@ -184,61 +202,75 @@ export const TeamTreeModal: React.FC<TeamTreeModalProps> = ({ isOpen, onClose })
             </button>
           </div>
           
+          {loading ? (
+             <div className="text-center text-white p-12">Cargando organigrama...</div>
+          ) : (
           <div className="space-y-12">
             {/* Dirección del Proyecto */}
-            <div>
-              <SectionTitle>{t('team.treeModal.sections.directors')}</SectionTitle>
-              <div className="flex flex-wrap justify-center gap-6 max-w-3xl mx-auto">
-                {directors.map((director, index) => (
-                  <MemberCard key={index} member={director} variant="director" />
-                ))}
-              </div>
-              <ConnectionLine />
-            </div>
+            {directors.length > 0 && (
+                <div>
+                <SectionTitle>{t('team.treeModal.sections.directors')}</SectionTitle>
+                <div className="flex flex-wrap justify-center gap-6 max-w-3xl mx-auto">
+                    {directors.map((director, index) => (
+                    <MemberCard key={index} member={director} variant="director" />
+                    ))}
+                </div>
+                <ConnectionLine />
+                </div>
+            )}
 
             {/* Coordinadores del Proyecto */}
-            <div>
-              <SectionTitle>{t('team.treeModal.sections.coordinators')}</SectionTitle>
-              <div className="flex flex-wrap justify-center gap-6 max-w-3xl mx-auto">
-                {coordinators.map((coordinator, index) => (
-                  <MemberCard key={index} member={coordinator} variant="coordinator" />
-                ))}
-              </div>
-              <ConnectionLine />
-            </div>
+            {coordinators.length > 0 && (
+                <div>
+                <SectionTitle>{t('team.treeModal.sections.coordinators')}</SectionTitle>
+                <div className="flex flex-wrap justify-center gap-6 max-w-3xl mx-auto">
+                    {coordinators.map((coordinator, index) => (
+                    <MemberCard key={index} member={coordinator} variant="coordinator" />
+                    ))}
+                </div>
+                <ConnectionLine />
+                </div>
+            )}
 
             {/* Líderes de Subsistema */}
-            <div>
-              <SectionTitle>{t('team.treeModal.sections.subsystemLeaders')}</SectionTitle>
-              <div className="flex flex-wrap justify-center gap-4 max-w-5xl mx-auto">
-                {subsystemLeaders.map((leader, index) => (
-                  <MemberCard key={index} member={leader} variant="leader" />
-                ))}
-              </div>
-              <ConnectionLine />
-            </div>
+            {subsystemLeaders.length > 0 && (
+                <div>
+                <SectionTitle>{t('team.treeModal.sections.subsystemLeaders')}</SectionTitle>
+                <div className="flex flex-wrap justify-center gap-4 max-w-5xl mx-auto">
+                    {subsystemLeaders.map((leader, index) => (
+                    <MemberCard key={index} member={leader} variant="leader" />
+                    ))}
+                </div>
+                <ConnectionLine />
+                </div>
+            )}
 
             {/* Equipo de Ingenieros por Subsistema */}
             <div>
               <SectionTitle>{t('team.treeModal.sections.developmentTeam')}</SectionTitle>
-              <div className="space-y-10">
-                {Object.entries(developmentTeamBySubsystem).map(([subsystem, members]) => (
-                  <div key={subsystem}>
-                    <h4 className="text-lg font-bold text-white mb-6 text-center bg-white/5 border border-white/10 rounded-lg py-3 px-6 inline-block mx-auto">
-                      {t(`team.treeModal.departments.${subsystem}`) !== `team.treeModal.departments.${subsystem}` 
-                        ? t(`team.treeModal.departments.${subsystem}`)
-                        : subsystem}
-                    </h4>
-                    <div className="flex flex-wrap justify-center gap-4 mt-4">
-                      {members.map((member, index) => (
-                        <MemberCard key={index} member={member} variant="member" />
-                      ))}
+              {Object.keys(developmentTeamBySubsystem).length === 0 ? (
+                  <div className="text-center text-white/60">No hay miembros en el equipo de desarrollo.</div>
+              ) : (
+                <div className="space-y-10">
+                    {Object.entries(developmentTeamBySubsystem).map(([subsystem, members]) => (
+                    <div key={subsystem}>
+                        <h4 className="text-lg font-bold text-white mb-6 text-center bg-white/5 border border-white/10 rounded-lg py-3 px-6 inline-block mx-auto">
+                        {t(`team.treeModal.departments.${subsystem}`) !== `team.treeModal.departments.${subsystem}`
+                            ? t(`team.treeModal.departments.${subsystem}`)
+                            : subsystem}
+                        </h4>
+                        <div className="flex flex-wrap justify-center gap-4 mt-4">
+                        {members.map((member, index) => (
+                            <MemberCard key={index} member={member} variant="member" />
+                        ))}
+                        </div>
                     </div>
-                  </div>
-                ))}
-              </div>
+                    ))}
+                </div>
+              )}
             </div>
           </div>
+          )}
           
           {/* Footer con estadísticas */}
           <div className="mt-12 text-center">
@@ -249,11 +281,11 @@ export const TeamTreeModal: React.FC<TeamTreeModalProps> = ({ isOpen, onClose })
                 </h4>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
                   <div>
-                    <div className="text-2xl font-bold text-blue-300">{directors.length + coordinators.length + subsystemLeaders.length + filteredDevelopmentTeam.length}</div>
+                    <div className="text-2xl font-bold text-blue-300">{members.length}</div>
                     <div className="text-white/80 text-sm">{t('team.treeModal.stats.members')}</div>
                   </div>
                   <div>
-                    <div className="text-2xl font-bold text-green-300">5</div>
+                    <div className="text-2xl font-bold text-green-300">{Object.keys(developmentTeamBySubsystem).length}</div>
                     <div className="text-white/80 text-sm">{t('team.treeModal.stats.departments')}</div>
                   </div>
                   <div>

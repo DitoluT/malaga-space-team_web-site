@@ -108,6 +108,24 @@ def init_database():
             github_url TEXT,
             email TEXT,
             active INTEGER DEFAULT 1,
+            display_order INTEGER DEFAULT 0,
+            title TEXT
+        )
+    ''')
+
+    # Tabla de Sponsors/Collaborators (Web)
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS web_sponsors (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT NOT NULL,
+            short_name TEXT,
+            description TEXT,
+            role TEXT,
+            icon TEXT,
+            color TEXT,
+            website TEXT,
+            contribution TEXT,
+            active INTEGER DEFAULT 1,
             display_order INTEGER DEFAULT 0
         )
     ''')
@@ -118,6 +136,13 @@ def init_database():
     if 'requiere_cambio_password' not in columns:
         cursor.execute('ALTER TABLE usuarios ADD COLUMN requiere_cambio_password INTEGER DEFAULT 0')
         print('✅ Columna requiere_cambio_password agregada a la tabla usuarios')
+
+    # Migration for web_team title
+    cursor.execute("PRAGMA table_info(web_team)")
+    team_columns = [column[1] for column in cursor.fetchall()]
+    if 'title' not in team_columns:
+        cursor.execute('ALTER TABLE web_team ADD COLUMN title TEXT')
+        print('✅ Columna title agregada a la tabla web_team')
     
     # Tabla de inventario
     cursor.execute('''
@@ -842,12 +867,12 @@ def create_team_member():
     conn = get_db_connection()
     cursor = conn.cursor()
     cursor.execute('''
-        INSERT INTO web_team (name, role, department, category, image_url, linkedin_url, github_url, email, active, display_order)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        INSERT INTO web_team (name, role, department, category, image_url, linkedin_url, github_url, email, active, display_order, title)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     ''', (
         data['name'], data.get('role'), data.get('department'), data.get('category', 'member'),
         data.get('image_url'), data.get('linkedin_url'), data.get('github_url'), data.get('email'),
-        data.get('active', 1), data.get('display_order', 0)
+        data.get('active', 1), data.get('display_order', 0), data.get('title')
     ))
     conn.commit()
     new_id = cursor.lastrowid
@@ -861,12 +886,12 @@ def update_team_member(id):
     data = request.get_json()
     conn = get_db_connection()
     conn.execute('''
-        UPDATE web_team SET name=?, role=?, department=?, category=?, image_url=?, linkedin_url=?, github_url=?, email=?, active=?, display_order=?
+        UPDATE web_team SET name=?, role=?, department=?, category=?, image_url=?, linkedin_url=?, github_url=?, email=?, active=?, display_order=?, title=?
         WHERE id=?
     ''', (
         data['name'], data.get('role'), data.get('department'), data.get('category', 'member'),
         data.get('image_url'), data.get('linkedin_url'), data.get('github_url'), data.get('email'),
-        data.get('active', 1), data.get('display_order', 0), id
+        data.get('active', 1), data.get('display_order', 0), data.get('title'), id
     ))
     conn.commit()
     conn.close()
@@ -878,6 +903,72 @@ def update_team_member(id):
 def delete_team_member(id):
     conn = get_db_connection()
     conn.execute('DELETE FROM web_team WHERE id=?', (id,))
+    conn.commit()
+    conn.close()
+    return jsonify({'success': True})
+
+# --- SPONSORS ---
+
+@app.route('/api/web/sponsors', methods=['GET'])
+def get_sponsors():
+    conn = get_db_connection()
+    sponsors = conn.execute('SELECT * FROM web_sponsors WHERE active = 1 ORDER BY display_order ASC').fetchall()
+    conn.close()
+    return jsonify({'success': True, 'data': [dict(s) for s in sponsors]})
+
+@app.route('/api/web/sponsors/all', methods=['GET'])
+@token_required
+@role_required(['admin', 'manager'])
+def get_all_sponsors():
+    conn = get_db_connection()
+    sponsors = conn.execute('SELECT * FROM web_sponsors ORDER BY display_order ASC').fetchall()
+    conn.close()
+    return jsonify({'success': True, 'data': [dict(s) for s in sponsors]})
+
+@app.route('/api/web/sponsors', methods=['POST'])
+@token_required
+@role_required(['admin', 'manager'])
+def create_sponsor():
+    data = request.get_json()
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute('''
+        INSERT INTO web_sponsors (name, short_name, description, role, icon, color, website, contribution, active, display_order)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    ''', (
+        data['name'], data.get('short_name'), data.get('description'), data.get('role'),
+        data.get('icon'), data.get('color'), data.get('website'), data.get('contribution'),
+        data.get('active', 1), data.get('display_order', 0)
+    ))
+    conn.commit()
+    new_id = cursor.lastrowid
+    conn.close()
+    return jsonify({'success': True, 'id': new_id})
+
+@app.route('/api/web/sponsors/<int:id>', methods=['PUT'])
+@token_required
+@role_required(['admin', 'manager'])
+def update_sponsor(id):
+    data = request.get_json()
+    conn = get_db_connection()
+    conn.execute('''
+        UPDATE web_sponsors SET name=?, short_name=?, description=?, role=?, icon=?, color=?, website=?, contribution=?, active=?, display_order=?
+        WHERE id=?
+    ''', (
+        data['name'], data.get('short_name'), data.get('description'), data.get('role'),
+        data.get('icon'), data.get('color'), data.get('website'), data.get('contribution'),
+        data.get('active', 1), data.get('display_order', 0), id
+    ))
+    conn.commit()
+    conn.close()
+    return jsonify({'success': True})
+
+@app.route('/api/web/sponsors/<int:id>', methods=['DELETE'])
+@token_required
+@role_required(['admin'])
+def delete_sponsor(id):
+    conn = get_db_connection()
+    conn.execute('DELETE FROM web_sponsors WHERE id=?', (id,))
     conn.commit()
     conn.close()
     return jsonify({'success': True})

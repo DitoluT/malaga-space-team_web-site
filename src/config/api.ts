@@ -18,6 +18,7 @@ export const API_ENDPOINTS = {
   webPartners: `${API_BASE_URL}/api/web/partners`,
   webTimeline: `${API_BASE_URL}/api/web/timeline`,
   webTeam: `${API_BASE_URL}/api/web/team`,
+  webSponsors: `${API_BASE_URL}/api/web/sponsors`,
 };
 
 export default API_BASE_URL;

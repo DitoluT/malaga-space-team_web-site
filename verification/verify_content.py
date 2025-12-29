@@ -1,4 +1,5 @@
 from playwright.sync_api import sync_playwright, expect
+import time
 
 def run():
     with sync_playwright() as p:
@@ -8,7 +9,6 @@ def run():
 
         # Capture console logs
         page.on("console", lambda msg: print(f"BROWSER LOG: {msg.text}"))
-        page.on("pageerror", lambda err: print(f"BROWSER ERROR: {err}"))
 
         # Capture network failures
         def handle_response(response):
@@ -17,75 +17,83 @@ def run():
 
         page.on("response", handle_response)
 
-        print("1. Visiting Homepage...")
-        page.goto("http://localhost:5173")
-        page.wait_for_timeout(2000)
-        page.screenshot(path="verification/1_homepage_initial.png")
-
-        print("2. Visiting Admin Login...")
+        print("1. Logging into Admin...")
         page.goto("http://localhost:5173/admin")
         page.wait_for_timeout(1000)
 
-        # Check if login is needed
         if page.get_by_placeholder("Usuario").count() > 0:
-             print("   Logging in...")
              page.get_by_placeholder("Usuario").fill("admin")
              page.get_by_placeholder("Contraseña").fill("admin123")
              page.get_by_role("button", name="Iniciar Sesión").click()
              page.wait_for_url("**/admin")
              page.wait_for_timeout(2000)
 
-        page.screenshot(path="verification/2_admin_dashboard.png")
-        print("   Logged in to Admin Dashboard")
+        print("   Logged in.")
 
-        print("3. Navigating to Content Management...")
+        print("2. Content Management...")
         page.get_by_text("Contenido Web").click()
         page.wait_for_timeout(1000)
-        page.screenshot(path="verification/3_content_management.png")
 
-        print("4. Adding a Partner...")
-        import time
-        unique_name = f"Playwright Partner {int(time.time())}"
+        # --- SPONSOR ---
+        print("3. Adding Sponsor...")
+        page.get_by_role("button", name="Colaboradores (Detalle)").click()
 
-        if page.get_by_role("button", name="Añadir Colaborador").count() > 0:
-            page.get_by_role("button", name="Añadir Colaborador").click()
-            page.get_by_placeholder("Nombre de la organización").fill(unique_name)
-            page.get_by_placeholder("https://...").first.fill("https://playwright.dev/logo.png") # Logo
-            page.get_by_placeholder("https://...").last.fill("https://playwright.dev") # URL
-            page.get_by_role("button", name="Guardar").click()
-            page.wait_for_timeout(1000)
+        unique_sponsor = f"Test Sponsor {int(time.time())}"
 
-            # Verify in list
-            expect(page.get_by_text(unique_name)).to_be_visible()
-            page.screenshot(path="verification/4_partner_added.png")
-            print(f"   Partner '{unique_name}' added in Admin")
-        else:
-            print("   Could not find 'Añadir Colaborador' button.")
+        page.get_by_role("button", name="Añadir Patrocinador").click()
+        page.get_by_placeholder("Nombre del Patrocinador").fill(unique_sponsor)
+        page.get_by_placeholder("Ej: Colaborador Principal").fill("Strategic Partner")
+        page.get_by_placeholder("Descripción del patrocinador...").fill("Testing description for sponsor.")
+        page.get_by_role("button", name="Guardar").click()
+        page.wait_for_timeout(1000)
+
+        expect(page.get_by_text(unique_sponsor)).to_be_visible()
+        print(f"   Sponsor '{unique_sponsor}' added.")
+
+        # --- TEAM MEMBER ---
+        print("4. Adding Team Member...")
+        page.get_by_role("button", name="Equipo").click()
+
+        unique_member = f"Test Member {int(time.time())}"
+
+        page.get_by_role("button", name="Añadir Miembro").click()
+        page.get_by_placeholder("Nombre Completo").fill(unique_member)
+        page.get_by_placeholder("Ej: Ingeniero de Software").fill("Test Engineer")
+        page.get_by_role("button", name="Guardar").click()
+        page.wait_for_timeout(1000)
+
+        # Verify in list (might need to check "Miembro" section)
+        expect(page.get_by_text(unique_member)).to_be_visible()
+        print(f"   Team Member '{unique_member}' added.")
 
         print("5. Verifying on Homepage...")
         page.goto("http://localhost:5173")
-        page.wait_for_timeout(2000) # Wait for load
+        page.wait_for_timeout(2000)
 
-        partner_title = page.get_by_text("Our Partners")
+        # Verify Sponsor
+        print("   Checking Sponsor...")
+        # Force scroll to Sponsors section
+        sponsor_loc = page.get_by_text(unique_sponsor)
+        sponsor_loc.scroll_into_view_if_needed()
+        expect(sponsor_loc).to_be_visible()
+        print("   Sponsor visible.")
 
-        # Force scroll to it
-        print("   Scrolling to 'Our Partners'...")
-        partner_title.scroll_into_view_if_needed()
-        page.evaluate("window.scrollBy(0, 100)")
+        # Verify Team Member (in Modal)
+        print("   Checking Team Member...")
+        # Click button inside #equipo section (first button is usually Tree Modal)
+        print("   Opening Team Modal...")
+        page.locator("#equipo button").first.click()
 
-        page.wait_for_timeout(2000) # Wait for animation
+        # Wait for modal
+        page.wait_for_timeout(1000)
 
-        expect(partner_title).to_be_visible()
+        # Check member
+        member_loc = page.get_by_text(unique_member)
+        member_loc.scroll_into_view_if_needed()
+        expect(member_loc).to_be_visible()
+        print("   Team Member visible in modal.")
 
-        # Check for the added partner
-        print(f"   Checking for '{unique_name}'...")
-        new_partner = page.get_by_text(unique_name)
-        new_partner.scroll_into_view_if_needed()
-        page.wait_for_timeout(500)
-        expect(new_partner).to_be_visible()
-
-        page.screenshot(path="verification/6_homepage_verified.png")
-        print("   Partner visible on Homepage")
+        page.screenshot(path="verification/7_final_verification.png")
 
         browser.close()
 
