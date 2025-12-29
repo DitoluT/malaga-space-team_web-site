@@ -136,9 +136,17 @@ def init_database():
             website TEXT,
             contribution TEXT,
             active INTEGER DEFAULT 1,
-            display_order INTEGER DEFAULT 0
+            display_order INTEGER DEFAULT 0,
+            image_url TEXT
         )
     ''')
+
+    # Check for image_url in web_sponsors
+    cursor.execute("PRAGMA table_info(web_sponsors)")
+    sponsor_columns = [column[1] for column in cursor.fetchall()]
+    if 'image_url' not in sponsor_columns:
+        cursor.execute('ALTER TABLE web_sponsors ADD COLUMN image_url TEXT')
+        print('✅ Columna image_url agregada a la tabla web_sponsors')
     
     # Agregar columna requiere_cambio_password si no existe (para bases de datos existentes)
     cursor.execute("PRAGMA table_info(usuarios)")
@@ -649,10 +657,45 @@ def create_user():
     """Crear nuevo usuario"""
     data = request.get_json()
     
+    # Quick Create Mode (Email only)
+    if 'quick_email' in data:
+        email = data['quick_email']
+        if not email.endswith('@uma.es'):
+            return jsonify({'error': 'El correo debe ser del dominio @uma.es'}), 400
+
+        username = email.split('@')[0]
+        password = 'spaceteam'
+        nombre_completo = username # Default to username as alias
+        rol = 'viewer' # Default role? Or member? Let's say viewer for safety, admin can upgrade.
+
+        conn = get_db_connection()
+        existing = conn.execute('SELECT id FROM usuarios WHERE username = ? OR email = ?', (username, email)).fetchone()
+        if existing:
+            conn.close()
+            return jsonify({'error': 'El usuario o correo ya existe'}), 400
+
+        hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+        cursor = conn.cursor()
+
+        cursor.execute('''
+            INSERT INTO usuarios (username, password, nombre_completo, email, rol, requiere_cambio_password)
+            VALUES (?, ?, ?, ?, ?, 1)
+        ''', (username, hashed_password, nombre_completo, email, rol))
+
+        user_id = cursor.lastrowid
+        conn.commit()
+        conn.close()
+        return jsonify({'success': True, 'id': user_id, 'message': 'Usuario creado. Contraseña temporal: spaceteam'}), 201
+
+    # Standard Create Mode
     username = data.get('username')
     password = data.get('password')
     nombre_completo = data.get('nombre_completo')
     rol = data.get('rol')
+    email = data.get('email')
+
+    if email and not email.endswith('@uma.es'):
+         return jsonify({'error': 'El correo debe ser del dominio @uma.es'}), 400
     
     if not all([username, password, nombre_completo, rol]):
         return jsonify({'error': 'Todos los campos son requeridos'}), 400
@@ -672,7 +715,7 @@ def create_user():
     cursor.execute('''
         INSERT INTO usuarios (username, password, nombre_completo, email, rol)
         VALUES (?, ?, ?, ?, ?)
-    ''', (username, hashed_password, nombre_completo, data.get('email'), rol))
+    ''', (username, hashed_password, nombre_completo, email, rol))
     
     user_id = cursor.lastrowid
     
@@ -1016,12 +1059,12 @@ def create_sponsor():
     conn = get_db_connection()
     cursor = conn.cursor()
     cursor.execute('''
-        INSERT INTO web_sponsors (name, short_name, description, role, icon, color, website, contribution, active, display_order)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        INSERT INTO web_sponsors (name, short_name, description, role, icon, color, website, contribution, active, display_order, image_url)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     ''', (
         data['name'], data.get('short_name'), data.get('description'), data.get('role'),
         data.get('icon'), data.get('color'), data.get('website'), data.get('contribution'),
-        data.get('active', 1), data.get('display_order', 0)
+        data.get('active', 1), data.get('display_order', 0), data.get('image_url')
     ))
     conn.commit()
     new_id = cursor.lastrowid
@@ -1035,12 +1078,12 @@ def update_sponsor(id):
     data = request.get_json()
     conn = get_db_connection()
     conn.execute('''
-        UPDATE web_sponsors SET name=?, short_name=?, description=?, role=?, icon=?, color=?, website=?, contribution=?, active=?, display_order=?
+        UPDATE web_sponsors SET name=?, short_name=?, description=?, role=?, icon=?, color=?, website=?, contribution=?, active=?, display_order=?, image_url=?
         WHERE id=?
     ''', (
         data['name'], data.get('short_name'), data.get('description'), data.get('role'),
         data.get('icon'), data.get('color'), data.get('website'), data.get('contribution'),
-        data.get('active', 1), data.get('display_order', 0), id
+        data.get('active', 1), data.get('display_order', 0), data.get('image_url'), id
     ))
     conn.commit()
     conn.close()

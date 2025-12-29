@@ -23,6 +23,7 @@ interface Sponsor {
   color: string;
   website: string;
   contribution: string;
+  image_url?: string;
 }
 
 export const SponsorsSection: React.FC = () => {
@@ -38,10 +39,6 @@ export const SponsorsSection: React.FC = () => {
         if (data.success && data.data.length > 0) {
           setSponsors(data.data);
         } else {
-           // If DB is empty, we show nothing (or could fallback to static if desired, but dynamic is requested)
-           // For better UX during transition, maybe we should keep static if empty?
-           // But the user wants to *edit*. If we show static, they can't edit it.
-           // So we show empty list (or message) until they add something.
            setSponsors([]);
         }
       } catch (e) {
@@ -52,32 +49,6 @@ export const SponsorsSection: React.FC = () => {
     };
     fetchSponsors();
   }, []);
-
-  const collaborationBenefits = [
-    {
-      title: t('sponsors.benefits.advancedResearch.title'),
-      description: t('sponsors.benefits.advancedResearch.description')
-    },
-    {
-      title: t('sponsors.benefits.techTransfer.title'),
-      description: t('sponsors.benefits.techTransfer.description')
-    },
-    {
-      title: t('sponsors.benefits.specializedTraining.title'),
-      description: t('sponsors.benefits.specializedTraining.description')
-    }
-  ];
-
-  if (!loading && sponsors.length === 0) {
-      // Return null or show empty state?
-      // If we return null, the "Collaborators" section disappears.
-      // This might be confusing.
-      // Let's render the section structure but with a "No collaborators yet" message or just empty grid.
-      // Actually, better to hide if empty?
-      // "Our Partners" (Logos) is separate.
-      // This section has benefits text too.
-      // I'll render the benefits but hide the sponsors grid if empty.
-  }
 
   return (
     <section id="patrocinadores" className="py-20 px-4">
@@ -99,12 +70,16 @@ export const SponsorsSection: React.FC = () => {
                 return (
                     <GlassContainer key={index} className="collaboration-glass">
                     <div className="p-6 text-center h-[420px] flex flex-col">
-                        <div className={`inline-flex w-12 h-12 bg-gradient-to-br ${collaborator.color || 'from-blue-400 to-blue-600'} rounded-full items-center justify-center mb-4 shadow-lg`}>
-                            <Icon className="w-6 h-6 text-white" />
+                        <div className={`inline-flex w-16 h-16 bg-gradient-to-br ${collaborator.color || 'from-blue-400 to-blue-600'} rounded-full items-center justify-center mb-4 shadow-lg overflow-hidden mx-auto`}>
+                            {collaborator.image_url ? (
+                                <img src={collaborator.image_url} alt={collaborator.name} className="w-full h-full object-cover" />
+                            ) : (
+                                <Icon className="w-8 h-8 text-white" />
+                            )}
                         </div>
                         <h3 className="text-lg font-bold text-white mb-2">{collaborator.name}</h3>
                         <p className="text-sm font-semibold text-blue-300 mb-3">{collaborator.role}</p>
-                        <p className="text-sm text-white/80 leading-relaxed mb-4 flex-1 overflow-y-auto">{collaborator.description}</p>
+                        <p className="text-sm text-white/80 leading-relaxed mb-4 flex-1 overflow-y-auto custom-scrollbar">{collaborator.description}</p>
 
                         {collaborator.contribution && (
                             <div className="bg-white/5 rounded-lg p-3 mb-4">
@@ -134,14 +109,6 @@ export const SponsorsSection: React.FC = () => {
             })}
             </div>
         )}
-
-        {/* Benefits/CTA (Static content preserved) */}
-         {/* ... Actually the original code didn't render benefits list explicitly in the JSX I saw?
-             Wait, I read SponsorsSection.tsx earlier.
-             It defined `collaborationBenefits` array but DID NOT RENDER IT.
-             It only rendered `collaborators.map`.
-             So I should stick to that behavior.
-         */}
       </div>
     </section>
   );

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, Users, GraduationCap, Briefcase } from 'lucide-react';
+import { X, Users, GraduationCap, Briefcase, Mail, Linkedin, Github } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { GlassContainer } from './GlassContainer';
 import { GlassButton } from './GlassButton';
@@ -19,6 +19,9 @@ interface TeamMember {
   department: string;
   category: string;
   image_url: string;
+  email?: string;
+  linkedin_url?: string;
+  github_url?: string;
 }
 
 const DEPARTMENTS_CONFIG = [
@@ -74,9 +77,9 @@ export const TeamTreeModal: React.FC<TeamTreeModalProps> = ({ isOpen, onClose })
     variant = 'small'
   }) => {
     const sizeClasses = {
-        large: 'w-64 min-h-[320px]',
-        medium: 'w-56 min-h-[280px]',
-        small: 'w-48 min-h-[240px]'
+        large: 'w-64 min-h-[340px]',
+        medium: 'w-56 min-h-[300px]',
+        small: 'w-48 min-h-[260px]'
     };
 
     return (
@@ -96,10 +99,10 @@ export const TeamTreeModal: React.FC<TeamTreeModalProps> = ({ isOpen, onClose })
             </h4>
           </div>
           
-          <div className="space-y-2 flex-1 flex flex-col justify-start">
+          <div className="space-y-2 flex-1 flex flex-col justify-start items-center w-full">
             <div className="flex items-center justify-center space-x-1.5">
               <Briefcase className="w-3 h-3 text-blue-400 flex-shrink-0" />
-              <p className="text-blue-300 font-medium leading-tight text-xs">
+              <p className="text-blue-300 font-medium leading-tight text-xs break-words">
                 {member.role}
               </p>
             </div>
@@ -112,6 +115,25 @@ export const TeamTreeModal: React.FC<TeamTreeModalProps> = ({ isOpen, onClose })
                 </p>
               </div>
             )}
+
+            {/* Social Links */}
+            <div className="flex gap-3 mt-auto pt-2">
+                {member.email && (
+                    <a href={`mailto:${member.email}`} className="text-white/60 hover:text-white transition-colors" title={member.email}>
+                        <Mail className="w-4 h-4" />
+                    </a>
+                )}
+                {member.linkedin_url && (
+                    <a href={member.linkedin_url} target="_blank" rel="noopener noreferrer" className="text-white/60 hover:text-blue-400 transition-colors">
+                        <Linkedin className="w-4 h-4" />
+                    </a>
+                )}
+                {member.github_url && (
+                    <a href={member.github_url} target="_blank" rel="noopener noreferrer" className="text-white/60 hover:text-white transition-colors">
+                        <Github className="w-4 h-4" />
+                    </a>
+                )}
+            </div>
           </div>
         </div>
       </GlassContainer>

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Users, RefreshCw } from 'lucide-react';
+import { Plus, Users, RefreshCw, Zap } from 'lucide-react';
 import { GlassContainer } from '../GlassContainer';
 import { GlassButton } from '../GlassButton';
 import { UserList } from './UserList';
@@ -15,6 +15,8 @@ export const UserManagement: React.FC<UserManagementProps> = ({ currentUser }) =
   const [loading, setLoading] = useState(true);
   const [showAddModal, setShowAddModal] = useState(false);
   const [error, setError] = useState('');
+  const [quickEmail, setQuickEmail] = useState('');
+  const [quickLoading, setQuickLoading] = useState(false);
 
   const fetchUsers = async () => {
     setLoading(true);
@@ -54,6 +56,37 @@ export const UserManagement: React.FC<UserManagementProps> = ({ currentUser }) =
     }
 
     await fetchUsers();
+  };
+
+  const handleQuickAdd = async (e: React.FormEvent) => {
+      e.preventDefault();
+      if (!quickEmail.endsWith('@uma.es')) {
+          alert('El correo debe ser del dominio @uma.es');
+          return;
+      }
+
+      setQuickLoading(true);
+      try {
+          const response = await fetch(API_ENDPOINTS.users, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              credentials: 'include',
+              body: JSON.stringify({ quick_email: quickEmail })
+          });
+          const data = await response.json();
+          if (data.success) {
+              alert(`Usuario creado: ${data.message}`);
+              setQuickEmail('');
+              await fetchUsers();
+          } else {
+              alert(data.error || 'Error al crear usuario');
+          }
+      } catch (err) {
+          console.error(err);
+          alert('Error de conexión');
+      } finally {
+          setQuickLoading(false);
+      }
   };
 
   const handleDeleteUser = async (userId: number) => {
@@ -108,6 +141,33 @@ export const UserManagement: React.FC<UserManagementProps> = ({ currentUser }) =
               Añadir Usuario
             </GlassButton>
           </div>
+        </div>
+
+        {/* Quick Add Section */}
+        <div className="mb-8 p-6 bg-blue-900/20 border border-blue-500/20 rounded-xl">
+            <h3 className="text-lg font-semibold text-white mb-4 flex items-center">
+                <Zap className="w-5 h-5 mr-2 text-yellow-400" />
+                Creación Rápida
+            </h3>
+            <form onSubmit={handleQuickAdd} className="flex gap-4 items-end">
+                <div className="flex-1">
+                    <label className="block text-xs text-white/60 mb-1">Correo UMA (@uma.es)</label>
+                    <input
+                        type="email"
+                        required
+                        placeholder="usuario@uma.es"
+                        className="w-full bg-black/40 border border-white/10 rounded-lg p-2.5 text-white focus:border-blue-500 focus:outline-none"
+                        value={quickEmail}
+                        onChange={e => setQuickEmail(e.target.value)}
+                    />
+                </div>
+                <GlassButton type="submit" variant="primary" disabled={quickLoading}>
+                    {quickLoading ? 'Creando...' : 'Crear Usuario'}
+                </GlassButton>
+            </form>
+            <p className="text-xs text-white/40 mt-2">
+                Se creará el usuario con el alias del correo y contraseña temporal 'spaceteam'.
+            </p>
         </div>
 
         {/* Content */}

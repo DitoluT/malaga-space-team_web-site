@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Trash2, Edit2, Link } from 'lucide-react';
+import { Plus, Trash2, Edit2, Link, Upload, Image as ImageIcon } from 'lucide-react';
 import { GlassButton } from '../../GlassButton';
 import { API_ENDPOINTS } from '../../../config/api';
 
@@ -15,6 +15,7 @@ interface Sponsor {
   contribution: string;
   active: number;
   display_order: number;
+  image_url?: string;
 }
 
 const ICONS = [
@@ -38,6 +39,7 @@ export const SponsorsManager: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [editingSponsor, setEditingSponsor] = useState<Sponsor | null>(null);
+  const [uploading, setUploading] = useState(false);
 
   const [formData, setFormData] = useState({
     name: '',
@@ -47,7 +49,8 @@ export const SponsorsManager: React.FC = () => {
     icon: 'Users',
     color: 'from-blue-400 to-blue-600',
     website: '',
-    contribution: ''
+    contribution: '',
+    image_url: ''
   });
 
   const fetchSponsors = async () => {
@@ -65,6 +68,33 @@ export const SponsorsManager: React.FC = () => {
 
   useEffect(() => { fetchSponsors(); }, []);
 
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files || e.target.files.length === 0) return;
+    const file = e.target.files[0];
+    const uploadData = new FormData();
+    uploadData.append('file', file);
+
+    setUploading(true);
+    try {
+        const res = await fetch('/api/upload', {
+            method: 'POST',
+            body: uploadData,
+            credentials: 'include'
+        });
+        const data = await res.json();
+        if (data.success) {
+            setFormData(prev => ({ ...prev, image_url: data.url }));
+        } else {
+            alert('Error uploading image');
+        }
+    } catch (error) {
+        console.error(error);
+        alert('Upload failed');
+    } finally {
+        setUploading(false);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const url = editingSponsor ? `${API_ENDPOINTS.webSponsors}/${editingSponsor.id}` : API_ENDPOINTS.webSponsors;
@@ -80,7 +110,7 @@ export const SponsorsManager: React.FC = () => {
 
       setShowModal(false);
       setEditingSponsor(null);
-      setFormData({ name: '', short_name: '', description: '', role: '', icon: 'Users', color: 'from-blue-400 to-blue-600', website: '', contribution: '' });
+      setFormData({ name: '', short_name: '', description: '', role: '', icon: 'Users', color: 'from-blue-400 to-blue-600', website: '', contribution: '', image_url: '' });
       fetchSponsors();
     } catch (e) {
       console.error(e);
@@ -108,14 +138,15 @@ export const SponsorsManager: React.FC = () => {
         icon: s.icon || 'Users',
         color: s.color || 'from-blue-400 to-blue-600',
         website: s.website || '',
-        contribution: s.contribution || ''
+        contribution: s.contribution || '',
+        image_url: s.image_url || ''
     });
     setShowModal(true);
   };
 
   const openAdd = () => {
     setEditingSponsor(null);
-    setFormData({ name: '', short_name: '', description: '', role: '', icon: 'Users', color: 'from-blue-400 to-blue-600', website: '', contribution: '' });
+    setFormData({ name: '', short_name: '', description: '', role: '', icon: 'Users', color: 'from-blue-400 to-blue-600', website: '', contribution: '', image_url: '' });
     setShowModal(true);
   };
 
@@ -135,7 +166,17 @@ export const SponsorsManager: React.FC = () => {
             {sponsors.map(s => (
                 <div key={s.id} className="bg-white/5 border border-white/10 rounded-lg p-4 flex flex-col hover:bg-white/10 transition-colors">
                     <div className="flex justify-between items-start mb-2">
-                        <h5 className="text-white font-bold">{s.name}</h5>
+                        <div className="flex items-center gap-3">
+                            {s.image_url ? (
+                                <img src={s.image_url} alt={s.name} className="w-10 h-10 rounded-full object-cover bg-white/10" />
+                            ) : (
+                                <div className={`w-10 h-10 rounded-full bg-gradient-to-br ${s.color} flex items-center justify-center`}>
+                                    {/* Icon rendering tricky here without map, assume icon is fallback */}
+                                    <span className="text-xs text-white">{s.icon}</span>
+                                </div>
+                            )}
+                            <h5 className="text-white font-bold">{s.name}</h5>
+                        </div>
                         <div className="flex space-x-2">
                             <button onClick={() => openEdit(s)} className="p-1.5 bg-white/10 rounded hover:bg-white/20 text-white transition-colors"><Edit2 className="w-3 h-3" /></button>
                             <button onClick={() => handleDelete(s.id)} className="p-1.5 bg-red-500/10 rounded hover:bg-red-500/20 text-red-400 transition-colors"><Trash2 className="w-3 h-3" /></button>
@@ -188,16 +229,29 @@ export const SponsorsManager: React.FC = () => {
                       value={formData.contribution} onChange={e => setFormData({...formData, contribution: e.target.value})} placeholder="Ej: Aportación económica" />
               </div>
 
+              <div>
+                <label className="block text-white/70 text-sm mb-1">Imagen (Opcional, reemplaza icono)</label>
+                <div className="flex space-x-2">
+                    <input className="w-full bg-black/40 border border-white/10 rounded-lg p-2.5 text-white focus:border-blue-500 focus:outline-none"
+                        value={formData.image_url} onChange={e => setFormData({...formData, image_url: e.target.value})} placeholder="URL o Subir archivo..." />
+                    <label className="cursor-pointer bg-white/10 hover:bg-white/20 text-white p-2.5 rounded-lg border border-white/10 transition-colors">
+                        <Upload className="w-5 h-5" />
+                        <input type="file" className="hidden" accept="image/*" onChange={handleImageUpload} />
+                    </label>
+                </div>
+                {uploading && <p className="text-xs text-blue-400 mt-1">Subiendo...</p>}
+              </div>
+
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                    <label className="block text-white/70 text-sm mb-1">Icono</label>
+                    <label className="block text-white/70 text-sm mb-1">Icono (Fallback)</label>
                     <select className="w-full bg-black/40 border border-white/10 rounded-lg p-2.5 text-white focus:border-blue-500 focus:outline-none"
                         value={formData.icon} onChange={e => setFormData({...formData, icon: e.target.value})}>
                         {ICONS.map(i => <option key={i.value} value={i.value} className="bg-slate-800">{i.label}</option>)}
                     </select>
                 </div>
                 <div>
-                    <label className="block text-white/70 text-sm mb-1">Color</label>
+                    <label className="block text-white/70 text-sm mb-1">Color (Fallback)</label>
                     <select className="w-full bg-black/40 border border-white/10 rounded-lg p-2.5 text-white focus:border-blue-500 focus:outline-none"
                         value={formData.color} onChange={e => setFormData({...formData, color: e.target.value})}>
                         {COLORS.map(c => <option key={c.value} value={c.value} className="bg-slate-800">{c.label}</option>)}
@@ -214,7 +268,7 @@ export const SponsorsManager: React.FC = () => {
 
             <div className="flex justify-end space-x-3 mt-8">
                <button type="button" onClick={() => setShowModal(false)} className="px-4 py-2 text-white/60 hover:text-white transition-colors">Cancelar</button>
-               <GlassButton type="submit" variant="primary">Guardar</GlassButton>
+               <GlassButton type="submit" variant="primary" disabled={uploading}>Guardar</GlassButton>
             </div>
           </form>
         </div>
