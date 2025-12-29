@@ -88,13 +88,6 @@ export const TeamManager: React.FC = () => {
 
     setUploading(true);
     try {
-        const res = await fetch(`${API_ENDPOINTS.webTeam}/../../upload`, { // Hacky relative path if api endpoint not defined?
-            // Actually I should add API_ENDPOINTS.upload
-            // Let's use direct path for now or add to config.
-            // Wait, I can't easily modify config/api.ts right here without another tool call.
-            // I'll assume /api/upload is available.
-        });
-        // Wait, fetch needs method POST.
         const res2 = await fetch('/api/upload', {
             method: 'POST',
             body: uploadData,

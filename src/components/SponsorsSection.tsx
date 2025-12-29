@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { ExternalLink, Users, Lightbulb, Link as LinkIcon, Rocket, Star } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { GlassContainer } from './GlassContainer';
-import { GlassButton } from './GlassButton';
 import { API_ENDPOINTS } from '../config/api';
 
 const iconMap: Record<string, any> = {
@@ -64,47 +63,64 @@ export const SponsorsSection: React.FC = () => {
 
         {/* Main Collaborators */}
         {sponsors.length > 0 && (
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-16">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-16">
             {sponsors.map((collaborator, index) => {
                 const Icon = iconMap[collaborator.icon] || Users;
                 return (
-                    <GlassContainer key={index} className="collaboration-glass">
-                    <div className="p-6 text-center h-[420px] flex flex-col">
-                        <div className={`inline-flex w-16 h-16 bg-gradient-to-br ${collaborator.color || 'from-blue-400 to-blue-600'} rounded-full items-center justify-center mb-4 shadow-lg overflow-hidden mx-auto`}>
-                            {collaborator.image_url ? (
-                                <img src={collaborator.image_url} alt={collaborator.name} className="w-full h-full object-cover" />
-                            ) : (
-                                <Icon className="w-8 h-8 text-white" />
-                            )}
-                        </div>
-                        <h3 className="text-lg font-bold text-white mb-2">{collaborator.name}</h3>
-                        <p className="text-sm font-semibold text-blue-300 mb-3">{collaborator.role}</p>
-                        <p className="text-sm text-white/80 leading-relaxed mb-4 flex-1 overflow-y-auto custom-scrollbar">{collaborator.description}</p>
+                  <a
+                    key={index}
+                    href={collaborator.website}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="block group"
+                  >
+                    <GlassContainer className="collaboration-glass h-full overflow-hidden transition-transform duration-300 hover:scale-[1.02] hover:shadow-2xl">
+                        <div className="flex flex-col h-full">
+                            {/* Image Area - Top Half */}
+                            <div className="h-48 relative overflow-hidden bg-white/5 flex items-center justify-center">
+                                {/* Optional gradient overlay */}
+                                <div className={`absolute inset-0 opacity-20 bg-gradient-to-br ${collaborator.color || 'from-blue-400 to-blue-600'}`} />
 
-                        {collaborator.contribution && (
-                            <div className="bg-white/5 rounded-lg p-3 mb-4">
-                            <h4 className="text-white font-semibold mb-2 flex items-center justify-center text-sm">
-                                {t('sponsors.contributionLabel')}
-                            </h4>
-                            <p className="text-white/80 text-xs">{collaborator.contribution}</p>
+                                {collaborator.image_url ? (
+                                    <img
+                                        src={collaborator.image_url}
+                                        alt={collaborator.name}
+                                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                                    />
+                                ) : (
+                                    <Icon className="w-20 h-20 text-white/40" />
+                                )}
                             </div>
-                        )}
 
-                        <div>
-                        {collaborator.website && (
-                            <a
-                            href={collaborator.website}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="inline-flex items-center space-x-2 text-white/80 hover:text-white transition-colors group text-sm"
-                            >
-                            <ExternalLink className="w-4 h-4 group-hover:scale-110 transition-transform" />
-                            <span className="text-sm">{t('sponsors.visitWebsite')}</span>
-                            </a>
-                        )}
+                            {/* Content Area - Bottom Half */}
+                            <div className="p-6 flex flex-col flex-grow text-center">
+                                <h3 className="text-xl font-bold text-white mb-2">{collaborator.name}</h3>
+                                <p className="text-sm font-semibold text-blue-300 mb-4">{collaborator.role}</p>
+
+                                {/* Contribution Badge */}
+                                {collaborator.contribution && (
+                                    <div className="mb-4">
+                                        <div className="bg-white/5 rounded-lg p-2 inline-block">
+                                            <p className="text-white/90 text-xs font-medium px-2">
+                                                {collaborator.contribution}
+                                            </p>
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* Description - clamp */}
+                                <p className="text-xs text-white/60 line-clamp-2 mb-4">
+                                    {collaborator.description}
+                                </p>
+
+                                <div className="mt-auto pt-2 flex justify-center items-center text-blue-300 text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity transform translate-y-2 group-hover:translate-y-0 duration-300">
+                                    <span>{t('sponsors.visitWebsite')}</span>
+                                    <ExternalLink className="w-4 h-4 ml-2" />
+                                </div>
+                            </div>
                         </div>
-                    </div>
                     </GlassContainer>
+                  </a>
                 );
             })}
             </div>
