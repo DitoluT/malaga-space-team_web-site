@@ -78,22 +78,16 @@ export const UserManagement: React.FC<UserManagementProps> = ({ currentUser }) =
   };
 
   return (
-    <div className="min-h-screen p-6 bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900">
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-            <div className="absolute top-0 right-0 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl"></div>
-            <div className="absolute bottom-0 left-0 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl"></div>
-        </div>
-
-      <div className="max-w-7xl mx-auto relative z-10">
+    <div className="p-8">
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
           <div>
-            <h1 className="text-3xl font-bold text-white flex items-center">
+            <h2 className="text-3xl font-bold text-white flex items-center">
               <Users className="w-8 h-8 mr-3 text-blue-400" />
-              Panel de Administración
-            </h1>
+              Gestión de Usuarios
+            </h2>
             <p className="text-white/60 mt-1">
-              Gestión de usuarios y permisos del sistema
+              Administra los accesos y permisos del sistema.
             </p>
           </div>
 
@@ -125,7 +119,6 @@ export const UserManagement: React.FC<UserManagementProps> = ({ currentUser }) =
             currentUserId={currentUser.id}
           />
         </GlassContainer>
-      </div>
 
       {showAddModal && (
         <AddUserModal

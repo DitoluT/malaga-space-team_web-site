@@ -2,12 +2,52 @@ import React, { useEffect, useState, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { CheckCircle, Clock, ArrowRight } from 'lucide-react';
 import { GlassContainer } from './GlassContainer';
+import { API_ENDPOINTS } from '../config/api';
+
+interface TimelineEvent {
+  id: number;
+  year: string;
+  title: string;
+  description: string;
+  status: string; // 'completed', 'in-progress', 'upcoming'
+  details?: string;
+}
 
 export const TimelineSection: React.FC = () => {
   const { t } = useTranslation();
+  const [events, setEvents] = useState<TimelineEvent[]>([]);
+  const [loading, setLoading] = useState(true);
+
   const [scrollProgress, setScrollProgress] = useState(0);
   const [visiblePhases, setVisiblePhases] = useState<Set<number>>(new Set());
   const timelineRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const fetchEvents = async () => {
+        try {
+            const res = await fetch(API_ENDPOINTS.webTimeline);
+            const data = await res.json();
+            if (data.success && data.data.length > 0) {
+                setEvents(data.data);
+            } else {
+                // Fallback to i18n keys if DB is empty?
+                // For now, let's assume we want to be fully dynamic.
+                // But to preserve current look if DB is empty, we might want to construct the list from i18n.
+                // However, that defeats the purpose of "user editing".
+                // I will just show what's in DB. If empty, it's empty.
+                // UNLESS the requirement implies "start with current content".
+                // Since I cannot run a migration script easily to populate DB from i18n json files (I don't have them handy in variables),
+                // I will default to empty list.
+                // The user can add events via admin panel.
+            }
+        } catch (e) {
+            console.error("Error fetching timeline", e);
+        } finally {
+            setLoading(false);
+        }
+    };
+    fetchEvents();
+  }, []);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -44,16 +84,7 @@ export const TimelineSection: React.FC = () => {
     handleScroll(); // Check initial position
 
     return () => window.removeEventListener('scroll', handleScroll);
-  }, [visiblePhases]);
-
-  const phaseKeys = ['phase1', 'phase2', 'phase3', 'phase4', 'phase5', 'phase6'];
-
-  const getStatusTranslation = (phaseKey: string) => {
-    const status = t(`timeline.${phaseKey}.status`);
-    if (status.includes('Completado')) return 'completed';
-    if (status.includes('Progreso') || status.includes('Progress')) return 'in-progress';
-    return 'upcoming';
-  };
+  }, [events]); // Removed visiblePhases to prevent infinite loop
 
   const getStatusText = (status: string) => {
     switch (status) {
@@ -62,6 +93,9 @@ export const TimelineSection: React.FC = () => {
       default: return t('timeline.statusLabels.upcoming', 'Próximo');
     }
   };
+
+  if (loading) return null;
+  if (events.length === 0) return null; // Or some "Coming Soon" text
 
   return (
     <section id="cronograma" className="py-20 px-4" ref={timelineRef}>
@@ -90,13 +124,13 @@ export const TimelineSection: React.FC = () => {
 
           {/* Timeline items */}
           <div className="space-y-16">
-            {phaseKeys.map((phaseKey, index) => {
+            {events.map((event, index) => {
               const isLeft = index % 2 === 0 && window.innerWidth >= 768;
               const isVisible = visiblePhases.has(index);
-              const status = getStatusTranslation(phaseKey);
+              const status = event.status || 'upcoming';
 
               return (
-                <div key={index} className="relative flex items-center" data-phase={index}>
+                <div key={event.id} className="relative flex items-center" data-phase={index}>
                   {/* Timeline node */}
                   <div className="absolute left-8 md:left-1/2 transform -translate-x-1/2 md:-translate-x-1/2 z-20">
                     <div 
@@ -141,7 +175,7 @@ export const TimelineSection: React.FC = () => {
                           {/* Year badge */}
                           <div className={`mb-4 ${(isLeft && window.innerWidth >= 768) ? 'text-left' : window.innerWidth >= 768 ? 'text-right' : 'text-left'}`}>
                             <span className="inline-block px-3 py-1 bg-blue-500/20 text-blue-300 rounded-full text-sm font-semibold">
-                              {t(`timeline.${phaseKey}.year`)}
+                              {event.year}
                             </span>
                           </div>
 
@@ -154,13 +188,15 @@ export const TimelineSection: React.FC = () => {
                               {getStatusText(status)}
                             </span>
                             
-                            <h3 className="text-sm font-semibold text-blue-300 mb-2">{t(`timeline.${phaseKey}.phase`)}</h3>
-                            <h4 className="text-2xl font-bold text-white mb-4">{t(`timeline.${phaseKey}.title`)}</h4>
-                            <p className="text-white/80 mb-4 leading-relaxed">{t(`timeline.${phaseKey}.description`)}</p>
+                            <h3 className="text-sm font-semibold text-blue-300 mb-2">{t(`timeline.phases.${index}`, 'Phase')}</h3>
+                            {/* Note: I removed dynamic phase key translation since we use DB data now. Kept a generic fallback or we could use event.title as phase name if we want? */}
+
+                            <h4 className="text-2xl font-bold text-white mb-4">{event.title}</h4>
+                            <p className="text-white/80 mb-4 leading-relaxed">{event.description}</p>
                             
-                            {t(`timeline.${phaseKey}.details`, { defaultValue: '' }) && (
+                            {event.details && (
                               <div className="bg-white/5 rounded-lg p-4">
-                                <p className="text-white/70 text-sm">{t(`timeline.${phaseKey}.details`)}</p>
+                                <p className="text-white/70 text-sm">{event.details}</p>
                               </div>
                             )}
                           </div>

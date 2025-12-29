@@ -7,6 +7,7 @@ import { MissionSection } from './components/MissionSection';
 import { TimelineSection } from './components/TimelineSection';
 import { SubsystemsSection } from './components/SubsystemsSection';
 import { TeamSection } from './components/TeamSection';
+import { PartnersSection } from './components/PartnersSection';
 import { SponsorsSection } from './components/SponsorsSection';
 import { ContactFormWithEmailJS } from './content/contactContent';
 import { Footer } from './components/Footer';
@@ -25,6 +26,7 @@ function App() {
           <TimelineSection />
           <SubsystemsSection />
           <TeamSection />
+          <PartnersSection />
           <SponsorsSection />
           <ContactFormWithEmailJS />
         </main>

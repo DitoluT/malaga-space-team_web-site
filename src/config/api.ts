@@ -15,6 +15,9 @@ export const API_ENDPOINTS = {
   itemById: (id: number) => `${API_BASE_URL}/api/inventory/items/${id}`,
   users: `${API_BASE_URL}/api/inventory/users`,
   userById: (id: number) => `${API_BASE_URL}/api/inventory/users/${id}`,
+  webPartners: `${API_BASE_URL}/api/web/partners`,
+  webTimeline: `${API_BASE_URL}/api/web/timeline`,
+  webTeam: `${API_BASE_URL}/api/web/team`,
 };
 
 export default API_BASE_URL;
