@@ -1,5 +1,5 @@
 import React from 'react';
-import { Trash2, User, Shield, CheckCircle, XCircle } from 'lucide-react';
+import { Trash2, User, Shield, CheckCircle, XCircle, Edit2 } from 'lucide-react';
 import { GlassButton } from '../GlassButton';
 
 interface User {
@@ -17,10 +17,11 @@ interface UserListProps {
   users: User[];
   loading: boolean;
   onDelete: (id: number) => void;
+  onEdit: (user: User) => void;
   currentUserId: number;
 }
 
-export const UserList: React.FC<UserListProps> = ({ users, loading, onDelete, currentUserId }) => {
+export const UserList: React.FC<UserListProps> = ({ users, loading, onDelete, onEdit, currentUserId }) => {
   if (loading) {
     return (
       <div className="text-center py-10">
@@ -117,17 +118,24 @@ export const UserList: React.FC<UserListProps> = ({ users, loading, onDelete, cu
                 </div>
               </td>
               <td className="py-4 px-4 text-right">
-                {user.id !== currentUserId && (
-                  <GlassButton
-                    variant="danger"
-                    size="sm"
-                    icon={Trash2}
-                    onClick={() => onDelete(user.id)}
-                    title="Eliminar usuario"
-                  >
-                    Eliminar
-                  </GlassButton>
-                )}
+                <div className="flex justify-end gap-2">
+                    <button
+                        onClick={() => onEdit(user)}
+                        className="p-1.5 bg-white/10 rounded hover:bg-white/20 text-white transition-colors"
+                        title="Editar usuario"
+                    >
+                        <Edit2 className="w-4 h-4" />
+                    </button>
+                    {user.id !== currentUserId && (
+                    <button
+                        onClick={() => onDelete(user.id)}
+                        className="p-1.5 bg-red-500/10 rounded hover:bg-red-500/20 text-red-400 transition-colors"
+                        title="Eliminar usuario"
+                    >
+                        <Trash2 className="w-4 h-4" />
+                    </button>
+                    )}
+                </div>
               </td>
             </tr>
           ))}

@@ -14,6 +14,7 @@ export const UserManagement: React.FC<UserManagementProps> = ({ currentUser }) =
   const [users, setUsers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [showAddModal, setShowAddModal] = useState(false);
+  const [editingUser, setEditingUser] = useState<any>(null);
   const [error, setError] = useState('');
   const [quickEmail, setQuickEmail] = useState('');
   const [quickLoading, setQuickLoading] = useState(false);
@@ -42,9 +43,12 @@ export const UserManagement: React.FC<UserManagementProps> = ({ currentUser }) =
     fetchUsers();
   }, []);
 
-  const handleAddUser = async (userData: any) => {
-    const response = await fetch(API_ENDPOINTS.users, {
-      method: 'POST',
+  const handleSaveUser = async (userData: any, isUpdate?: boolean) => {
+    const url = isUpdate ? `${API_ENDPOINTS.users}/${editingUser.id}` : API_ENDPOINTS.users;
+    const method = isUpdate ? 'PUT' : 'POST';
+
+    const response = await fetch(url, {
+      method,
       headers: { 'Content-Type': 'application/json' },
       credentials: 'include',
       body: JSON.stringify(userData),
@@ -52,7 +56,7 @@ export const UserManagement: React.FC<UserManagementProps> = ({ currentUser }) =
 
     const data = await response.json();
     if (!data.success) {
-      throw new Error(data.error || 'Error al crear usuario');
+      throw new Error(data.error || 'Error al guardar usuario');
     }
 
     await fetchUsers();
@@ -110,6 +114,16 @@ export const UserManagement: React.FC<UserManagementProps> = ({ currentUser }) =
     }
   };
 
+  const openAdd = () => {
+      setEditingUser(null);
+      setShowAddModal(true);
+  };
+
+  const openEdit = (user: any) => {
+      setEditingUser(user);
+      setShowAddModal(true);
+  };
+
   return (
     <div className="p-8">
         {/* Header */}
@@ -136,7 +150,7 @@ export const UserManagement: React.FC<UserManagementProps> = ({ currentUser }) =
             <GlassButton
               variant="primary"
               icon={Plus}
-              onClick={() => setShowAddModal(true)}
+              onClick={openAdd}
             >
               Añadir Usuario
             </GlassButton>
@@ -176,6 +190,7 @@ export const UserManagement: React.FC<UserManagementProps> = ({ currentUser }) =
             users={users}
             loading={loading}
             onDelete={handleDeleteUser}
+            onEdit={openEdit}
             currentUserId={currentUser.id}
           />
         </GlassContainer>
@@ -183,7 +198,8 @@ export const UserManagement: React.FC<UserManagementProps> = ({ currentUser }) =
       {showAddModal && (
         <AddUserModal
           onClose={() => setShowAddModal(false)}
-          onAdd={handleAddUser}
+          onSave={handleSaveUser}
+          initialData={editingUser}
         />
       )}
     </div>

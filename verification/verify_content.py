@@ -58,7 +58,9 @@ def run():
         page.wait_for_timeout(1000)
 
         expect(page.get_by_text(unique_user)).to_be_visible()
-        print(f"   User '{unique_user}' created successfully.")
+        # Check for Edit button
+        expect(page.locator("button[title='Editar usuario']").first).to_be_visible()
+        print(f"   User '{unique_user}' created successfully and Edit button visible.")
 
         print("3. Testing Sponsor Image...")
         page.get_by_text("Contenido Web").click()

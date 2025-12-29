@@ -11,12 +11,14 @@ interface User {
   username: string;
   nombre_completo: string;
   rol: 'viewer' | 'manager' | 'admin';
+  requiere_cambio_password?: number | boolean;
 }
 
 export const AdminApp: React.FC = () => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [activeSection, setActiveSection] = useState<'users' | 'content' | 'profile'>('profile');
+  const [forcePasswordChange, setForcePasswordChange] = useState(false);
 
   useEffect(() => {
     checkSession();
@@ -32,9 +34,14 @@ export const AdminApp: React.FC = () => {
         const data = await response.json();
         if (data.success && data.user) {
             setUser(data.user);
-            // Default view based on role
-            if (data.user.rol === 'admin') setActiveSection('users');
-            else setActiveSection('profile');
+            if (data.user.requiere_cambio_password) {
+                setForcePasswordChange(true);
+                setActiveSection('profile');
+            } else {
+                // Default view based on role
+                if (data.user.rol === 'admin') setActiveSection('users');
+                else setActiveSection('profile');
+            }
         }
       }
     } catch (error) {
@@ -44,10 +51,15 @@ export const AdminApp: React.FC = () => {
     }
   };
 
-  const handleLoginSuccess = (userData: User) => {
+  const handleLoginSuccess = (userData: User, requiresChange: boolean) => {
       setUser(userData);
-      if (userData.rol === 'admin') setActiveSection('users');
-      else setActiveSection('profile');
+      if (requiresChange) {
+          setForcePasswordChange(true);
+          setActiveSection('profile');
+      } else {
+          if (userData.rol === 'admin') setActiveSection('users');
+          else setActiveSection('profile');
+      }
   };
 
   const handleLogout = async () => {
@@ -87,35 +99,41 @@ export const AdminApp: React.FC = () => {
             <p className="text-xs text-white/40">Gestión Málaga Space Team</p>
           </div>
 
-          <nav className="space-y-1 flex-1">
-            <button
-                onClick={() => setActiveSection('profile')}
-                className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition-all duration-200 ${activeSection === 'profile' ? 'bg-blue-600 text-white shadow-lg shadow-blue-900/50' : 'text-white/60 hover:bg-white/5 hover:text-white'}`}
-            >
-                <UserCircle className="w-5 h-5" />
-                <span>Mi Perfil</span>
-            </button>
-
-            {isAdmin && (
+          {forcePasswordChange ? (
+              <div className="p-4 bg-yellow-500/10 border border-yellow-500/20 rounded-lg text-yellow-200 text-sm mb-4">
+                  ⚠️ Por seguridad, debes cambiar tu contraseña antes de continuar.
+              </div>
+          ) : (
+            <nav className="space-y-1 flex-1">
                 <button
-                    onClick={() => setActiveSection('users')}
-                    className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition-all duration-200 ${activeSection === 'users' ? 'bg-blue-600 text-white shadow-lg shadow-blue-900/50' : 'text-white/60 hover:bg-white/5 hover:text-white'}`}
+                    onClick={() => setActiveSection('profile')}
+                    className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition-all duration-200 ${activeSection === 'profile' ? 'bg-blue-600 text-white shadow-lg shadow-blue-900/50' : 'text-white/60 hover:bg-white/5 hover:text-white'}`}
                 >
-                    <Users className="w-5 h-5" />
-                    <span>Usuarios</span>
+                    <UserCircle className="w-5 h-5" />
+                    <span>Mi Perfil</span>
                 </button>
-            )}
 
-            {isManager && (
-                <button
-                    onClick={() => setActiveSection('content')}
-                    className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition-all duration-200 ${activeSection === 'content' ? 'bg-blue-600 text-white shadow-lg shadow-blue-900/50' : 'text-white/60 hover:bg-white/5 hover:text-white'}`}
-                >
-                    <Layout className="w-5 h-5" />
-                    <span>Contenido Web</span>
-                </button>
-            )}
-          </nav>
+                {isAdmin && (
+                    <button
+                        onClick={() => setActiveSection('users')}
+                        className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition-all duration-200 ${activeSection === 'users' ? 'bg-blue-600 text-white shadow-lg shadow-blue-900/50' : 'text-white/60 hover:bg-white/5 hover:text-white'}`}
+                    >
+                        <Users className="w-5 h-5" />
+                        <span>Usuarios</span>
+                    </button>
+                )}
+
+                {isManager && (
+                    <button
+                        onClick={() => setActiveSection('content')}
+                        className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition-all duration-200 ${activeSection === 'content' ? 'bg-blue-600 text-white shadow-lg shadow-blue-900/50' : 'text-white/60 hover:bg-white/5 hover:text-white'}`}
+                    >
+                        <Layout className="w-5 h-5" />
+                        <span>Contenido Web</span>
+                    </button>
+                )}
+            </nav>
+          )}
 
           <div className="border-t border-white/10 pt-4 mt-4">
               <div className="px-4 py-2 mb-2">

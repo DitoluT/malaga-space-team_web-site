@@ -1,13 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { X, User, Lock, Mail, Shield, Loader2 } from 'lucide-react';
 import { GlassButton } from '../GlassButton';
 
 interface AddUserModalProps {
   onClose: () => void;
-  onAdd: (userData: any) => Promise<void>;
+  onSave: (userData: any, isUpdate?: boolean) => Promise<void>;
+  initialData?: any;
 }
 
-export const AddUserModal: React.FC<AddUserModalProps> = ({ onClose, onAdd }) => {
+export const AddUserModal: React.FC<AddUserModalProps> = ({ onClose, onSave, initialData }) => {
   const [formData, setFormData] = useState({
     username: '',
     password: '',
@@ -18,16 +19,28 @@ export const AddUserModal: React.FC<AddUserModalProps> = ({ onClose, onAdd }) =>
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
+  useEffect(() => {
+      if (initialData) {
+          setFormData({
+              username: initialData.username,
+              password: '', // Don't fill password
+              nombre_completo: initialData.nombre_completo,
+              email: initialData.email || '',
+              rol: initialData.rol
+          });
+      }
+  }, [initialData]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError('');
 
     try {
-      await onAdd(formData);
+      await onSave(formData, !!initialData);
       onClose();
     } catch (err: any) {
-      setError(err.message || 'Error al crear usuario');
+      setError(err.message || 'Error al guardar usuario');
     } finally {
       setLoading(false);
     }
@@ -38,7 +51,7 @@ export const AddUserModal: React.FC<AddUserModalProps> = ({ onClose, onAdd }) =>
       <div className="relative w-full max-w-md bg-slate-900/90 border border-white/10 rounded-xl shadow-2xl overflow-hidden">
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-white/10 bg-white/5">
-          <h2 className="text-xl font-bold text-white">Añadir Nuevo Usuario</h2>
+          <h2 className="text-xl font-bold text-white">{initialData ? 'Editar Usuario' : 'Añadir Nuevo Usuario'}</h2>
           <button
             onClick={onClose}
             className="text-white/40 hover:text-white transition-colors"
@@ -65,24 +78,27 @@ export const AddUserModal: React.FC<AddUserModalProps> = ({ onClose, onAdd }) =>
                 required
                 value={formData.username}
                 onChange={(e) => setFormData({...formData, username: e.target.value})}
-                className="w-full pl-10 pr-4 py-2 bg-black/20 border border-white/10 rounded-lg text-white focus:border-blue-500 focus:outline-none"
+                className="w-full pl-10 pr-4 py-2 bg-black/20 border border-white/10 rounded-lg text-white focus:border-blue-500 focus:outline-none disabled:opacity-50"
                 placeholder="jdoe"
+                disabled={!!initialData} // Usually username is immutable or needs care
               />
             </div>
           </div>
 
           {/* Password */}
           <div>
-            <label className="block text-white/70 text-sm mb-1">Contraseña *</label>
+            <label className="block text-white/70 text-sm mb-1">
+                {initialData ? 'Nueva Contraseña (Opcional)' : 'Contraseña *'}
+            </label>
             <div className="relative">
               <Lock className="absolute left-3 top-2.5 w-5 h-5 text-white/30" />
               <input
                 type="password"
-                required
+                required={!initialData}
                 value={formData.password}
                 onChange={(e) => setFormData({...formData, password: e.target.value})}
                 className="w-full pl-10 pr-4 py-2 bg-black/20 border border-white/10 rounded-lg text-white focus:border-blue-500 focus:outline-none"
-                placeholder="••••••"
+                placeholder={initialData ? "Dejar en blanco para no cambiar" : "••••••"}
               />
             </div>
           </div>

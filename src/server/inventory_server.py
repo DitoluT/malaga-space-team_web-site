@@ -944,6 +944,18 @@ def get_all_team():
     conn.close()
     return jsonify({'success': True, 'data': [dict(m) for m in team]})
 
+@app.route('/api/web/team/me', methods=['GET'])
+@token_required
+def get_my_team_member():
+    conn = get_db_connection()
+    member = conn.execute('SELECT * FROM web_team WHERE user_id = ?', (request.user['id'],)).fetchone()
+    conn.close()
+
+    if member:
+        return jsonify({'success': True, 'data': dict(member)})
+    else:
+        return jsonify({'success': False, 'message': 'No linked team member found'})
+
 @app.route('/api/web/team', methods=['POST'])
 @token_required
 @role_required(['admin', 'manager'])

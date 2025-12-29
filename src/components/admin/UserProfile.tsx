@@ -39,26 +39,19 @@ export const UserProfile: React.FC<UserProfileProps> = ({ user }) => {
   }, [user.id]);
 
   const fetchTeamMember = async () => {
-      // We need to find the team member linked to this user.
-      // Since we don't have a direct endpoint "get_my_team_member", we can search web_team.
-      // Or we can add an endpoint.
-      // For now, let's fetch all and filter (not efficient but works for small team).
-      // A better way is GET /api/web/team?user_id=...
       try {
-          const res = await fetch(`${API_ENDPOINTS.webTeam}/all`, { credentials: 'include' });
+          const res = await fetch(`${API_ENDPOINTS.webTeam}/me`, { credentials: 'include' });
           const data = await res.json();
-          if (data.success) {
-              const member = data.data.find((m: any) => m.user_id === user.id);
-              if (member) {
-                  setTeamMember(member);
-                  setMemberFormData({
-                      name: member.name,
-                      image_url: member.image_url || '',
-                      linkedin_url: member.linkedin_url || '',
-                      github_url: member.github_url || '',
-                      email: member.email || ''
-                  });
-              }
+          if (data.success && data.data) {
+              const member = data.data;
+              setTeamMember(member);
+              setMemberFormData({
+                  name: member.name,
+                  image_url: member.image_url || '',
+                  linkedin_url: member.linkedin_url || '',
+                  github_url: member.github_url || '',
+                  email: member.email || ''
+              });
           }
       } catch (e) {
           console.error(e);
