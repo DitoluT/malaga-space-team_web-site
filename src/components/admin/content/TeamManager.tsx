@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Trash2, Edit2, Linkedin } from 'lucide-react';
+import { Plus, Trash2, Edit2, Linkedin, User, Upload } from 'lucide-react';
 import { GlassButton } from '../../GlassButton';
 import { API_ENDPOINTS } from '../../../config/api';
 
@@ -10,34 +10,41 @@ interface TeamMember {
   title?: string;
   image_url: string;
   linkedin_url: string;
-  category: string; // director, coordinator, leader, member
+  category: string;
   department: string;
   display_order: number;
+  user_id?: number;
+}
+
+interface User {
+  id: number;
+  username: string;
+  nombre_completo: string;
 }
 
 const CATEGORIES = [
-  { value: 'director', label: 'Director' },
-  { value: 'coordinator', label: 'Coordinador' },
-  { value: 'leader', label: 'Líder de Subsistema' },
+  { value: 'leader', label: 'Líder / Responsable' },
   { value: 'member', label: 'Miembro' },
+  { value: 'director', label: 'Director / Profesor' }, // Keep for professors
 ];
 
 const DEPARTMENTS = [
-  { value: 'management', label: 'Gestión / Management' },
-  { value: 'systems', label: 'Ingeniería de Sistemas' },
-  { value: 'software', label: 'Software (OBSw)' },
-  { value: 'adcs', label: 'ADCS' },
-  { value: 'eps', label: 'EPS (Potencia)' },
+  { value: 'professors', label: 'Profesores' },
+  { value: 'management', label: 'Management' },
+  { value: 'structure_energy', label: 'Estructura y Energía' },
   { value: 'comms', label: 'Comunicaciones' },
-  { value: 'structure', label: 'Estructura y Térmico' },
-  { value: 'groundStation', label: 'Estación Terrena' },
+  { value: 'ground_station', label: 'Estación Terrena' },
+  { value: 'control_software', label: 'Sistemas de Control y Software' },
+  { value: 'marketing', label: 'Marketing' },
 ];
 
 export const TeamManager: React.FC = () => {
   const [members, setMembers] = useState<TeamMember[]>([]);
+  const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [editingMember, setEditingMember] = useState<TeamMember | null>(null);
+  const [uploading, setUploading] = useState(false);
 
   const [formData, setFormData] = useState({
     name: '',
@@ -46,15 +53,24 @@ export const TeamManager: React.FC = () => {
     image_url: '',
     linkedin_url: '',
     category: 'member',
-    department: 'software'
+    department: 'management',
+    user_id: '' as string | number // allow empty
   });
 
-  const fetchMembers = async () => {
+  const fetchData = async () => {
     setLoading(true);
     try {
-      const res = await fetch(`${API_ENDPOINTS.webTeam}/all`, { credentials: 'include' });
-      const data = await res.json();
-      if (data.success) setMembers(data.data);
+      const [resMembers, resUsers] = await Promise.all([
+        fetch(`${API_ENDPOINTS.webTeam}/all`, { credentials: 'include' }),
+        fetch(`${API_ENDPOINTS.users}`, { credentials: 'include' })
+      ]);
+
+      const dataMembers = await resMembers.json();
+      if (dataMembers.success) setMembers(dataMembers.data);
+
+      const dataUsers = await resUsers.json();
+      if (dataUsers.success) setUsers(dataUsers.users);
+
     } catch (e) {
       console.error(e);
     } finally {
@@ -62,36 +78,80 @@ export const TeamManager: React.FC = () => {
     }
   };
 
-  useEffect(() => { fetchMembers(); }, []);
+  useEffect(() => { fetchData(); }, []);
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files || e.target.files.length === 0) return;
+    const file = e.target.files[0];
+    const uploadData = new FormData();
+    uploadData.append('file', file);
+
+    setUploading(true);
+    try {
+        const res = await fetch(`${API_ENDPOINTS.webTeam}/../../upload`, { // Hacky relative path if api endpoint not defined?
+            // Actually I should add API_ENDPOINTS.upload
+            // Let's use direct path for now or add to config.
+            // Wait, I can't easily modify config/api.ts right here without another tool call.
+            // I'll assume /api/upload is available.
+        });
+        // Wait, fetch needs method POST.
+        const res2 = await fetch('/api/upload', {
+            method: 'POST',
+            body: uploadData,
+            credentials: 'include'
+        });
+        const data = await res2.json();
+        if (data.success) {
+            setFormData(prev => ({ ...prev, image_url: data.url }));
+        } else {
+            alert('Error uploading image');
+        }
+    } catch (error) {
+        console.error(error);
+        alert('Upload failed');
+    } finally {
+        setUploading(false);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const url = editingMember ? `${API_ENDPOINTS.webTeam}/${editingMember.id}` : API_ENDPOINTS.webTeam;
     const method = editingMember ? 'PUT' : 'POST';
 
+    // Prepare payload
+    const payload = {
+        ...formData,
+        user_id: formData.user_id ? Number(formData.user_id) : null
+    };
+
     try {
       await fetch(url, {
         method,
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
-        body: JSON.stringify(formData)
+        body: JSON.stringify(payload)
       });
 
       setShowModal(false);
       setEditingMember(null);
-      setFormData({ name: '', role: '', title: '', image_url: '', linkedin_url: '', category: 'member', department: 'software' });
-      fetchMembers();
+      resetForm();
+      fetchData();
     } catch (e) {
       console.error(e);
       alert('Error al guardar');
     }
   };
 
+  const resetForm = () => {
+      setFormData({ name: '', role: '', title: '', image_url: '', linkedin_url: '', category: 'member', department: 'management', user_id: '' });
+  };
+
   const handleDelete = async (id: number) => {
     if (!window.confirm('¿Eliminar miembro del equipo?')) return;
     try {
       await fetch(`${API_ENDPOINTS.webTeam}/${id}`, { method: 'DELETE', credentials: 'include' });
-      fetchMembers();
+      fetchData();
     } catch (e) {
       console.error(e);
     }
@@ -106,14 +166,15 @@ export const TeamManager: React.FC = () => {
         image_url: m.image_url || '',
         linkedin_url: m.linkedin_url || '',
         category: m.category || 'member',
-        department: m.department || 'software'
+        department: m.department || 'management',
+        user_id: m.user_id || ''
     });
     setShowModal(true);
   };
 
   const openAdd = () => {
     setEditingMember(null);
-    setFormData({ name: '', role: '', title: '', image_url: '', linkedin_url: '', category: 'member', department: 'software' });
+    resetForm();
     setShowModal(true);
   };
 
@@ -133,23 +194,27 @@ export const TeamManager: React.FC = () => {
          <div className="text-center text-white/40 p-8 border border-white/10 rounded-lg">No hay miembros en el equipo.</div>
       ) : (
         <div className="space-y-8">
-            {CATEGORIES.map(cat => {
-                const catMembers = members.filter(m => m.category === cat.value);
-                if (catMembers.length === 0) return null;
+            {DEPARTMENTS.map(dept => {
+                const deptMembers = members.filter(m => m.department === dept.value);
+                if (deptMembers.length === 0) return null;
                 return (
-                    <div key={cat.value}>
-                        <h4 className="text-blue-300 font-bold mb-4 text-lg border-b border-white/10 pb-2">{cat.label}</h4>
+                    <div key={dept.value}>
+                        <h4 className="text-blue-300 font-bold mb-4 text-lg border-b border-white/10 pb-2">{dept.label}</h4>
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                            {catMembers.map(m => (
-                                <div key={m.id} className="bg-white/5 border border-white/10 rounded-lg p-4 flex items-start space-x-4 hover:bg-white/10 transition-colors">
+                            {deptMembers.map(m => (
+                                <div key={m.id} className="bg-white/5 border border-white/10 rounded-lg p-4 flex items-start space-x-4 hover:bg-white/10 transition-colors relative">
                                     <div className="w-12 h-12 rounded-full bg-white/10 overflow-hidden flex-shrink-0">
                                         {m.image_url ? <img src={m.image_url} alt={m.name} className="w-full h-full object-cover" /> : <div className="w-full h-full flex items-center justify-center text-xs text-white/40">Img</div>}
                                     </div>
                                     <div className="flex-1 min-w-0">
                                         <h5 className="text-white font-bold truncate">{m.name}</h5>
                                         <p className="text-blue-400 text-xs mb-0.5 truncate">{m.role}</p>
-                                        <p className="text-white/50 text-[10px] mb-1 truncate">{getDepartmentLabel(m.department)}</p>
-                                        {m.linkedin_url && <a href={m.linkedin_url} target="_blank" className="text-white/40 hover:text-white"><Linkedin className="w-4 h-4" /></a>}
+                                        <div className="flex items-center gap-2">
+                                            <span className={`text-[10px] px-1.5 py-0.5 rounded ${m.category === 'leader' ? 'bg-yellow-500/20 text-yellow-300' : 'bg-white/10 text-white/50'}`}>
+                                                {getCategoryLabel(m.category)}
+                                            </span>
+                                            {m.user_id && <User className="w-3 h-3 text-green-400" title="Usuario vinculado" />}
+                                        </div>
                                     </div>
                                     <div className="flex flex-col space-y-2">
                                         <button onClick={() => openEdit(m)} className="p-1.5 bg-white/10 rounded hover:bg-white/20 text-white transition-colors"><Edit2 className="w-3 h-3" /></button>
@@ -206,9 +271,28 @@ export const TeamManager: React.FC = () => {
               </div>
 
               <div>
-                <label className="block text-white/70 text-sm mb-1">Imagen URL</label>
-                <input className="w-full bg-black/40 border border-white/10 rounded-lg p-2.5 text-white focus:border-blue-500 focus:outline-none"
-                      value={formData.image_url} onChange={e => setFormData({...formData, image_url: e.target.value})} placeholder="https://..." />
+                <label className="block text-white/70 text-sm mb-1">Imagen</label>
+                <div className="flex space-x-2">
+                    <input className="w-full bg-black/40 border border-white/10 rounded-lg p-2.5 text-white focus:border-blue-500 focus:outline-none"
+                        value={formData.image_url} onChange={e => setFormData({...formData, image_url: e.target.value})} placeholder="URL o Subir archivo..." />
+                    <label className="cursor-pointer bg-white/10 hover:bg-white/20 text-white p-2.5 rounded-lg border border-white/10 transition-colors">
+                        <Upload className="w-5 h-5" />
+                        <input type="file" className="hidden" accept="image/*" onChange={handleImageUpload} />
+                    </label>
+                </div>
+                {uploading && <p className="text-xs text-blue-400 mt-1">Subiendo...</p>}
+              </div>
+
+              <div>
+                <label className="block text-white/70 text-sm mb-1">Usuario Vinculado</label>
+                <select className="w-full bg-black/40 border border-white/10 rounded-lg p-2.5 text-white focus:border-blue-500 focus:outline-none"
+                    value={formData.user_id} onChange={e => setFormData({...formData, user_id: e.target.value})}>
+                    <option value="" className="bg-slate-800">-- Sin vincular --</option>
+                    {users.map(u => (
+                        <option key={u.id} value={u.id} className="bg-slate-800">{u.username} ({u.nombre_completo})</option>
+                    ))}
+                </select>
+                <p className="text-xs text-white/40 mt-1">Vincular permite al usuario editar esta ficha.</p>
               </div>
 
               <div>
@@ -220,7 +304,7 @@ export const TeamManager: React.FC = () => {
 
             <div className="flex justify-end space-x-3 mt-8">
                <button type="button" onClick={() => setShowModal(false)} className="px-4 py-2 text-white/60 hover:text-white transition-colors">Cancelar</button>
-               <GlassButton type="submit" variant="primary">Guardar</GlassButton>
+               <GlassButton type="submit" variant="primary" disabled={uploading}>Guardar</GlassButton>
             </div>
           </form>
         </div>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { X, Users, GraduationCap, Briefcase } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { GlassContainer } from './GlassContainer';
@@ -18,7 +18,16 @@ interface TeamMember {
   title?: string;
   department: string;
   category: string;
+  image_url: string;
 }
+
+const DEPARTMENTS_CONFIG = [
+    { id: 'structure_energy', label: 'Estructura y Energía' },
+    { id: 'comms', label: 'Comunicaciones' },
+    { id: 'ground_station', label: 'Estación Terrena' },
+    { id: 'control_software', label: 'Sistemas de Control y Software' },
+    { id: 'marketing', label: 'Marketing' },
+];
 
 export const TeamTreeModal: React.FC<TeamTreeModalProps> = ({ isOpen, onClose }) => {
   const { t } = useTranslation();
@@ -57,85 +66,48 @@ export const TeamTreeModal: React.FC<TeamTreeModalProps> = ({ isOpen, onClose })
     }
   };
 
-  const directors = members.filter(m => m.category === 'director');
-  const coordinators = members.filter(m => m.category === 'coordinator');
-  const subsystemLeaders = members.filter(m => m.category === 'leader');
-  // Filter members, and also exclude any that might be leaders (if category is mixed, but here we assume strict category)
-  // Actually, 'member' category is explicit.
-  const developmentTeam = members.filter(m => m.category === 'member');
+  const professors = members.filter(m => m.department === 'professors');
+  const management = members.filter(m => m.department === 'management');
 
-  // Agrupar el equipo de desarrollo filtrado por departamento
-  const developmentTeamBySubsystem = developmentTeam.reduce((acc, member) => {
-    const { department } = member;
-    if (!acc[department]) {
-      acc[department] = [];
-    }
-    acc[department].push(member);
-    return acc;
-  }, {} as Record<string, TeamMember[]>);
-
-  const MemberCard: React.FC<{ member: TeamMember; variant?: 'director' | 'coordinator' | 'leader' | 'member' }> = ({ 
+  const MemberCard: React.FC<{ member: TeamMember; variant?: 'large' | 'medium' | 'small' }> = ({
     member, 
-    variant = 'member' 
+    variant = 'small'
   }) => {
-    // Tarjetas con mejor espaciado y tamaño adaptativo
-    const cardSize = variant === 'director' || variant === 'coordinator' 
-      ? 'w-full max-w-[280px] min-h-[300px]' 
-      : 'w-full max-w-[240px] min-h-[280px]';
+    const sizeClasses = {
+        large: 'w-64 min-h-[320px]',
+        medium: 'w-56 min-h-[280px]',
+        small: 'w-48 min-h-[240px]'
+    };
 
     return (
       <GlassContainer className="mission-glass">
-        <div className={`p-5 text-center h-full flex flex-col justify-between ${cardSize}`}>
-          {/* Avatar */}
-          <div className="flex flex-col items-center mb-4">
-            <div className={`${
-              variant === 'director' ? 'w-20 h-20' : 
-              variant === 'coordinator' ? 'w-16 h-16' : 
-              'w-14 h-14'
-            } bg-gradient-to-br from-blue-500/20 to-purple-500/20 border-2 border-white/30 rounded-full flex items-center justify-center backdrop-blur-sm shadow-lg mb-3`}>
-              <Users className={`${
-                variant === 'director' ? 'w-10 h-10' : 
-                variant === 'coordinator' ? 'w-8 h-8' : 
-                'w-7 h-7'
-              } text-white`} />
+        <div className={`p-4 text-center h-full flex flex-col justify-between ${sizeClasses[variant]}`}>
+          <div className="flex flex-col items-center mb-3">
+            <div className="w-20 h-20 rounded-full overflow-hidden border-2 border-white/30 mb-3 bg-white/10 shadow-lg">
+                {member.image_url ? (
+                    <img src={member.image_url} alt={member.name} className="w-full h-full object-cover" />
+                ) : (
+                    <div className="w-full h-full flex items-center justify-center"><Users className="w-8 h-8 text-white/50" /></div>
+                )}
             </div>
             
-            {/* Nombre */}
-            <h4 className={`font-bold text-white leading-tight mb-2 ${
-              variant === 'director' ? 'text-base' : 
-              variant === 'coordinator' ? 'text-sm' : 
-              'text-sm'
-            }`}>
+            <h4 className="font-bold text-white leading-tight mb-1 text-sm md:text-base">
               {member.name}
             </h4>
           </div>
           
-          {/* Información */}
-          <div className="space-y-2.5 flex-1">
-            {/* Rol */}
-            <div className="flex items-start justify-center space-x-2">
-              <Briefcase className="w-3.5 h-3.5 text-blue-400 mt-0.5 flex-shrink-0" />
+          <div className="space-y-2 flex-1 flex flex-col justify-start">
+            <div className="flex items-center justify-center space-x-1.5">
+              <Briefcase className="w-3 h-3 text-blue-400 flex-shrink-0" />
               <p className="text-blue-300 font-medium leading-tight text-xs">
                 {member.role}
               </p>
             </div>
             
-            {/* Departamento */}
-            {member.department && (
-              <div className="bg-gradient-to-r from-white/5 to-white/10 rounded-lg px-3 py-2 border border-white/10">
-                <p className="text-white/90 font-semibold text-xs leading-tight">
-                  {t(`team.treeModal.departments.${member.department}`) !== `team.treeModal.departments.${member.department}` 
-                    ? t(`team.treeModal.departments.${member.department}`)
-                    : member.department}
-                </p>
-              </div>
-            )}
-            
-            {/* Título académico */}
             {member.title && (
-              <div className="flex items-start justify-center space-x-2 pt-1">
-                <GraduationCap className="w-3.5 h-3.5 text-green-400 mt-0.5 flex-shrink-0" />
-                <p className="text-white/70 leading-tight text-xs">
+              <div className="flex items-center justify-center space-x-1.5">
+                <GraduationCap className="w-3 h-3 text-green-400 flex-shrink-0" />
+                <p className="text-white/70 leading-tight text-[10px]">
                   {member.title}
                 </p>
               </div>
@@ -146,28 +118,11 @@ export const TeamTreeModal: React.FC<TeamTreeModalProps> = ({ isOpen, onClose })
     );
   };
 
-  const SectionTitle: React.FC<{ children: React.ReactNode; className?: string }> = ({ children, className = '' }) => (
-    <h3 className={`text-xl md:text-2xl font-bold text-white mb-6 text-center drop-shadow-lg ${className}`}>
+  const SectionTitle: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+    <h3 className="text-xl md:text-2xl font-bold text-white mb-8 text-center drop-shadow-lg border-b border-white/10 pb-4 inline-block px-12">
       {children}
     </h3>
   );
-
-  const ConnectionLine: React.FC<{ orientation?: 'vertical' | 'horizontal'; length?: 'short' | 'medium' | 'long' }> = ({ 
-    orientation = 'vertical', 
-    length = 'short' 
-  }) => {
-    const lengths = {
-      short: orientation === 'vertical' ? 'h-6' : 'w-32',
-      medium: orientation === 'vertical' ? 'h-8' : 'w-48',
-      long: orientation === 'vertical' ? 'h-12' : 'w-64'
-    };
-    
-    return (
-      <div className="flex justify-center my-4">
-        <div className={`${orientation === 'vertical' ? 'w-px' : 'h-px'} ${lengths[length]} bg-white/20`}></div>
-      </div>
-    );
-  };
 
   const handleClose = () => {
     setIsClosing(true);
@@ -180,132 +135,90 @@ export const TeamTreeModal: React.FC<TeamTreeModalProps> = ({ isOpen, onClose })
 
   return (
     <div className="fixed inset-0 z-[70] flex items-center justify-center p-2" data-modal>
-      <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={handleClose}></div>
+      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={handleClose}></div>
       
       <GlassContainer className={`modal-glass w-full max-w-7xl max-h-[95vh] mx-2 overflow-hidden ${isClosing ? 'modal-exit' : ''}`}>
-        <div className="modal-content-wrapper p-6 lg:p-8 max-h-[90vh] overflow-y-auto">
+        <div className="modal-content-wrapper p-6 lg:p-8 max-h-[90vh] overflow-y-auto custom-scrollbar">
           {/* Header */}
-          <div className="flex justify-between items-start mb-8">
+          <div className="flex justify-between items-start mb-8 sticky top-0 bg-slate-900/80 backdrop-blur-md z-10 p-4 -mx-4 -mt-4 border-b border-white/10">
             <div>
-              <h2 className="text-2xl md:text-3xl font-bold text-white drop-shadow-lg mb-2">
+              <h2 className="text-2xl md:text-3xl font-bold text-white drop-shadow-lg mb-1">
                 {t('team.treeModal.title')}
               </h2>
-              <p className="text-white/80 drop-shadow text-base">
-                {t('team.treeModal.description')}
+              <p className="text-white/60 text-sm">
+                Organigrama del Equipo
               </p>
             </div>
             <button 
               onClick={handleClose}
-              className="w-10 h-10 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 transition-colors border border-white/20 backdrop-blur-sm"
+              className="w-8 h-8 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 transition-colors border border-white/20 backdrop-blur-sm"
             >
-              <X className="w-5 h-5 text-white/90" />
+              <X className="w-4 h-4 text-white/90" />
             </button>
           </div>
           
           {loading ? (
              <div className="text-center text-white p-12">Cargando organigrama...</div>
           ) : (
-          <div className="space-y-12">
-            {/* Dirección del Proyecto */}
-            {directors.length > 0 && (
-                <div>
-                <SectionTitle>{t('team.treeModal.sections.directors')}</SectionTitle>
-                <div className="flex flex-wrap justify-center gap-6 max-w-3xl mx-auto">
-                    {directors.map((director, index) => (
-                    <MemberCard key={index} member={director} variant="director" />
-                    ))}
-                </div>
-                <ConnectionLine />
-                </div>
-            )}
+          <div className="space-y-16 pb-12">
 
-            {/* Coordinadores del Proyecto */}
-            {coordinators.length > 0 && (
-                <div>
-                <SectionTitle>{t('team.treeModal.sections.coordinators')}</SectionTitle>
-                <div className="flex flex-wrap justify-center gap-6 max-w-3xl mx-auto">
-                    {coordinators.map((coordinator, index) => (
-                    <MemberCard key={index} member={coordinator} variant="coordinator" />
-                    ))}
-                </div>
-                <ConnectionLine />
-                </div>
-            )}
-
-            {/* Líderes de Subsistema */}
-            {subsystemLeaders.length > 0 && (
-                <div>
-                <SectionTitle>{t('team.treeModal.sections.subsystemLeaders')}</SectionTitle>
-                <div className="flex flex-wrap justify-center gap-4 max-w-5xl mx-auto">
-                    {subsystemLeaders.map((leader, index) => (
-                    <MemberCard key={index} member={leader} variant="leader" />
-                    ))}
-                </div>
-                <ConnectionLine />
-                </div>
-            )}
-
-            {/* Equipo de Ingenieros por Subsistema */}
-            <div>
-              <SectionTitle>{t('team.treeModal.sections.developmentTeam')}</SectionTitle>
-              {Object.keys(developmentTeamBySubsystem).length === 0 ? (
-                  <div className="text-center text-white/60">No hay miembros en el equipo de desarrollo.</div>
-              ) : (
-                <div className="space-y-10">
-                    {Object.entries(developmentTeamBySubsystem).map(([subsystem, members]) => (
-                    <div key={subsystem}>
-                        <h4 className="text-lg font-bold text-white mb-6 text-center bg-white/5 border border-white/10 rounded-lg py-3 px-6 inline-block mx-auto">
-                        {t(`team.treeModal.departments.${subsystem}`) !== `team.treeModal.departments.${subsystem}`
-                            ? t(`team.treeModal.departments.${subsystem}`)
-                            : subsystem}
-                        </h4>
-                        <div className="flex flex-wrap justify-center gap-4 mt-4">
-                        {members.map((member, index) => (
-                            <MemberCard key={index} member={member} variant="member" />
-                        ))}
-                        </div>
+            {/* Profesores */}
+            {professors.length > 0 && (
+                <div className="text-center">
+                    <SectionTitle>Profesores</SectionTitle>
+                    <div className="flex flex-wrap justify-center gap-6">
+                        {professors.map(m => <MemberCard key={m.id} member={m} variant="large" />)}
                     </div>
-                    ))}
                 </div>
-              )}
+            )}
+
+            {/* Management */}
+            {management.length > 0 && (
+                <div className="text-center">
+                    <SectionTitle>Management</SectionTitle>
+                    <div className="flex flex-wrap justify-center gap-6">
+                        {management.map(m => <MemberCard key={m.id} member={m} variant="medium" />)}
+                    </div>
+                </div>
+            )}
+
+            {/* Departamentos Técnicos */}
+            <div className="space-y-12">
+                {DEPARTMENTS_CONFIG.map(dept => {
+                    const deptMembers = members.filter(m => m.department === dept.id);
+                    if (deptMembers.length === 0) return null;
+
+                    const leaders = deptMembers.filter(m => m.category === 'leader');
+                    const regularMembers = deptMembers.filter(m => m.category === 'member' || m.category === 'director' || m.category === 'coordinator'); // Fallback if category misused
+                    // Wait, director/coordinator shouldn't be here if filtering by dept.
+                    // But if someone sets dept=comms and category=coordinator?
+                    // I'll stick to leader vs others.
+                    const others = deptMembers.filter(m => m.category !== 'leader');
+
+                    return (
+                        <div key={dept.id} className="bg-white/5 border border-white/10 rounded-2xl p-8">
+                            <h4 className="text-2xl font-bold text-white mb-8 text-center">{dept.label}</h4>
+
+                            {/* Leaders Row */}
+                            {leaders.length > 0 && (
+                                <div className="flex flex-wrap justify-center gap-6 mb-8 border-b border-white/5 pb-8">
+                                    {leaders.map(m => <MemberCard key={m.id} member={m} variant="medium" />)}
+                                </div>
+                            )}
+
+                            {/* Members Grid */}
+                            {others.length > 0 && (
+                                <div className="flex flex-wrap justify-center gap-4">
+                                    {others.map(m => <MemberCard key={m.id} member={m} variant="small" />)}
+                                </div>
+                            )}
+                        </div>
+                    );
+                })}
             </div>
+
           </div>
           )}
-          
-          {/* Footer con estadísticas */}
-          <div className="mt-12 text-center">
-            <GlassContainer className="stats-glass">
-              <div className="p-6">
-                <h4 className="text-white font-semibold mb-4 text-lg">
-                  {t('team.treeModal.stats.title')}
-                </h4>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
-                  <div>
-                    <div className="text-2xl font-bold text-blue-300">{members.length}</div>
-                    <div className="text-white/80 text-sm">{t('team.treeModal.stats.members')}</div>
-                  </div>
-                  <div>
-                    <div className="text-2xl font-bold text-green-300">{Object.keys(developmentTeamBySubsystem).length}</div>
-                    <div className="text-white/80 text-sm">{t('team.treeModal.stats.departments')}</div>
-                  </div>
-                  <div>
-                    <div className="text-2xl font-bold text-purple-300">8</div>
-                    <div className="text-white/80 text-sm">{t('team.treeModal.stats.disciplines')}</div>
-                  </div>
-                  <div>
-                    <div className="text-2xl font-bold text-orange-300">2+</div>
-                    <div className="text-white/80 text-sm">{t('team.treeModal.stats.years')}</div>
-                  </div>
-                </div>
-              </div>
-            </GlassContainer>
-            
-            <div className="mt-6">
-              <GlassButton onClick={handleClose} variant="primary" size="md">
-                {t('team.treeModal.closeButton')}
-              </GlassButton>
-            </div>
-          </div>
         </div>
       </GlassContainer>
     </div>

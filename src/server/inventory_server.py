@@ -15,6 +15,7 @@ ROLES:
 
 from flask import Flask, request, jsonify, make_response
 from flask_cors import CORS
+from werkzeug.utils import secure_filename
 import bcrypt
 import sqlite3
 import jwt
@@ -109,9 +110,18 @@ def init_database():
             email TEXT,
             active INTEGER DEFAULT 1,
             display_order INTEGER DEFAULT 0,
-            title TEXT
+            title TEXT,
+            user_id INTEGER,
+            FOREIGN KEY (user_id) REFERENCES usuarios(id)
         )
     ''')
+
+    # Check for user_id column in existing table
+    cursor.execute("PRAGMA table_info(web_team)")
+    team_columns = [column[1] for column in cursor.fetchall()]
+    if 'user_id' not in team_columns:
+        cursor.execute('ALTER TABLE web_team ADD COLUMN user_id INTEGER REFERENCES usuarios(id)')
+        print('✅ Columna user_id agregada a la tabla web_team')
 
     # Tabla de Sponsors/Collaborators (Web)
     cursor.execute('''
@@ -190,6 +200,10 @@ def init_database():
         ''', ('admin', hashed_password, 'Administrador', 'admin@malagaspaceteam.uma.es', 'admin', 0))
         print('✅ Usuario admin creado: admin/admin123')
     
+    # Create uploads directory
+    uploads_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), 'public/uploads')
+    os.makedirs(uploads_dir, exist_ok=True)
+
     conn.commit()
     conn.close()
 
@@ -365,6 +379,34 @@ def change_password():
         'success': True,
         'message': 'Contraseña actualizada correctamente'
     })
+
+# ====================================
+# RUTAS DE UTILIDAD
+# ====================================
+
+@app.route('/api/upload', methods=['POST'])
+@token_required
+def upload_file():
+    if 'file' not in request.files:
+        return jsonify({'error': 'No file part'}), 400
+    file = request.files['file']
+    if file.filename == '':
+        return jsonify({'error': 'No selected file'}), 400
+
+    if file:
+        filename = secure_filename(file.filename)
+        unique_name = f"{int(datetime.datetime.now().timestamp())}_{filename}"
+
+        # Determine upload path relative to this script
+        # Script is in src/server/
+        # Uploads go to public/uploads/
+        base_dir = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
+        upload_folder = os.path.join(base_dir, 'public/uploads')
+
+        os.makedirs(upload_folder, exist_ok=True)
+        file.save(os.path.join(upload_folder, unique_name))
+
+        return jsonify({'success': True, 'url': f'/uploads/{unique_name}'})
 
 # ====================================
 # RUTAS DE INVENTARIO
@@ -867,12 +909,12 @@ def create_team_member():
     conn = get_db_connection()
     cursor = conn.cursor()
     cursor.execute('''
-        INSERT INTO web_team (name, role, department, category, image_url, linkedin_url, github_url, email, active, display_order, title)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        INSERT INTO web_team (name, role, department, category, image_url, linkedin_url, github_url, email, active, display_order, title, user_id)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     ''', (
         data['name'], data.get('role'), data.get('department'), data.get('category', 'member'),
         data.get('image_url'), data.get('linkedin_url'), data.get('github_url'), data.get('email'),
-        data.get('active', 1), data.get('display_order', 0), data.get('title')
+        data.get('active', 1), data.get('display_order', 0), data.get('title'), data.get('user_id')
     ))
     conn.commit()
     new_id = cursor.lastrowid
@@ -881,18 +923,59 @@ def create_team_member():
 
 @app.route('/api/web/team/<int:id>', methods=['PUT'])
 @token_required
-@role_required(['admin', 'manager'])
 def update_team_member(id):
-    data = request.get_json()
+    # Permissions: Admin, Manager, or the linked user
     conn = get_db_connection()
-    conn.execute('''
-        UPDATE web_team SET name=?, role=?, department=?, category=?, image_url=?, linkedin_url=?, github_url=?, email=?, active=?, display_order=?, title=?
-        WHERE id=?
-    ''', (
-        data['name'], data.get('role'), data.get('department'), data.get('category', 'member'),
-        data.get('image_url'), data.get('linkedin_url'), data.get('github_url'), data.get('email'),
-        data.get('active', 1), data.get('display_order', 0), data.get('title'), id
-    ))
+    member = conn.execute('SELECT * FROM web_team WHERE id = ?', (id,)).fetchone()
+
+    if not member:
+        conn.close()
+        return jsonify({'error': 'Miembro no encontrado'}), 404
+
+    is_admin = request.user['rol'] in ['admin', 'manager']
+    is_owner = member['user_id'] == request.user['id']
+
+    if not (is_admin or is_owner):
+        conn.close()
+        return jsonify({'error': 'Permisos insuficientes'}), 403
+
+    data = request.get_json()
+
+    # If not admin, restrict fields
+    if not is_admin:
+        # User can only update personal info
+        conn.execute('''
+            UPDATE web_team SET name=?, image_url=?, linkedin_url=?, github_url=?, email=?
+            WHERE id=?
+        ''', (
+            data.get('name', member['name']),
+            data.get('image_url', member['image_url']),
+            data.get('linkedin_url', member['linkedin_url']),
+            data.get('github_url', member['github_url']),
+            data.get('email', member['email']),
+            id
+        ))
+    else:
+        # Admin can update everything
+        conn.execute('''
+            UPDATE web_team SET name=?, role=?, department=?, category=?, image_url=?, linkedin_url=?, github_url=?, email=?, active=?, display_order=?, title=?, user_id=?
+            WHERE id=?
+        ''', (
+            data.get('name', member['name']),
+            data.get('role', member['role']),
+            data.get('department', member['department']),
+            data.get('category', member['category']),
+            data.get('image_url', member['image_url']),
+            data.get('linkedin_url', member['linkedin_url']),
+            data.get('github_url', member['github_url']),
+            data.get('email', member['email']),
+            data.get('active', member['active']),
+            data.get('display_order', member['display_order']),
+            data.get('title', member['title']),
+            data.get('user_id', member['user_id']),
+            id
+        ))
+
     conn.commit()
     conn.close()
     return jsonify({'success': True})
