@@ -119,7 +119,7 @@ export const TeamTreeModal: React.FC<TeamTreeModalProps> = ({ isOpen, onClose })
   };
 
   const SectionTitle: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-    <h3 className="text-xl md:text-2xl font-bold text-white mb-8 text-center drop-shadow-lg border-b border-white/10 pb-4 inline-block px-12">
+    <h3 className="text-xl md:text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-200 to-purple-300 mb-10 text-center drop-shadow-sm">
       {children}
     </h3>
   );
@@ -138,22 +138,22 @@ export const TeamTreeModal: React.FC<TeamTreeModalProps> = ({ isOpen, onClose })
       <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={handleClose}></div>
       
       <GlassContainer className={`modal-glass w-full max-w-7xl max-h-[95vh] mx-2 overflow-hidden ${isClosing ? 'modal-exit' : ''}`}>
-        <div className="modal-content-wrapper p-6 lg:p-8 max-h-[90vh] overflow-y-auto custom-scrollbar">
+        <div className="modal-content-wrapper p-6 lg:p-8 max-h-[90vh] overflow-y-auto custom-scrollbar relative">
           {/* Header */}
-          <div className="flex justify-between items-start mb-8 sticky top-0 bg-slate-900/80 backdrop-blur-md z-10 p-4 -mx-4 -mt-4 border-b border-white/10">
+          <div className="flex justify-between items-start mb-8 p-2 border-b border-white/10">
             <div>
-              <h2 className="text-2xl md:text-3xl font-bold text-white drop-shadow-lg mb-1">
+              <h2 className="text-3xl md:text-4xl font-bold text-white drop-shadow-lg mb-2">
                 {t('team.treeModal.title')}
               </h2>
-              <p className="text-white/60 text-sm">
+              <p className="text-white/60 text-lg">
                 Organigrama del Equipo
               </p>
             </div>
             <button 
               onClick={handleClose}
-              className="w-8 h-8 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 transition-colors border border-white/20 backdrop-blur-sm"
+              className="w-10 h-10 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 transition-colors border border-white/20 backdrop-blur-sm"
             >
-              <X className="w-4 h-4 text-white/90" />
+              <X className="w-5 h-5 text-white/90" />
             </button>
           </div>
           
