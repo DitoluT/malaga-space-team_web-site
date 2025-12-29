@@ -1,6 +1,19 @@
 version: '3.8'
 
 services:
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: malaga-frontend
+    ports:
+      - "80:80"
+    restart: unless-stopped
+    depends_on:
+      - inventory-backend
+    networks:
+      - malaga-network
+
   inventory-backend:
     build:
       context: .
@@ -11,11 +24,10 @@ services:
     volumes:
       # Montar la base de datos para persistencia
       - ./data:/app/data
-      # Opcional: montar el código para desarrollo en caliente
-      # - ./src/server:/app/src/server
     environment:
       - JWT_SECRET=malaga-space-team-secret-key-change-in-production
       - FLASK_ENV=production
+      - FRONTEND_URL=http://localhost
     restart: unless-stopped
     networks:
       - malaga-network
