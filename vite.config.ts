@@ -12,6 +12,7 @@ export default defineConfig({
       input: {
         main: './index.html',
         inventario: './inventario.html',
+        admin: './admin.html',
       },
     },
   },

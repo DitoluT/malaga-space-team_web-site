@@ -1,6 +1,21 @@
 version: '3.8'
 
 services:
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: malaga-frontend
+    ports:
+      - "80:80"
+    restart: unless-stopped
+    depends_on:
+      - inventory-backend
+    volumes:
+      - uploads_data:/usr/share/nginx/html/uploads
+    networks:
+      - malaga-network
+
   inventory-backend:
     build:
       context: .
@@ -11,11 +26,12 @@ services:
     volumes:
       # Montar la base de datos para persistencia
       - ./data:/app/data
-      # Opcional: montar el código para desarrollo en caliente
-      # - ./src/server:/app/src/server
+      # Montar uploads para compartir con frontend
+      - uploads_data:/app/public/uploads
     environment:
       - JWT_SECRET=malaga-space-team-secret-key-change-in-production
       - FLASK_ENV=production
+      - FRONTEND_URL=http://localhost
     restart: unless-stopped
     networks:
       - malaga-network
@@ -23,3 +39,6 @@ services:
 networks:
   malaga-network:
     driver: bridge
+
+volumes:
+  uploads_data:
