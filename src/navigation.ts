@@ -47,7 +47,6 @@ export const getFooterData = (lang: Lang) => {
           { text: t.navigation.joinTeam, href: route('join', lang) },
           { text: t.extra.teamLive.alumniLink, href: route('alumni', lang) },
           { text: t.extra.social, href: CONTACT.social },
-          { text: t.extra.inventory, href: '/inventario' },
         ],
       },
     ],

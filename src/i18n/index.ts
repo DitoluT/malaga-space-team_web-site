@@ -46,7 +46,6 @@ const extra = {
       sending: 'Enviando...',
     },
     social: 'Redes y enlaces',
-    inventory: 'Inventario',
     notFound: {
       title: 'Página no encontrada',
       description: 'La página que buscas no existe o se ha movido.',
@@ -91,7 +90,6 @@ const extra = {
       sending: 'Sending...',
     },
     social: 'Social links',
-    inventory: 'Inventory',
     notFound: {
       title: 'Page not found',
       description: 'The page you are looking for does not exist or has moved.',
