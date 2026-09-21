@@ -996,7 +996,12 @@ def content_rows(kind, only_active):
     where = 'WHERE active = 1' if only_active else ''
     rows = conn.execute(f'SELECT * FROM {table} {where} ORDER BY display_order ASC, id ASC').fetchall()
     conn.close()
-    return jsonify({'success': True, 'data': [dict(row) for row in rows]})
+    data = [dict(row) for row in rows]
+    if only_active:
+        # La web pública no necesita saber qué cuenta está vinculada a cada ficha
+        for item in data:
+            item.pop('user_id', None)
+    return jsonify({'success': True, 'data': data})
 
 
 def register_web_content(kind):
