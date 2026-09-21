@@ -11,6 +11,7 @@ services:
     restart: unless-stopped
     depends_on:
       - inventory-backend
+      - linkstack
     volumes:
       - uploads_data:/usr/share/nginx/html/uploads
     networks:
@@ -36,9 +37,34 @@ services:
     networks:
       - malaga-network
 
+  # LinkStack: página de enlaces servida en /social (detrás del nginx del frontend)
+  linkstack:
+    build:
+      context: ./linkstack
+    container_name: malaga-linkstack
+    environment:
+      - TZ=Europe/Madrid
+      - SERVER_ADMIN=spaceteam@uma.es
+      - HTTP_SERVER_NAME=spaceteam.uma.es
+      - HTTPS_SERVER_NAME=spaceteam.uma.es
+      - LOG_LEVEL=info
+      # Credenciales del admin (solo se usan en el primer arranque).
+      # Si no se define la contraseña, se genera una y se muestra en los logs.
+      - LINKSTACK_ADMIN_EMAIL=${LINKSTACK_ADMIN_EMAIL:-spaceteam@uma.es}
+      - LINKSTACK_ADMIN_PASSWORD=${LINKSTACK_ADMIN_PASSWORD:-}
+      # Poner a true si el proxy de delante no envía X-Forwarded-Proto
+      - LINKSTACK_FORCE_HTTPS=${LINKSTACK_FORCE_HTTPS:-false}
+    volumes:
+      # App + base de datos SQLite + subidas (recomendación oficial de LinkStack)
+      - linkstack_data:/htdocs
+    restart: unless-stopped
+    networks:
+      - malaga-network
+
 networks:
   malaga-network:
     driver: bridge
 
 volumes:
   uploads_data:
+  linkstack_data:

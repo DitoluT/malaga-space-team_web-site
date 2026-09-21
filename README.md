@@ -133,6 +133,48 @@ El sitio está optimizado para despliegue en:
 - Vercel
 - Servidores web estáticos
 
+## Página de enlaces (`/social`)
+
+En `spaceteam.uma.es/social` se sirve una página de enlaces tipo *link in bio* con
+[LinkStack](https://github.com/LinkStackOrg/LinkStack). Corre como un servicio más del
+`docker-compose.yml` (`linkstack`, definido en [`linkstack/`](./linkstack)) y el nginx del
+frontend lo publica bajo `/social`.
+
+- **Primer arranque:** se instala solo (sin asistente web) y crea el perfil
+  `@malagaspaceteam` con LinkedIn, Instagram y el correo `spaceteam@uma.es`
+  (ver [`linkstack/seed.php`](./linkstack/seed.php)).
+- **Contraseña del admin:** define `LINKSTACK_ADMIN_PASSWORD` (p. ej. en un `.env` junto al
+  `docker-compose.yml`) antes del primer `./deploy.sh`. Si no se define, se genera una y
+  aparece en `docker logs malaga-linkstack`.
+- **Editar enlaces, tema, avatar...:** entra en `https://spaceteam.uma.es/social/login` con
+  `spaceteam@uma.es` (o `LINKSTACK_ADMIN_EMAIL`). Los cambios se guardan en el volumen
+  `linkstack_data`; `seed.php` no vuelve a ejecutarse.
+- **Contraseña:** `LINKSTACK_ADMIN_PASSWORD` va en `.env` (no se sube a git; ver
+  [`.env.example`](./.env.example)).
+- **HTTPS:** LinkStack genera URLs `https://` cuando el proxy de delante envía
+  `X-Forwarded-Proto: https`. Si no lo envía, arranca por primera vez con
+  `LINKSTACK_FORCE_HTTPS=true`.
+
+## Despliegue en producción (todo en Docker)
+
+En `spaceteam.uma.es` corre todo con Docker Compose: nginx (frontend + TLS con el certificado
+de la UMA), el backend de inventario y LinkStack. Se usa `docker-compose.yml` +
+[`docker-compose.prod.yml`](./docker-compose.prod.yml) y [`nginx.prod.conf`](./nginx.prod.conf).
+
+```bash
+./deploy_prod.sh             # despliega la rama actual (commiteada)
+./deploy_prod.sh --rollback  # vuelve al Apache del host
+```
+
+El script envía la rama al servidor, completa su `.env` (genera `JWT_SECRET`, toma las rutas
+del certificado de la configuración de Apache), hace copia de `data/inventory.db`, ensaya el
+stack en `127.0.0.1:8443` y solo entonces para el Apache del host y publica nginx en 80/443.
+Si la comprobación final falla, restaura Apache solo.
+
+- **Renovar el certificado:** sustituye los ficheros en `/etc/pki/tls/` (mismas rutas) y
+  ejecuta `docker compose -f docker-compose.yml -f docker-compose.prod.yml restart frontend`.
+- **`/reload`:** nginx lo sigue enviando al servicio del host en el puerto 4000.
+
 ## Contribución
 
 Para contribuir al proyecto:
