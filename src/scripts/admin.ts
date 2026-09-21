@@ -429,7 +429,11 @@ function initResource(section: HTMLElement) {
   });
 
   $('[data-reset-password]', form)?.addEventListener('click', async () => {
-    if (!form.dataset.id || !window.confirm('¿Restablecer la contraseña de este usuario a la primera contraseña del equipo?')) return;
+    if (
+      !form.dataset.id ||
+      !window.confirm('¿Restablecer la contraseña de este usuario a la primera contraseña del equipo?')
+    )
+      return;
     try {
       const result = await api<{ temp_password?: string }>(`${endpoint}/${form.dataset.id}`, {
         method: 'PUT',
