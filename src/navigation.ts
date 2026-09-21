@@ -38,7 +38,6 @@ export const getFooterData = (lang: Lang) => {
         title: t.footer.contactInfo,
         links: [
           { text: CONTACT.email, href: `mailto:${CONTACT.email}` },
-          { text: CONTACT.phone, href: `tel:${CONTACT.phone.replace(/\s/g, '')}` },
           { text: `${t.contact.address}, ${t.contact.city}` },
         ],
       },

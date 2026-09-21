@@ -173,7 +173,6 @@ Este proyecto está bajo la licencia MIT. Ver el archivo `LICENSE` para más det
 ## Contacto
 
 - **Email**: spaceteam@uma.es
-- **Teléfono**: +34 952 13 71 00
 - **Ubicación**: Universidad de Málaga, 29071 Málaga, España
 
 ---

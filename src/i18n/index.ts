@@ -139,7 +139,6 @@ export const OG_LOCALE: Record<Lang, string> = { es: 'es_ES', en: 'en_US' };
 /** Datos de contacto y redes del equipo (únicos para ambos idiomas). */
 export const CONTACT = {
   email: 'spaceteam@uma.es',
-  phone: '+34 952 13 71 00',
   linkedin: 'https://www.linkedin.com/company/malaga-space-team',
   instagram: 'https://www.instagram.com/malagaspaceteam/',
   social: '/social',
