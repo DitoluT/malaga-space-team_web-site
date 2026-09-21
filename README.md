@@ -157,22 +157,21 @@ frontend lo publica bajo `/social`.
 
 ## Despliegue en producción (todo en Docker)
 
-En `spaceteam.uma.es` corre todo con Docker Compose: nginx (frontend + TLS con el certificado
-de la UMA), el backend de inventario y LinkStack. Se usa `docker-compose.yml` +
-[`docker-compose.prod.yml`](./docker-compose.prod.yml) y [`nginx.prod.conf`](./nginx.prod.conf).
+En `spaceteam.uma.es` corre todo con Docker Compose: nginx (frontend), el backend de
+inventario y LinkStack. **El TLS lo termina el proxy inverso de la UMA**, que reenvía todo por
+HTTP al puerto 80 del servidor; por eso en el servidor no hay certificados ni redirección a
+https. Se usa `docker-compose.yml` + [`docker-compose.prod.yml`](./docker-compose.prod.yml) y
+[`nginx.prod.conf`](./nginx.prod.conf).
 
 ```bash
 ./deploy_prod.sh             # despliega la rama actual (commiteada)
 ./deploy_prod.sh --rollback  # vuelve al Apache del host
 ```
 
-El script envía la rama al servidor, completa su `.env` (genera `JWT_SECRET`, toma las rutas
-del certificado de la configuración de Apache), hace copia de `data/inventory.db`, ensaya el
-stack en `127.0.0.1:8443` y solo entonces para el Apache del host y publica nginx en 80/443.
-Si la comprobación final falla, restaura Apache solo.
+El script envía la rama al servidor, completa su `.env` (genera `JWT_SECRET`), hace copia de
+`data/inventory.db`, ensaya el stack en `127.0.0.1:8080` y solo entonces para el Apache del
+host y publica nginx en el puerto 80. Si la comprobación final falla, restaura Apache solo.
 
-- **Renovar el certificado:** sustituye los ficheros en `/etc/pki/tls/` (mismas rutas) y
-  ejecuta `docker compose -f docker-compose.yml -f docker-compose.prod.yml restart frontend`.
 - **`/reload`:** nginx lo sigue enviando al servicio del host en el puerto 4000.
 
 ## Contribución

@@ -1,17 +1,13 @@
-# Producción (spaceteam.uma.es): todo en Docker, nginx termina el TLS.
+# Producción (spaceteam.uma.es): todo en Docker. El TLS lo termina el proxy de la UMA,
+# que reenvía por HTTP al puerto 80 de este servidor.
 #   docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
 # Variables en .env (no se sube a git): ver .env.example. Lo usa deploy_prod.sh.
 services:
   frontend:
     ports: !override
       - "${HTTP_PORT:-80}:80"
-      - "${HTTPS_PORT:-443}:443"
     volumes:
       - ./nginx.prod.conf:/etc/nginx/nginx.conf:ro
-      - ./nginx/10-fullchain.sh:/docker-entrypoint.d/10-fullchain.sh:ro
-      - ${TLS_CERT_FILE:?define TLS_CERT_FILE en .env}:/certs/cert.cer:ro
-      - ${TLS_CHAIN_FILE:?define TLS_CHAIN_FILE en .env}:/certs/chain.cer:ro
-      - ${TLS_KEY_FILE:?define TLS_KEY_FILE en .env}:/certs/privkey.key:ro
     extra_hosts:
       - "host.docker.internal:host-gateway"
     healthcheck:

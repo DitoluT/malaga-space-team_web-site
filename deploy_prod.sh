@@ -1,19 +1,20 @@
 #!/bin/bash
 
 # Despliegue de PRODUCCIÓN en spaceteam.uma.es con todo en Docker
-# (nginx+TLS, backend de inventario y LinkStack en /social).
+# (nginx, backend de inventario y LinkStack en /social). El TLS lo termina el proxy
+# inverso de la UMA, que reenvía por HTTP al puerto 80 de este servidor.
 #
 #   ./deploy_prod.sh              Despliega la rama actual (debe estar commiteada)
 #   ./deploy_prod.sh --rollback   Vuelve al Apache del host (para nginx de Docker)
 #
 # Qué hace, en orden, y sin cortar el servicio hasta el último paso:
 #   1. Envía la rama actual al repo del servidor (git bundle, sin pasar por GitHub).
-#   2. Completa el .env del servidor (JWT_SECRET aleatorio, rutas del certificado
-#      de la UMA leídas del Apache, contraseña de LinkStack de tu .env local).
+#   2. Completa el .env del servidor (JWT_SECRET aleatorio y la contraseña de
+#      LinkStack de tu .env local).
 #   3. Copia de seguridad de data/inventory.db.
-#   4. Construye las imágenes y levanta el stack en 127.0.0.1:8080/8443 (ensayo).
-#   5. Si el ensayo pasa: para el Apache del host y publica nginx en 80/443.
-#      Si la comprobación final falla, deshace el cambio automáticamente.
+#   4. Construye las imágenes y levanta el stack en 127.0.0.1:8080 (ensayo).
+#   5. Si el ensayo pasa: para el Apache del host y publica nginx en el puerto 80.
+#      Si la comprobación final (local o pública) falla, deshace el cambio solo.
 #
 # Conexión: la misma que el alias `space` (entrada spaceteam.uma.es de ~/.ssh/config).
 
@@ -76,65 +77,68 @@ touch .env && chmod 600 .env
 setenv() { grep -q "^$1=" .env || echo "$1=$2" >> .env; }
 while IFS='=' read -r k v; do [ -n "$k" ] && setenv "$k" "$v"; done < .env.linkstack.tmp
 rm -f .env.linkstack.tmp
-VHOST=/etc/httpd/conf.d/$DOMAIN.conf
-apache_path() { awk -v d="$1" '$1==d {print $2; exit}' "$VHOST"; }
 setenv JWT_SECRET "$(openssl rand -hex 32)"
-setenv TLS_CERT_FILE "$(apache_path SSLCertificateFile)"
-setenv TLS_CHAIN_FILE "$(apache_path SSLCertificateChainFile)"
-setenv TLS_KEY_FILE "$(apache_path SSLCertificateKeyFile)"
-for k in TLS_CERT_FILE TLS_CHAIN_FILE TLS_KEY_FILE; do
-  f="$(grep "^$k=" .env | cut -d= -f2-)"
-  [ -f "$f" ] || { echo "   Error: $k no apunta a un fichero existente."; exit 1; }
-done
+sed -i '/^TLS_/d' .env
 
 echo "💾 [3/5] Copia de seguridad de la base de datos..."
 if [ -f data/inventory.db ]; then
   cp -p data/inventory.db "data/inventory.db.bak-$(date +%Y%m%d-%H%M%S)"
 fi
 
-check() { # check <puerto https> : comprueba web, /social y API con el certificado real
+check() { # check <puerto> : web, /social (con URLs https) y API, como las pediría el proxy de la UMA
   local p="$1" ok=0 url
   for i in $(seq 1 30); do
     ok=1
     for url in / /social/ /api/web/team; do
-      code=$(curl -s -o /dev/null -w '%{http_code}' --resolve "$DOMAIN:$p:127.0.0.1" "https://$DOMAIN:$p$url" || true)
+      code=$(curl -s -o /dev/null -w '%{http_code}' -H "Host: $DOMAIN" "http://127.0.0.1:$p$url" || true)
       [ "$code" = "200" ] || ok=0
     done
-    curl -s --resolve "$DOMAIN:$p:127.0.0.1" "https://$DOMAIN:$p/social/" | grep -q "linkedin.com/company/malaga-space-team" || ok=0
+    page="$(curl -s -H "Host: $DOMAIN" "http://127.0.0.1:$p/social/" || true)"
+    echo "$page" | grep -q "linkedin.com/company/malaga-space-team" || ok=0
+    echo "$page" | grep -q "https://$DOMAIN/social/" || ok=0
     [ "$ok" = 1 ] && return 0
     sleep 2
   done
   return 1
 }
 
-echo "🏗️  [4/5] Construyendo imágenes y ensayando en 127.0.0.1:8443 (la web sigue en Apache)..."
+echo "🏗️  [4/5] Construyendo imágenes y ensayando en 127.0.0.1:8080 (la web sigue en Apache)..."
 $COMPOSE build -q </dev/null
-HTTP_PORT=127.0.0.1:8080 HTTPS_PORT=127.0.0.1:8443 $COMPOSE up -d </dev/null
-if ! check 8443; then
+HTTP_PORT=127.0.0.1:8080 $COMPOSE up -d --remove-orphans </dev/null
+if ! check 8080; then
   echo "   ❌ El ensayo ha fallado. No se toca Apache. Revisa: $COMPOSE logs"
   $COMPOSE stop frontend </dev/null
   exit 1
 fi
-echo "   Ensayo OK (TLS válido, web, /social y API responden)."
+echo "   Ensayo OK (web, /social y API responden)."
 
 echo "🚀 [5/5] Cambio: Apache del host -> nginx en Docker..."
 systemctl stop httpd
 $COMPOSE up -d </dev/null
-if check 443; then
-  systemctl disable -q httpd
-  echo "   Apache del host parado y deshabilitado (su configuración queda intacta)."
+if check 80; then
+  echo "   nginx de Docker sirviendo en el puerto 80."
 else
   echo "   ❌ La comprobación final ha fallado: se restaura Apache."
   $COMPOSE stop frontend </dev/null
   systemctl start httpd
   exit 1
 fi
-docker image prune -f >/dev/null
 REMOTE
 
-echo "🌍 Comprobando desde fuera..."
-for url in "https://$DOMAIN/" "https://$DOMAIN/social/" "https://$DOMAIN/inventario"; do
-  printf '   %-40s %s\n' "$url" "$(curl -s -o /dev/null -w '%{http_code}' --max-time 20 "$url")"
+echo "🌍 Comprobando desde fuera (a través del proxy de la UMA)..."
+PUBLIC_OK=1
+for url in "https://$DOMAIN/" "https://$DOMAIN/social/" "https://$DOMAIN/inventario" "https://$DOMAIN/api/web/team"; do
+  code="$(curl -s -o /dev/null -w '%{http_code}' --max-time 20 "$url" || true)"
+  printf '   %-45s %s\n' "$url" "$code"
+  [ "$code" = "200" ] || PUBLIC_OK=0
 done
+curl -s --max-time 20 "https://$DOMAIN/social/" | grep -q "linkedin.com/company/malaga-space-team" || PUBLIC_OK=0
+if [ "$PUBLIC_OK" != 1 ]; then
+  echo "❌ La comprobación pública ha fallado: se restaura el Apache del host."
+  ssh "$SSH_HOST" "cd '$REMOTE_DIR' && $COMPOSE stop frontend && systemctl start httpd"
+  exit 1
+fi
+ssh "$SSH_HOST" "systemctl disable -q httpd; docker image prune -f >/dev/null"
+echo "   Apache del host parado y deshabilitado (su configuración queda intacta)."
 echo "✅ Desplegado. Panel de enlaces: https://$DOMAIN/social/login"
 echo "   Si algo va mal: ./deploy_prod.sh --rollback"
