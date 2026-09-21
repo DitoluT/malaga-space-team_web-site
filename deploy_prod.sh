@@ -127,14 +127,22 @@ fi
 REMOTE
 
 echo "🌍 Comprobando desde fuera (a través del proxy de la UMA)..."
-PUBLIC_OK=1
-for url in "https://$DOMAIN/" "https://$DOMAIN/social/" "https://$DOMAIN/inventario" "https://$DOMAIN/api/web/team"; do
-  code="$(curl -s -o /dev/null -w '%{http_code}' --max-time 20 "$url" || true)"
-  printf '   %-45s %s\n' "$url" "$code"
-  [ "$code" = "200" ] || PUBLIC_OK=0
+# El proxy de la UMA puede marcar el servidor como caído unos segundos tras el microcorte
+# del cambio y responder 503 sin reintentar: se insiste hasta 2 minutos antes de deshacer.
+PUBLIC_OK=0
+for attempt in $(seq 1 24); do
+  PUBLIC_OK=1
+  for url in "https://$DOMAIN/" "https://$DOMAIN/social/" "https://$DOMAIN/inventario" "https://$DOMAIN/api/web/team"; do
+    code="$(curl -s -o /dev/null -w '%{http_code}' --max-time 20 "$url" || true)"
+    [ "$code" = "200" ] || { PUBLIC_OK=0; echo "   (intento $attempt) $url -> $code"; break; }
+  done
+  if [ "$PUBLIC_OK" = 1 ]; then
+    PUBLIC_PAGE="$(curl -s --max-time 20 "https://$DOMAIN/social/" || true)"
+    grep -q "linkedin.com/company/malaga-space-team" <<<"$PUBLIC_PAGE" && break
+    PUBLIC_OK=0
+  fi
+  sleep 5
 done
-PUBLIC_PAGE="$(curl -s --max-time 20 "https://$DOMAIN/social/" || true)"
-grep -q "linkedin.com/company/malaga-space-team" <<<"$PUBLIC_PAGE" || PUBLIC_OK=0
 if [ "$PUBLIC_OK" != 1 ]; then
   echo "❌ La comprobación pública ha fallado: se restaura el Apache del host."
   ssh "$SSH_HOST" "cd '$REMOTE_DIR' && $COMPOSE stop frontend && systemctl start httpd"
