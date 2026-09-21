@@ -41,8 +41,7 @@ const organization = {
 
 const stats = [
   { amount: '25+', title: t.stats.teamMembers, description: t.stats.teamMembersDesc },
-  { amount: '6', title: t.stats.subsystems, description: t.stats.subsystemsDesc },
-  { amount: '6', title: t.stats.knowledgeAreas, description: t.stats.knowledgeAreasDesc },
+  { amount: '+10', title: t.extra.stats.degrees, description: t.extra.stats.degreesDesc },
 ];
 
 const mission = [
@@ -81,7 +80,7 @@ const benefits = [
       </div>
 
       <!-- Cifras -->
-      <dl class="grid border-t border-strong sm:grid-cols-3">
+      <dl class="grid border-t border-strong sm:grid-cols-2">
         {
           stats.map((stat) => (
             <div class="border-b border-line py-8 sm:border-b-0 sm:border-r sm:px-8 sm:first:pl-0 sm:last:border-r-0">

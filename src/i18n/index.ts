@@ -12,6 +12,7 @@ const extra = {
     switchTo: 'English',
     heroTitle: 'El equipo de estudiantes malagueño',
     heroTitleMuted: 'para la investigación espacial',
+    stats: { degrees: 'Carreras distintas', degreesDesc: 'Equipo interdisciplinar' },
     openMenu: 'Abrir menú',
     partners: {
       title: 'Patrocinadores',
@@ -57,6 +58,7 @@ const extra = {
     switchTo: 'Español',
     heroTitle: 'The Málaga student team',
     heroTitleMuted: 'for space research',
+    stats: { degrees: 'Different degrees', degreesDesc: 'Interdisciplinary team' },
     openMenu: 'Open menu',
     partners: {
       title: 'Sponsors',
