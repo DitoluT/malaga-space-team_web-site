@@ -1,21 +1,21 @@
 #!/bin/bash
 
-# Despliegue de PRODUCCIÓN en spaceteam.uma.es con todo en Docker
-# (nginx, backend de inventario y LinkStack en /social). Delante está el proxy de la
-# UMA, que reenvía https:// al puerto 443 y http:// al 80 de este servidor y vigila
-# ambos puertos: nginx sirve los dos, con el mismo certificado que usaba Apache.
+# Despliegue de PRODUCCIÓN en spaceteam.uma.es (todo en Docker: nginx con la web y los
+# paneles, backend de inventario y LinkStack en /social).
 #
 #   ./deploy_prod.sh              Despliega la rama actual (debe estar commiteada)
-#   ./deploy_prod.sh --rollback   Vuelve al Apache del host (para nginx de Docker)
+#   ./deploy_prod.sh --rollback   Vuelve a la versión anterior del frontend
 #
-# Qué hace, en orden, y sin cortar el servicio hasta el último paso:
+# Delante del servidor está el proxy de la UMA, que reenvía https:// al puerto 443 y
+# http:// al 80 y vigila ambos: nginx sirve los dos con el certificado del servidor.
+#
+# Qué hace, en orden:
 #   1. Envía la rama actual al repo del servidor (git bundle, sin pasar por GitHub).
-#   2. Completa el .env del servidor (JWT_SECRET aleatorio, rutas del certificado
-#      leídas de la configuración de Apache, contraseña de LinkStack de tu .env).
+#   2. Completa el .env del servidor (JWT_SECRET, rutas del certificado, LinkStack).
 #   3. Copia de seguridad de data/inventory.db.
-#   4. Construye las imágenes y levanta el stack en los puertos 8080/8443 (ensayo).
-#   5. Si el ensayo pasa: para el Apache del host y publica nginx en 80 y 443.
-#      Si la comprobación final (local o pública) falla, deshace el cambio solo.
+#   4. Construye las imágenes. La web sigue en marcha; si el build falla, no se toca nada.
+#   5. Guarda la imagen actual como «anterior», actualiza los contenedores y comprueba
+#      en local y desde fuera. Si algo falla, vuelve sola a la imagen anterior.
 #
 # Conexión: la misma que el alias `space` (entrada spaceteam.uma.es de ~/.ssh/config).
 
@@ -25,12 +25,16 @@ SSH_HOST="${SSH_HOST:-spaceteam.uma.es}"
 REMOTE_DIR="${REMOTE_DIR:-/root/malaga-space-team_web-site}"
 DOMAIN="${DOMAIN:-spaceteam.uma.es}"
 COMPOSE="docker compose -f docker-compose.yml -f docker-compose.prod.yml"
+FRONTEND_IMAGE="malaga-space-team_web-site-frontend"
 
 cd "$(dirname "$0")"
 
+# Vuelve a la imagen anterior del frontend (la guarda cada despliegue) y la arranca
+ROLLBACK_CMD="cd '$REMOTE_DIR' && docker image inspect $FRONTEND_IMAGE:previous >/dev/null && docker tag $FRONTEND_IMAGE:previous $FRONTEND_IMAGE:latest && $COMPOSE up -d --no-build --force-recreate --no-deps frontend"
+
 if [ "${1:-}" = "--rollback" ]; then
-  echo "↩️  Volviendo al Apache del host..."
-  ssh "$SSH_HOST" "cd '$REMOTE_DIR' && $COMPOSE stop frontend && systemctl enable --now httpd && echo 'Apache del host activo de nuevo.'; [ -f /root/load_website.sh.apache-bak ] && cp -p /root/load_website.sh.apache-bak /root/load_website.sh"
+  echo "↩️  Volviendo a la versión anterior del frontend..."
+  ssh "$SSH_HOST" "$ROLLBACK_CMD" </dev/null
   exit 0
 fi
 
@@ -51,7 +55,7 @@ trap 'rm -rf "$TMPDIR_DEPLOY"' EXIT
 
 echo "📦 [1/5] Enviando ${BRANCH} (${COMMIT}) al servidor..."
 # Solo los commits que el servidor aún no tiene
-BASE="$(ssh "$SSH_HOST" "git -C '$REMOTE_DIR' rev-parse HEAD")"
+BASE="$(ssh "$SSH_HOST" "git -C '$REMOTE_DIR' rev-parse HEAD" </dev/null)"
 if [ "$BASE" = "$(git rev-parse HEAD)" ]; then
   echo "   El servidor ya está en ${COMMIT}."
   git bundle create "$BUNDLE" -1 "$BRANCH" >/dev/null 2>&1
@@ -63,9 +67,15 @@ fi
 scp -q "$BUNDLE" "$SSH_HOST:/tmp/mst-deploy.bundle"
 grep -E '^LINKSTACK_' .env | ssh "$SSH_HOST" "umask 077; cat > '$REMOTE_DIR/.env.linkstack.tmp'"
 
-ssh "$SSH_HOST" "REMOTE_DIR='$REMOTE_DIR' BRANCH='$BRANCH' DOMAIN='$DOMAIN' COMPOSE='$COMPOSE' bash -s" <<'REMOTE'
+ssh "$SSH_HOST" "REMOTE_DIR='$REMOTE_DIR' BRANCH='$BRANCH' DOMAIN='$DOMAIN' COMPOSE='$COMPOSE' FRONTEND_IMAGE='$FRONTEND_IMAGE' bash -s" <<'REMOTE'
 set -euo pipefail
 cd "$REMOTE_DIR"
+
+if systemctl is-active -q httpd; then
+  echo "   Error: el Apache del host está activo y ocupa los puertos 80/443."
+  echo "   Páralo antes (systemctl disable --now httpd) o revisa el estado del servidor."
+  exit 1
+fi
 
 git fetch -q /tmp/mst-deploy.bundle "$BRANCH:refs/remotes/deploy/$BRANCH"
 rm -f /tmp/mst-deploy.bundle
@@ -92,22 +102,24 @@ done
 echo "💾 [3/5] Copia de seguridad de la base de datos..."
 if [ -f data/inventory.db ]; then
   cp -p data/inventory.db "data/inventory.db.bak-$(date +%Y%m%d-%H%M%S)"
+  # se conservan las 10 copias más recientes
+  ls -1t data/inventory.db.bak-* 2>/dev/null | tail -n +11 | xargs -r rm -f
 fi
 
-# Nota: en esta VM no se puede conectar a la propia IPv6 global desde dentro (ni siquiera
-# a Apache), así que se prueba por loopback IPv4 e IPv6; el proxy de la UMA entra por IPv6.
+# Nota: en esta VM no se puede conectar a la propia IPv6 global desde dentro, así que se
+# prueba por loopback IPv4 e IPv6 (el proxy de la UMA entra por IPv6).
 # -k: igual que el proxy de la UMA, no se valida el certificado del servidor.
-check() { # check <puerto http> <puerto https> : web, /social (con URLs https) y API
+check() { # web, paneles, /social (con URLs https) y API, por HTTP y HTTPS
   local ok=0 url base
   for i in $(seq 1 20); do
     ok=1
-    for base in "http://127.0.0.1:$1" "http://[::1]:$1" "https://127.0.0.1:$2" "https://[::1]:$2"; do
-      for url in / /social/ /api/web/team; do
+    for base in "http://127.0.0.1" "http://[::1]" "https://127.0.0.1" "https://[::1]"; do
+      for url in / /en /inventario /admin /social/ /api/web/team; do
         code=$(curl -g -k -s --noproxy '*' -o /dev/null -w '%{http_code}' --max-time 5 -H "Host: $DOMAIN" "$base$url" || true)
         [ "$code" = "200" ] || ok=0
       done
     done
-    page="$(curl -g -k -s --noproxy '*' --max-time 5 -H "Host: $DOMAIN" "https://[::1]:$2/social/" || true)"
+    page="$(curl -g -k -s --noproxy '*' --max-time 5 -H "Host: $DOMAIN" "https://[::1]/social/" || true)"
     # (here-strings: con pipefail, `echo | grep -q` falla por SIGPIPE aunque haya coincidencia)
     grep -q "linkedin.com/company/malaga-space-team" <<<"$page" || ok=0
     grep -q "https://$DOMAIN/social/" <<<"$page" || ok=0
@@ -117,45 +129,32 @@ check() { # check <puerto http> <puerto https> : web, /social (con URLs https) y
   return 1
 }
 
-echo "🏗️  [4/5] Construyendo imágenes y ensayando en los puertos 8080/8443 (la web sigue en Apache)..."
+echo "🏗️  [4/5] Construyendo imágenes (la web sigue en marcha)..."
 $COMPOSE build -q </dev/null
-# 8080/8443 no están abiertos en el firewall: solo son alcanzables desde el propio servidor
-HTTP_PORT=8080 HTTPS_PORT=8443 $COMPOSE up -d --remove-orphans </dev/null
-if ! check 8080 8443; then
-  echo "   ❌ El ensayo ha fallado. No se toca Apache. Revisa: $COMPOSE logs"
-  $COMPOSE stop frontend </dev/null
-  exit 1
-fi
-echo "   Ensayo OK (web, /social y API responden por HTTP y HTTPS, IPv4 e IPv6)."
-if docker exec malaga-frontend nc -z -w 3 host.docker.internal 4000; then
-  echo "   El servicio /reload del host (puerto 4000) es alcanzable desde nginx."
-else
-  echo "   ⚠️  nginx no alcanza el puerto 4000 del host: /reload no funcionará (no bloquea el despliegue)."
-fi
 
-echo "🚀 [5/5] Cambio: Apache del host -> nginx en Docker..."
-# El contenedor definitivo (puertos 80 y 443) se deja creado antes de parar Apache:
-# así el hueco sin servicio es de ~1 s y el proxy de la UMA apenas lo nota
-$COMPOSE up --no-start </dev/null
-systemctl stop httpd
-docker start malaga-frontend >/dev/null
-if check 80 443; then
-  echo "   nginx de Docker sirviendo en los puertos 80 y 443."
+echo "🚀 [5/5] Actualizando contenedores..."
+if [ -n "$(docker ps -q -f name=malaga-frontend)" ]; then
+  # imagen que está sirviendo ahora mismo: es a la que se vuelve si algo falla
+  docker tag "$(docker inspect -f '{{.Image}}' malaga-frontend)" "$FRONTEND_IMAGE:previous"
+fi
+$COMPOSE up -d --remove-orphans </dev/null
+if check; then
+  echo "   Comprobación local OK (web, paneles, /social y API por HTTP y HTTPS, IPv4 e IPv6)."
 else
-  echo "   ❌ La comprobación final ha fallado: se restaura Apache."
-  $COMPOSE stop frontend </dev/null
-  systemctl start httpd
+  echo "   ❌ La comprobación local ha fallado: se vuelve a la imagen anterior."
+  docker tag "$FRONTEND_IMAGE:previous" "$FRONTEND_IMAGE:latest"
+  $COMPOSE up -d --no-build --force-recreate --no-deps frontend </dev/null
   exit 1
 fi
 REMOTE
 
 echo "🌍 Comprobando desde fuera (a través del proxy de la UMA)..."
-# El proxy de la UMA puede marcar el servidor como caído unos segundos tras el microcorte
-# del cambio y responder 503 sin reintentar: se insiste hasta 2 minutos antes de deshacer.
+# El proxy de la UMA puede marcar el servidor como caído unos segundos tras el reinicio de
+# nginx y responder 503 sin reintentar: se insiste hasta 2 minutos antes de deshacer.
 PUBLIC_OK=0
 for attempt in $(seq 1 24); do
   PUBLIC_OK=1
-  for url in "https://$DOMAIN/" "https://$DOMAIN/social/" "https://$DOMAIN/inventario" "https://$DOMAIN/api/web/team"; do
+  for url in "https://$DOMAIN/" "https://$DOMAIN/en" "https://$DOMAIN/social/" "https://$DOMAIN/inventario" "https://$DOMAIN/api/web/team"; do
     code="$(curl -s -o /dev/null -w '%{http_code}' --max-time 20 "$url" || true)"
     [ "$code" = "200" ] || { PUBLIC_OK=0; echo "   (intento $attempt) $url -> $code"; break; }
   done
@@ -167,19 +166,11 @@ for attempt in $(seq 1 24); do
   sleep 5
 done
 if [ "$PUBLIC_OK" != 1 ]; then
-  echo "❌ La comprobación pública ha fallado: se restaura el Apache del host."
-  ssh "$SSH_HOST" "cd '$REMOTE_DIR' && $COMPOSE stop frontend && systemctl start httpd"
+  echo "❌ La comprobación pública ha fallado: se vuelve a la imagen anterior."
+  ssh "$SSH_HOST" "$ROLLBACK_CMD" </dev/null
   exit 1
 fi
-ssh "$SSH_HOST" "
-  systemctl disable -q httpd
-  docker image prune -f >/dev/null
-  # /reload: el script antiguo borraba /var/www/html y copiaba dist/ (que ya no existe)
-  [ -f /root/load_website.sh ] && [ ! -f /root/load_website.sh.apache-bak ] && cp -p /root/load_website.sh /root/load_website.sh.apache-bak
-  printf '#!/bin/bash\\nexec $REMOTE_DIR/reload_website.sh\\n' > /root/load_website.sh
-  chmod 755 /root/load_website.sh
-"
-echo "   Apache del host parado y deshabilitado (su configuración queda intacta)."
-echo "   /reload ahora ejecuta reload_website.sh (git pull + docker compose up --build)."
-echo "✅ Desplegado. Panel de enlaces: https://$DOMAIN/social/login"
+
+ssh "$SSH_HOST" "docker image prune -f >/dev/null" </dev/null
+echo "✅ Desplegado: https://$DOMAIN/"
 echo "   Si algo va mal: ./deploy_prod.sh --rollback"

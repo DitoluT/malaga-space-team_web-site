@@ -132,12 +132,13 @@ lectura. Se usa `docker-compose.yml` + [`docker-compose.prod.yml`](./docker-comp
 
 ```bash
 ./deploy_prod.sh             # despliega la rama actual (commiteada)
-./deploy_prod.sh --rollback  # vuelve al Apache del host
+./deploy_prod.sh --rollback  # vuelve a la versión anterior del frontend
 ```
 
-El script envía la rama al servidor, completa su `.env` (genera `JWT_SECRET`), hace copia de
-`data/inventory.db`, ensaya el stack en los puertos 8080/8443 y solo entonces para el Apache del
-host y publica nginx en 80 y 443. Si la comprobación final falla, restaura Apache solo.
+El script envía la rama al servidor, completa su `.env`, hace copia de `data/inventory.db`,
+construye las imágenes (la web sigue en marcha mientras tanto), actualiza los contenedores y
+comprueba la web en local y desde fuera. Si alguna comprobación falla, vuelve sola a la imagen
+anterior. El Apache que servía la web antes de Docker sigue instalado pero parado y deshabilitado.
 
 - **`/reload`:** nginx lo sigue enviando al servicio del host en el puerto 4000, que ahora
   ejecuta [`reload_website.sh`](./reload_website.sh): `git pull` + reconstruir los contenedores.
