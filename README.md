@@ -32,8 +32,9 @@ fotos de los miembros.
 - **Gestor** (`manager`): equipo, colaboradores, patrocinadores e inventario.
 - **Administrador** (`admin`): además, usuarios.
 
-Al crear un usuario o restablecerle la contraseña, el panel genera una **contraseña temporal
-aleatoria** que se muestra una sola vez; la persona debe cambiarla en su primer acceso.
+Al crear un usuario o restablecerle la contraseña, la cuenta queda con la primera contraseña
+del equipo (`spaceteam`, configurable con la variable `TEMP_PASSWORD` del backend) y la persona
+debe cambiarla en su primer acceso.
 
 ## Descripción
 

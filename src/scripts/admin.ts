@@ -416,7 +416,7 @@ function initResource(section: HTMLElement) {
       });
       await loadResource(section);
       if (result.temp_password) {
-        // La contraseña temporal solo se muestra esta vez: el diálogo sigue abierto para copiarla
+        // Se muestra la primera contraseña: el diálogo sigue abierto para poder copiarla
         showSecret(form, result.temp_password);
         notify(form, 'success', 'Guardado.');
       } else {
@@ -429,7 +429,7 @@ function initResource(section: HTMLElement) {
   });
 
   $('[data-reset-password]', form)?.addEventListener('click', async () => {
-    if (!form.dataset.id || !window.confirm('¿Generar una contraseña temporal nueva para este usuario?')) return;
+    if (!form.dataset.id || !window.confirm('¿Restablecer la contraseña de este usuario a la primera contraseña del equipo?')) return;
     try {
       const result = await api<{ temp_password?: string }>(`${endpoint}/${form.dataset.id}`, {
         method: 'PUT',

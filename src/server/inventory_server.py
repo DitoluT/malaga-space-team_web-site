@@ -22,7 +22,6 @@ import jwt
 import datetime
 import os
 import re
-import secrets
 import uuid
 from functools import wraps
 
@@ -35,6 +34,9 @@ DATABASE_PATH = os.environ.get('DATABASE_PATH', os.path.join(os.path.dirname(__f
 # Subidas (logos): tamaño máximo y tipos permitidos
 app.config['MAX_CONTENT_LENGTH'] = 10 * 1024 * 1024
 ALLOWED_IMAGE_EXTENSIONS = {'png', 'jpg', 'jpeg', 'webp', 'gif', 'svg'}
+
+# Primera contraseña de las cuentas nuevas o restablecidas (hay que cambiarla al entrar)
+TEMP_PASSWORD = os.environ.get('TEMP_PASSWORD', 'spaceteam')
 
 # En producción (HTTPS) la cookie de sesión solo viaja cifrada
 COOKIE_SECURE = os.environ.get('COOKIE_SECURE', 'false').lower() == 'true'
@@ -781,10 +783,10 @@ def create_user():
     if email and not email.endswith('@uma.es'):
          return jsonify({'error': 'El correo debe ser del dominio @uma.es'}), 400
     
-    # Sin contraseña: se genera una temporal aleatoria y se devuelve una sola vez
+    # Sin contraseña: se usa la primera contraseña del equipo (cambio obligatorio al entrar)
     temp_password = None
     if not password:
-        temp_password = secrets.token_urlsafe(9)
+        temp_password = TEMP_PASSWORD
         password = temp_password
 
     if not all([username, nombre_completo, rol]):
@@ -832,10 +834,10 @@ def update_user(user_id):
         conn.close()
         return jsonify({'error': 'Usuario no encontrado'}), 404
 
-    # Restablecer contraseña: temporal aleatoria (se devuelve una sola vez) y cambio obligatorio
+    # Restablecer contraseña: vuelve a la primera contraseña del equipo, con cambio obligatorio
     temp_password = None
     if data.get('reset_password'):
-        temp_password = secrets.token_urlsafe(9)
+        temp_password = TEMP_PASSWORD
         data['password'] = temp_password
 
     # Si se actualiza el password
