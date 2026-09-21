@@ -94,8 +94,9 @@ check() { # check <puerto> : web, /social (con URLs https) y API, como las pedir
       [ "$code" = "200" ] || ok=0
     done
     page="$(curl -s -H "Host: $DOMAIN" "http://127.0.0.1:$p/social/" || true)"
-    echo "$page" | grep -q "linkedin.com/company/malaga-space-team" || ok=0
-    echo "$page" | grep -q "https://$DOMAIN/social/" || ok=0
+    # (here-strings: con pipefail, `echo | grep -q` falla por SIGPIPE aunque haya coincidencia)
+    grep -q "linkedin.com/company/malaga-space-team" <<<"$page" || ok=0
+    grep -q "https://$DOMAIN/social/" <<<"$page" || ok=0
     [ "$ok" = 1 ] && return 0
     sleep 2
   done
@@ -132,7 +133,8 @@ for url in "https://$DOMAIN/" "https://$DOMAIN/social/" "https://$DOMAIN/inventa
   printf '   %-45s %s\n' "$url" "$code"
   [ "$code" = "200" ] || PUBLIC_OK=0
 done
-curl -s --max-time 20 "https://$DOMAIN/social/" | grep -q "linkedin.com/company/malaga-space-team" || PUBLIC_OK=0
+PUBLIC_PAGE="$(curl -s --max-time 20 "https://$DOMAIN/social/" || true)"
+grep -q "linkedin.com/company/malaga-space-team" <<<"$PUBLIC_PAGE" || PUBLIC_OK=0
 if [ "$PUBLIC_OK" != 1 ]; then
   echo "❌ La comprobación pública ha fallado: se restaura el Apache del host."
   ssh "$SSH_HOST" "cd '$REMOTE_DIR' && $COMPOSE stop frontend && systemctl start httpd"
