@@ -158,9 +158,11 @@ frontend lo publica bajo `/social`.
 ## Despliegue en producción (todo en Docker)
 
 En `spaceteam.uma.es` corre todo con Docker Compose: nginx (frontend), el backend de
-inventario y LinkStack. **El TLS lo termina el proxy inverso de la UMA**, que reenvía todo por
-HTTP al puerto 80 del servidor; por eso en el servidor no hay certificados ni redirección a
-https. Se usa `docker-compose.yml` + [`docker-compose.prod.yml`](./docker-compose.prod.yml) y
+inventario y LinkStack. Delante está el **proxy inverso de la UMA**, que termina el TLS público
+y reenvía `https://` al puerto **443** del servidor (re-cifrado, sin validar el certificado) y
+`http://` al **80**; además vigila ambos puertos cada 2 s y devuelve 503 si alguno no responde.
+Por eso nginx sirve lo mismo en 80 y 443, con el certificado que usaba Apache montado en solo
+lectura. Se usa `docker-compose.yml` + [`docker-compose.prod.yml`](./docker-compose.prod.yml) y
 [`nginx.prod.conf`](./nginx.prod.conf).
 
 ```bash
@@ -169,13 +171,15 @@ https. Se usa `docker-compose.yml` + [`docker-compose.prod.yml`](./docker-compos
 ```
 
 El script envía la rama al servidor, completa su `.env` (genera `JWT_SECRET`), hace copia de
-`data/inventory.db`, ensaya el stack en `127.0.0.1:8080` y solo entonces para el Apache del
-host y publica nginx en el puerto 80. Si la comprobación final falla, restaura Apache solo.
+`data/inventory.db`, ensaya el stack en los puertos 8080/8443 y solo entonces para el Apache del
+host y publica nginx en 80 y 443. Si la comprobación final falla, restaura Apache solo.
 
 - **`/reload`:** nginx lo sigue enviando al servicio del host en el puerto 4000, que ahora
   ejecuta [`reload_website.sh`](./reload_website.sh): `git pull` + reconstruir los contenedores.
   (El flujo antiguo copiaba `dist/` a `/var/www/html`; `dist/` ya no se versiona.)
-- **TLS:** lo termina el proxy de la UMA; el servidor solo recibe HTTP en el puerto 80.
+- **Certificado del servidor:** las rutas están en el `.env` del servidor (`TLS_*`). Al
+  renovarlo (se pide al CAU), sustituye los ficheros y ejecuta
+  `docker compose -f docker-compose.yml -f docker-compose.prod.yml restart frontend`.
 
 ## Contribución
 

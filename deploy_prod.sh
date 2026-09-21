@@ -1,19 +1,20 @@
 #!/bin/bash
 
 # Despliegue de PRODUCCIÓN en spaceteam.uma.es con todo en Docker
-# (nginx, backend de inventario y LinkStack en /social). El TLS lo termina el proxy
-# inverso de la UMA, que reenvía por HTTP al puerto 80 de este servidor.
+# (nginx, backend de inventario y LinkStack en /social). Delante está el proxy de la
+# UMA, que reenvía https:// al puerto 443 y http:// al 80 de este servidor y vigila
+# ambos puertos: nginx sirve los dos, con el mismo certificado que usaba Apache.
 #
 #   ./deploy_prod.sh              Despliega la rama actual (debe estar commiteada)
 #   ./deploy_prod.sh --rollback   Vuelve al Apache del host (para nginx de Docker)
 #
 # Qué hace, en orden, y sin cortar el servicio hasta el último paso:
 #   1. Envía la rama actual al repo del servidor (git bundle, sin pasar por GitHub).
-#   2. Completa el .env del servidor (JWT_SECRET aleatorio y la contraseña de
-#      LinkStack de tu .env local).
+#   2. Completa el .env del servidor (JWT_SECRET aleatorio, rutas del certificado
+#      leídas de la configuración de Apache, contraseña de LinkStack de tu .env).
 #   3. Copia de seguridad de data/inventory.db.
-#   4. Construye las imágenes y levanta el stack en 127.0.0.1:8080 (ensayo).
-#   5. Si el ensayo pasa: para el Apache del host y publica nginx en el puerto 80.
+#   4. Construye las imágenes y levanta el stack en los puertos 8080/8443 (ensayo).
+#   5. Si el ensayo pasa: para el Apache del host y publica nginx en 80 y 443.
 #      Si la comprobación final (local o pública) falla, deshace el cambio solo.
 #
 # Conexión: la misma que el alias `space` (entrada spaceteam.uma.es de ~/.ssh/config).
@@ -78,7 +79,15 @@ setenv() { grep -q "^$1=" .env || echo "$1=$2" >> .env; }
 while IFS='=' read -r k v; do [ -n "$k" ] && setenv "$k" "$v"; done < .env.linkstack.tmp
 rm -f .env.linkstack.tmp
 setenv JWT_SECRET "$(openssl rand -hex 32)"
-sed -i '/^TLS_/d' .env
+VHOST=/etc/httpd/conf.d/$DOMAIN.conf
+apache_path() { awk -v d="$1" '$1==d {print $2; exit}' "$VHOST"; }
+setenv TLS_CERT_FILE "$(apache_path SSLCertificateFile)"
+setenv TLS_CHAIN_FILE "$(apache_path SSLCertificateChainFile)"
+setenv TLS_KEY_FILE "$(apache_path SSLCertificateKeyFile)"
+for k in TLS_CERT_FILE TLS_CHAIN_FILE TLS_KEY_FILE; do
+  f="$(grep "^$k=" .env | cut -d= -f2-)"
+  [ -f "$f" ] || { echo "   Error: $k no apunta a un fichero existente."; exit 1; }
+done
 
 echo "💾 [3/5] Copia de seguridad de la base de datos..."
 if [ -f data/inventory.db ]; then
@@ -87,17 +96,18 @@ fi
 
 # Nota: en esta VM no se puede conectar a la propia IPv6 global desde dentro (ni siquiera
 # a Apache), así que se prueba por loopback IPv4 e IPv6; el proxy de la UMA entra por IPv6.
-check() { # check <puerto> : web, /social (con URLs https) y API, como las pediría el proxy de la UMA
-  local p="$1" ok=0 url base
+# -k: igual que el proxy de la UMA, no se valida el certificado del servidor.
+check() { # check <puerto http> <puerto https> : web, /social (con URLs https) y API
+  local ok=0 url base
   for i in $(seq 1 20); do
     ok=1
-    for base in "127.0.0.1" "[::1]"; do
+    for base in "http://127.0.0.1:$1" "http://[::1]:$1" "https://127.0.0.1:$2" "https://[::1]:$2"; do
       for url in / /social/ /api/web/team; do
-        code=$(curl -g -s --noproxy '*' -o /dev/null -w '%{http_code}' --max-time 5 -H "Host: $DOMAIN" "http://$base:$p$url" || true)
+        code=$(curl -g -k -s --noproxy '*' -o /dev/null -w '%{http_code}' --max-time 5 -H "Host: $DOMAIN" "$base$url" || true)
         [ "$code" = "200" ] || ok=0
       done
     done
-    page="$(curl -g -s --noproxy '*' --max-time 5 -H "Host: $DOMAIN" "http://[::1]:$p/social/" || true)"
+    page="$(curl -g -k -s --noproxy '*' --max-time 5 -H "Host: $DOMAIN" "https://[::1]:$2/social/" || true)"
     # (here-strings: con pipefail, `echo | grep -q` falla por SIGPIPE aunque haya coincidencia)
     grep -q "linkedin.com/company/malaga-space-team" <<<"$page" || ok=0
     grep -q "https://$DOMAIN/social/" <<<"$page" || ok=0
@@ -107,16 +117,16 @@ check() { # check <puerto> : web, /social (con URLs https) y API, como las pedir
   return 1
 }
 
-echo "🏗️  [4/5] Construyendo imágenes y ensayando en el puerto 8080 (la web sigue en Apache)..."
+echo "🏗️  [4/5] Construyendo imágenes y ensayando en los puertos 8080/8443 (la web sigue en Apache)..."
 $COMPOSE build -q </dev/null
-# 8080 no está abierto en firewalld: solo es alcanzable desde el propio servidor
-HTTP_PORT=8080 $COMPOSE up -d --remove-orphans </dev/null
-if ! check 8080; then
+# 8080/8443 no están abiertos en el firewall: solo son alcanzables desde el propio servidor
+HTTP_PORT=8080 HTTPS_PORT=8443 $COMPOSE up -d --remove-orphans </dev/null
+if ! check 8080 8443; then
   echo "   ❌ El ensayo ha fallado. No se toca Apache. Revisa: $COMPOSE logs"
   $COMPOSE stop frontend </dev/null
   exit 1
 fi
-echo "   Ensayo OK (web, /social y API responden)."
+echo "   Ensayo OK (web, /social y API responden por HTTP y HTTPS, IPv4 e IPv6)."
 if docker exec malaga-frontend nc -z -w 3 host.docker.internal 4000; then
   echo "   El servicio /reload del host (puerto 4000) es alcanzable desde nginx."
 else
@@ -124,13 +134,13 @@ else
 fi
 
 echo "🚀 [5/5] Cambio: Apache del host -> nginx en Docker..."
-# El contenedor definitivo (puerto 80) se deja creado antes de parar Apache:
+# El contenedor definitivo (puertos 80 y 443) se deja creado antes de parar Apache:
 # así el hueco sin servicio es de ~1 s y el proxy de la UMA apenas lo nota
 $COMPOSE up --no-start </dev/null
 systemctl stop httpd
 docker start malaga-frontend >/dev/null
-if check 80; then
-  echo "   nginx de Docker sirviendo en el puerto 80."
+if check 80 443; then
+  echo "   nginx de Docker sirviendo en los puertos 80 y 443."
 else
   echo "   ❌ La comprobación final ha fallado: se restaura Apache."
   $COMPOSE stop frontend </dev/null
