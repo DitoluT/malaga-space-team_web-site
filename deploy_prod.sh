@@ -29,7 +29,7 @@ cd "$(dirname "$0")"
 
 if [ "${1:-}" = "--rollback" ]; then
   echo "↩️  Volviendo al Apache del host..."
-  ssh "$SSH_HOST" "cd '$REMOTE_DIR' && $COMPOSE stop frontend && systemctl enable --now httpd && echo 'Apache del host activo de nuevo.'"
+  ssh "$SSH_HOST" "cd '$REMOTE_DIR' && $COMPOSE stop frontend && systemctl enable --now httpd && echo 'Apache del host activo de nuevo.'; [ -f /root/load_website.sh.apache-bak ] && cp -p /root/load_website.sh.apache-bak /root/load_website.sh"
   exit 0
 fi
 
@@ -85,15 +85,20 @@ if [ -f data/inventory.db ]; then
   cp -p data/inventory.db "data/inventory.db.bak-$(date +%Y%m%d-%H%M%S)"
 fi
 
+# El proxy de la UMA entra por HTTP a la IPv6 global del servidor: se prueba por ahí
+ADDR6="$(ip -6 -o addr show scope global | awk '{print $4}' | cut -d/ -f1 | grep -v '^2001:db8' | head -1)"
+[ -n "$ADDR6" ] && BASE_HOST="[$ADDR6]" || BASE_HOST="127.0.0.1"
+echo "   Las comprobaciones locales usan http://$BASE_HOST"
+
 check() { # check <puerto> : web, /social (con URLs https) y API, como las pediría el proxy de la UMA
   local p="$1" ok=0 url
   for i in $(seq 1 30); do
     ok=1
     for url in / /social/ /api/web/team; do
-      code=$(curl -s -o /dev/null -w '%{http_code}' -H "Host: $DOMAIN" "http://127.0.0.1:$p$url" || true)
+      code=$(curl -g -s -o /dev/null -w '%{http_code}' --max-time 10 -H "Host: $DOMAIN" "http://$BASE_HOST:$p$url" || true)
       [ "$code" = "200" ] || ok=0
     done
-    page="$(curl -s -H "Host: $DOMAIN" "http://127.0.0.1:$p/social/" || true)"
+    page="$(curl -g -s --max-time 10 -H "Host: $DOMAIN" "http://$BASE_HOST:$p/social/" || true)"
     # (here-strings: con pipefail, `echo | grep -q` falla por SIGPIPE aunque haya coincidencia)
     grep -q "linkedin.com/company/malaga-space-team" <<<"$page" || ok=0
     grep -q "https://$DOMAIN/social/" <<<"$page" || ok=0
@@ -103,19 +108,28 @@ check() { # check <puerto> : web, /social (con URLs https) y API, como las pedir
   return 1
 }
 
-echo "🏗️  [4/5] Construyendo imágenes y ensayando en 127.0.0.1:8080 (la web sigue en Apache)..."
+echo "🏗️  [4/5] Construyendo imágenes y ensayando en el puerto 8080 (la web sigue en Apache)..."
 $COMPOSE build -q </dev/null
-HTTP_PORT=127.0.0.1:8080 $COMPOSE up -d --remove-orphans </dev/null
+# 8080 no está abierto en firewalld: solo es alcanzable desde el propio servidor
+HTTP_PORT=8080 $COMPOSE up -d --remove-orphans </dev/null
 if ! check 8080; then
   echo "   ❌ El ensayo ha fallado. No se toca Apache. Revisa: $COMPOSE logs"
   $COMPOSE stop frontend </dev/null
   exit 1
 fi
 echo "   Ensayo OK (web, /social y API responden)."
+if docker exec malaga-frontend nc -z -w 3 host.docker.internal 4000; then
+  echo "   El servicio /reload del host (puerto 4000) es alcanzable desde nginx."
+else
+  echo "   ⚠️  nginx no alcanza el puerto 4000 del host: /reload no funcionará (no bloquea el despliegue)."
+fi
 
 echo "🚀 [5/5] Cambio: Apache del host -> nginx en Docker..."
+# El contenedor definitivo (puerto 80) se deja creado antes de parar Apache:
+# así el hueco sin servicio es de ~1 s y el proxy de la UMA apenas lo nota
+$COMPOSE up --no-start </dev/null
 systemctl stop httpd
-$COMPOSE up -d </dev/null
+docker start malaga-frontend >/dev/null
 if check 80; then
   echo "   nginx de Docker sirviendo en el puerto 80."
 else
@@ -148,7 +162,15 @@ if [ "$PUBLIC_OK" != 1 ]; then
   ssh "$SSH_HOST" "cd '$REMOTE_DIR' && $COMPOSE stop frontend && systemctl start httpd"
   exit 1
 fi
-ssh "$SSH_HOST" "systemctl disable -q httpd; docker image prune -f >/dev/null"
+ssh "$SSH_HOST" "
+  systemctl disable -q httpd
+  docker image prune -f >/dev/null
+  # /reload: el script antiguo borraba /var/www/html y copiaba dist/ (que ya no existe)
+  [ -f /root/load_website.sh ] && [ ! -f /root/load_website.sh.apache-bak ] && cp -p /root/load_website.sh /root/load_website.sh.apache-bak
+  printf '#!/bin/bash\\nexec $REMOTE_DIR/reload_website.sh\\n' > /root/load_website.sh
+  chmod 755 /root/load_website.sh
+"
 echo "   Apache del host parado y deshabilitado (su configuración queda intacta)."
+echo "   /reload ahora ejecuta reload_website.sh (git pull + docker compose up --build)."
 echo "✅ Desplegado. Panel de enlaces: https://$DOMAIN/social/login"
 echo "   Si algo va mal: ./deploy_prod.sh --rollback"

@@ -172,7 +172,10 @@ El script envía la rama al servidor, completa su `.env` (genera `JWT_SECRET`), 
 `data/inventory.db`, ensaya el stack en `127.0.0.1:8080` y solo entonces para el Apache del
 host y publica nginx en el puerto 80. Si la comprobación final falla, restaura Apache solo.
 
-- **`/reload`:** nginx lo sigue enviando al servicio del host en el puerto 4000.
+- **`/reload`:** nginx lo sigue enviando al servicio del host en el puerto 4000, que ahora
+  ejecuta [`reload_website.sh`](./reload_website.sh): `git pull` + reconstruir los contenedores.
+  (El flujo antiguo copiaba `dist/` a `/var/www/html`; `dist/` ya no se versiona.)
+- **TLS:** lo termina el proxy de la UMA; el servidor solo recibe HTTP en el puerto 80.
 
 ## Contribución
 
