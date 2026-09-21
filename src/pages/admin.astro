@@ -1,0 +1,482 @@
+---
+// Panel de gestión de la web: equipo, colaboradores, patrocinadores y usuarios.
+// Usa el mismo layout, logo y estilos que la web pública; la lógica está en ~/scripts/admin.ts
+import Layout from '~/layouts/Layout.astro';
+import Logo from '~/components/Logo.astro';
+import ToggleTheme from '~/components/common/ToggleTheme.astro';
+import Field from '~/components/admin/Field.astro';
+import ResourcePanel from '~/components/admin/ResourcePanel.astro';
+import { card, eyebrow, input } from '~/components/mst/styles';
+import { getDictionary } from '~/i18n';
+
+// «other» es solo el encabezado de la web para quien no tiene equipo asignado
+const departments = Object.entries(getDictionary('es').extra.teamLive.departments).filter(
+  ([key]) => key !== 'other'
+) as Array<[string, string]>;
+const departmentOptions: Array<[string, string]> = [['', 'Sin asignar'], ...departments];
+
+// Sugerencias para el campo «Rol» (se puede escribir cualquier otro)
+const roleSuggestions = [
+  'Director del Proyecto',
+  'Codirector del Proyecto',
+  'Coordinador del Proyecto',
+  'Mentor',
+  'Líder de Subsistema',
+  'Responsable Técnico',
+  'Ingeniero de Software',
+  'Ingeniero de Hardware',
+  'Ingeniero de Comunicaciones',
+  'Ingeniero de Estructuras',
+  'Ingeniero de Energía',
+  'Operador de Estación Terrena',
+  'Marketing y Redes Sociales',
+];
+
+const tabs = [
+  { id: 'team', label: 'Equipo', requires: 'manager' },
+  { id: 'sponsors', label: 'Colaboradores', requires: 'manager' },
+  { id: 'partners', label: 'Patrocinadores', requires: 'manager' },
+  { id: 'users', label: 'Usuarios', requires: 'admin' },
+  { id: 'profile', label: 'Mi perfil' },
+];
+
+const badge = 'rounded-sm border border-line px-1.5 py-0.5 text-xs font-medium text-muted';
+const metadata = { title: 'Panel', robots: { index: false, follow: false } };
+---
+
+<Layout metadata={metadata} lang="es">
+  <div data-admin class="flex min-h-screen flex-col">
+    <header class="border-b border-line">
+      <div class="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3 sm:px-6">
+        <a href="/" class="flex items-center gap-3" aria-label="Volver a la web">
+          <Logo />
+          <span class:list={[eyebrow, 'hidden sm:inline']}>Panel</span>
+        </a>
+        <div class="flex items-center gap-3">
+          <p class="hidden text-right text-sm leading-tight sm:block" data-when-logged hidden>
+            <span class="block font-semibold text-heading" data-user-name></span>
+            <span class="block text-xs capitalize text-muted" data-user-role></span>
+          </p>
+          <ToggleTheme iconClass="w-5 h-5" />
+          <button type="button" class="btn py-2 text-sm" data-logout data-when-logged hidden>Salir</button>
+        </div>
+      </div>
+    </header>
+
+    <main class="mx-auto w-full max-w-6xl flex-1 px-4 py-10 sm:px-6">
+      <p data-view="loading" class="py-24 text-center text-muted">Cargando…</p>
+
+      <!-- Inicio de sesión -->
+      <section data-view="login" hidden class="mx-auto max-w-sm py-12">
+        <p class={eyebrow}>Málaga Space Team</p>
+        <h1 class="mt-3 text-3xl font-bold tracking-tight text-heading">Panel de gestión</h1>
+        <p class="mt-2 text-muted">Inicia sesión con tu usuario del equipo.</p>
+        <form data-login class="mt-8 space-y-5" novalidate>
+          <Field name="username" label="Usuario" required autocomplete="username" />
+          <Field name="password" label="Contraseña" type="password" required autocomplete="current-password" />
+          <p data-status hidden role="alert" class="form-status rounded-md px-4 py-3 text-sm"></p>
+          <button type="submit" class="btn-primary w-full">Entrar</button>
+        </form>
+      </section>
+
+      <!-- Cambio de contraseña obligatorio -->
+      <section data-view="password" hidden class="mx-auto max-w-sm py-12">
+        <p class={eyebrow}>Primer acceso</p>
+        <h1 class="mt-3 text-3xl font-bold tracking-tight text-heading">Elige tu contraseña</h1>
+        <p class="mt-2 text-muted">Por seguridad, cambia la contraseña temporal antes de continuar.</p>
+        <form data-change-password="forced" class="mt-8 space-y-5" novalidate>
+          <Field
+            name="current_password"
+            label="Contraseña temporal"
+            type="password"
+            required
+            autocomplete="current-password"
+          />
+          <Field
+            name="new_password"
+            label="Contraseña nueva"
+            type="password"
+            required
+            autocomplete="new-password"
+            hint="Mínimo 6 caracteres."
+          />
+          <Field
+            name="confirm_password"
+            label="Repite la contraseña nueva"
+            type="password"
+            required
+            autocomplete="new-password"
+          />
+          <p data-status hidden role="alert" class="form-status rounded-md px-4 py-3 text-sm"></p>
+          <button type="submit" class="btn-primary w-full">Guardar y continuar</button>
+        </form>
+      </section>
+
+      <!-- Panel -->
+      <div data-view="app" hidden>
+        <div role="tablist" class="flex gap-1 overflow-x-auto border-b border-line">
+          {
+            tabs.map((tab) => (
+              <button
+                type="button"
+                role="tab"
+                data-tab={tab.id}
+                data-requires={tab.requires}
+                aria-selected="false"
+                class="-mb-px whitespace-nowrap border-b-2 border-transparent px-4 py-3 text-sm font-semibold text-muted hover:text-heading aria-selected:border-strong aria-selected:text-heading"
+              >
+                {tab.label}
+              </button>
+            ))
+          }
+        </div>
+
+        <!-- Equipo -->
+        <div data-panel="team" hidden class="pt-10">
+          <ResourcePanel
+            name="team"
+            endpoint="/api/web/team"
+            title="Equipo"
+            description="Las personas que salen en la web. El equipo y el rol se pueden cambiar directamente en la lista; el orden de la lista es el orden en la web."
+            addLabel="Añadir miembro"
+            itemLabel="miembro"
+            emptyText="Todavía no hay miembros. Añade el primero."
+          >
+            <select
+              slot="filters"
+              data-filter="department"
+              class:list={[input, 'mt-0 w-auto py-2.5 text-sm']}
+              aria-label="Filtrar por equipo"
+            >
+              <option value="">Todos los equipos</option>
+              <option value="__none__">Sin asignar</option>
+              {departments.map(([value, text]) => <option value={value}>{text}</option>)}
+            </select>
+
+            <div slot="row" class="grid items-center gap-3 md:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)_minmax(0,1fr)]">
+              <p class="truncate font-semibold text-heading">
+                <span data-field="name"></span>
+                <span class:list={[badge, 'ml-2']} data-badge-if="category=alumni" hidden>Antiguo</span>
+                <span class:list={[badge, 'ml-2']} data-badge="hidden" hidden>Oculto</span>
+              </p>
+              <select data-inline="department" class:list={[input, 'mt-0 py-2 text-sm']} aria-label="Equipo">
+                {departmentOptions.map(([value, text]) => <option value={value}>{text}</option>)}
+              </select>
+              <input
+                data-inline="role"
+                list="role-suggestions"
+                placeholder="Rol"
+                class:list={[input, 'mt-0 py-2 text-sm']}
+                aria-label="Rol"
+              />
+            </div>
+
+            <Fragment slot="fields">
+              <Field name="name" label="Nombre y apellidos" required maxlength={120} />
+              <div class="grid gap-5 md:grid-cols-2">
+                <Field name="department" label="Equipo" type="select" options={departmentOptions} />
+                <Field
+                  name="role"
+                  label="Rol"
+                  list="role-suggestions"
+                  maxlength={120}
+                  placeholder="Ej.: Líder de Subsistema"
+                />
+              </div>
+              <Field
+                name="role_en"
+                label="Rol en inglés (opcional)"
+                maxlength={120}
+                hint="Si lo dejas vacío, la versión en inglés muestra el rol en español."
+              />
+              <div class="grid gap-5 md:grid-cols-2">
+                <Field
+                  name="linkedin_url"
+                  label="LinkedIn (opcional)"
+                  type="url"
+                  placeholder="https://www.linkedin.com/in/…"
+                  hint="Cada persona puede rellenarlo desde su cuenta."
+                />
+                <Field name="github_url" label="GitHub (opcional)" type="url" placeholder="https://github.com/…" />
+              </div>
+              <div data-requires="admin">
+                <Field
+                  name="user_id"
+                  label="Cuenta vinculada"
+                  type="select"
+                  options={[['', 'Sin vincular']]}
+                  hint="La persona con esa cuenta podrá editar su enlace de LinkedIn, y nada más."
+                  data-options="/api/inventory/users"
+                  data-options-key="users"
+                  data-option-label="nombre_completo,username"
+                />
+              </div>
+              <label class="flex items-start gap-3">
+                <input
+                  type="checkbox"
+                  name="category"
+                  data-true="alumni"
+                  data-false="member"
+                  class="mt-1 h-4 w-4 accent-[var(--aw-color-primary)]"
+                />
+                <span>
+                  <span class="block text-sm font-medium text-heading">Antiguo miembro</span>
+                  <span class="block text-xs text-muted"
+                    >Sale solo en la página «Antiguos miembros», no en la principal.</span
+                  >
+                </span>
+              </label>
+            </Fragment>
+          </ResourcePanel>
+          <datalist id="role-suggestions">{roleSuggestions.map((role) => <option value={role} />)}</datalist>
+        </div>
+
+        <!-- Colaboradores (tabla web_sponsors) -->
+        <div data-panel="sponsors" hidden class="pt-10">
+          <ResourcePanel
+            name="sponsors"
+            endpoint="/api/web/sponsors"
+            title="Colaboradores"
+            description="Instituciones y grupos que apoyan el proyecto. Salen en la sección «Nuestros Colaboradores» con su descripción."
+            addLabel="Añadir colaborador"
+            itemLabel="colaborador"
+            emptyText="Todavía no hay colaboradores."
+          >
+            <div slot="row" class="flex items-center gap-4">
+              <img data-image="image_url" alt="" class="h-10 w-16 shrink-0 rounded-sm bg-white object-contain p-1" />
+              <div class="min-w-0">
+                <p class="truncate font-semibold text-heading">
+                  <span data-field="name"></span>
+                  <span class:list={[badge, 'ml-2']} data-badge="hidden" hidden>Oculto</span>
+                </p>
+                <p class="truncate text-sm text-muted" data-field="role" data-optional></p>
+              </div>
+            </div>
+
+            <Fragment slot="fields">
+              <Field name="name" label="Nombre" required maxlength={160} />
+              <div class="grid gap-5 md:grid-cols-2">
+                <Field
+                  name="role"
+                  label="Tipo de colaboración"
+                  maxlength={120}
+                  placeholder="Ej.: Laboratorio de Investigación"
+                />
+                <Field name="website" label="Página web" type="url" placeholder="https://…" />
+              </div>
+              <Field name="description" label="Descripción" type="textarea" rows={4} maxlength={1200} />
+              <Field name="contribution" label="Qué aporta al proyecto" type="textarea" rows={2} maxlength={400} />
+              <div>
+                <Field name="image_url" label="Logo (opcional)" placeholder="Sube una imagen o pega su dirección" />
+                <div class="mt-2 flex items-center gap-3">
+                  <input
+                    type="file"
+                    accept="image/png,image/jpeg,image/webp,image/gif,image/svg+xml"
+                    data-upload="image_url"
+                    class="text-sm text-muted file:mr-3 file:rounded-md file:border file:border-line file:bg-transparent file:px-3 file:py-2 file:text-sm file:font-medium file:text-heading"
+                    aria-label="Subir logo"
+                  />
+                  <img
+                    data-upload-preview="image_url"
+                    hidden
+                    alt=""
+                    class="h-10 w-16 rounded-sm bg-white object-contain p-1"
+                  />
+                </div>
+              </div>
+              <details class="rounded-md border border-line p-4">
+                <summary class="cursor-pointer text-sm font-semibold text-heading">Versión en inglés (opcional)</summary
+                >
+                <div class="mt-4 space-y-5">
+                  <Field name="role_en" label="Tipo de colaboración (inglés)" maxlength={120} />
+                  <Field name="description_en" label="Descripción (inglés)" type="textarea" rows={4} maxlength={1200} />
+                  <Field name="contribution_en" label="Qué aporta (inglés)" type="textarea" rows={2} maxlength={400} />
+                </div>
+              </details>
+            </Fragment>
+          </ResourcePanel>
+        </div>
+
+        <!-- Patrocinadores (tabla web_partners): logos -->
+        <div data-panel="partners" hidden class="pt-10">
+          <ResourcePanel
+            name="partners"
+            endpoint="/api/web/partners"
+            title="Patrocinadores"
+            description="Empresas y entidades patrocinadoras. Salen como una fila de logos en la sección «Patrocinadores» (la sección se oculta si no hay ninguno)."
+            addLabel="Añadir patrocinador"
+            itemLabel="patrocinador"
+            emptyText="Todavía no hay patrocinadores."
+          >
+            <div slot="row" class="flex items-center gap-4">
+              <img data-image="logo_url" alt="" class="h-10 w-16 shrink-0 rounded-sm bg-white object-contain p-1" />
+              <div class="min-w-0">
+                <p class="truncate font-semibold text-heading">
+                  <span data-field="name"></span>
+                  <span class:list={[badge, 'ml-2']} data-badge="hidden" hidden>Oculto</span>
+                </p>
+                <p class="truncate text-sm text-muted" data-field="url" data-optional></p>
+              </div>
+            </div>
+
+            <Fragment slot="fields">
+              <Field name="name" label="Nombre" required maxlength={160} />
+              <Field name="url" label="Página web" type="url" placeholder="https://…" />
+              <div>
+                <Field
+                  name="logo_url"
+                  label="Logo"
+                  placeholder="Sube una imagen o pega su dirección"
+                  hint="PNG, JPG, WebP, GIF o SVG, hasta 10 MB. Mejor con fondo transparente."
+                />
+                <div class="mt-2 flex items-center gap-3">
+                  <input
+                    type="file"
+                    accept="image/png,image/jpeg,image/webp,image/gif,image/svg+xml"
+                    data-upload="logo_url"
+                    class="text-sm text-muted file:mr-3 file:rounded-md file:border file:border-line file:bg-transparent file:px-3 file:py-2 file:text-sm file:font-medium file:text-heading"
+                    aria-label="Subir logo"
+                  />
+                  <img
+                    data-upload-preview="logo_url"
+                    hidden
+                    alt=""
+                    class="h-10 w-16 rounded-sm bg-white object-contain p-1"
+                  />
+                </div>
+              </div>
+            </Fragment>
+          </ResourcePanel>
+        </div>
+
+        <!-- Usuarios -->
+        <div data-panel="users" hidden class="pt-10">
+          <ResourcePanel
+            name="users"
+            endpoint="/api/inventory/users"
+            listPath="/api/inventory/users"
+            listKey="users"
+            activeField=""
+            reorder={false}
+            title="Usuarios"
+            description="Cuentas para entrar al panel y al inventario. «Lector» no puede editar nada salvo el LinkedIn de su ficha; «Gestor» edita el contenido de la web y el inventario; «Administrador» además gestiona usuarios."
+            addLabel="Añadir usuario"
+            itemLabel="usuario"
+            emptyText="No hay usuarios."
+          >
+            <div slot="row" class="min-w-0">
+              <p class="truncate font-semibold text-heading">
+                <span data-field="nombre_completo"></span>
+                <span class:list={[badge, 'ml-2 capitalize']} data-field="rol"></span>
+                <span class:list={[badge, 'ml-2']} data-badge-if="activo=0" hidden>Desactivado</span>
+              </p>
+              <p class="truncate text-sm text-muted">
+                <span data-field="username"></span> · <span data-field="email" data-empty="sin correo"></span>
+              </p>
+            </div>
+
+            <Fragment slot="fields">
+              <Field name="nombre_completo" label="Nombre y apellidos" required maxlength={120} />
+              <div class="grid gap-5 md:grid-cols-2">
+                <div data-only="create">
+                  <Field
+                    name="username"
+                    label="Usuario"
+                    required
+                    maxlength={60}
+                    autocomplete="off"
+                    hint="Normalmente, lo que va antes de @uma.es."
+                  />
+                </div>
+                <Field name="email" label="Correo (@uma.es)" type="email" maxlength={200} autocomplete="off" />
+              </div>
+              <Field
+                name="rol"
+                label="Permisos"
+                type="select"
+                options={[
+                  ['viewer', 'Lector: solo su LinkedIn'],
+                  ['manager', 'Gestor: contenido e inventario'],
+                  ['admin', 'Administrador: todo'],
+                ]}
+              />
+              <p data-only="create" class="text-sm text-muted">
+                Al guardar se genera una contraseña temporal que verás una sola vez.
+              </p>
+              <div
+                data-only="edit"
+                class="flex flex-wrap items-center justify-between gap-3 rounded-md border border-line p-4"
+              >
+                <label class="flex items-center gap-3 text-sm font-medium text-heading">
+                  <input type="checkbox" name="activo" class="h-4 w-4 accent-[var(--aw-color-primary)]" />
+                  Cuenta activa
+                </label>
+                <button
+                  type="button"
+                  class="rounded-md border border-line px-3 py-2 text-sm font-medium text-heading hover:border-strong"
+                  data-reset-password
+                >
+                  Restablecer contraseña
+                </button>
+              </div>
+            </Fragment>
+          </ResourcePanel>
+        </div>
+
+        <!-- Mi perfil -->
+        <div data-panel="profile" hidden class="grid gap-10 pt-10 lg:grid-cols-2">
+          <section>
+            <h2 class="text-2xl font-bold tracking-tight text-heading">Mi ficha en la web</h2>
+            <p class="mt-1 text-muted">
+              Puedes cambiar tu enlace de LinkedIn. El resto lo gestiona la coordinación del equipo.
+            </p>
+            <p data-no-member hidden class="mt-6 rounded-md border border-dashed border-line p-6 text-sm text-muted">
+              Tu cuenta todavía no está vinculada a ninguna ficha del equipo. Pídeselo a un administrador.
+            </p>
+            <form data-my-member hidden class:list={[card, 'mt-6 space-y-5 p-6']} novalidate>
+              <p class="text-lg font-bold text-heading" data-member-name></p>
+              <Field name="linkedin_url" label="LinkedIn" type="url" placeholder="https://www.linkedin.com/in/…" />
+              <p data-status hidden role="status" class="form-status rounded-md px-4 py-3 text-sm"></p>
+              <button type="submit" class="btn-primary">Guardar</button>
+            </form>
+          </section>
+
+          <section>
+            <h2 class="text-2xl font-bold tracking-tight text-heading">Contraseña</h2>
+            <p class="mt-1 text-muted">Cámbiala cuando quieras.</p>
+            <form data-change-password="normal" class:list={[card, 'mt-6 space-y-5 p-6']} novalidate>
+              <Field
+                name="current_password"
+                label="Contraseña actual"
+                type="password"
+                required
+                autocomplete="current-password"
+              />
+              <Field
+                name="new_password"
+                label="Contraseña nueva"
+                type="password"
+                required
+                autocomplete="new-password"
+                hint="Mínimo 6 caracteres."
+              />
+              <Field
+                name="confirm_password"
+                label="Repite la contraseña nueva"
+                type="password"
+                required
+                autocomplete="new-password"
+              />
+              <p data-status hidden role="status" class="form-status rounded-md px-4 py-3 text-sm"></p>
+              <button type="submit" class="btn-primary">Cambiar contraseña</button>
+            </form>
+          </section>
+        </div>
+      </div>
+    </main>
+  </div>
+</Layout>
+
+<script>
+  import '~/scripts/admin';
+</script>

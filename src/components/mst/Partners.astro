@@ -10,9 +10,9 @@ export interface Props {
 const { t } = Astro.props;
 ---
 
-{/* Oculta hasta que /admin tenga partners: no hay contenido de respaldo real que mostrar */}
+{/* Patrocinadores (logos). Oculta hasta que /admin tenga alguno: no hay contenido de respaldo */}
 <div data-live-partners hidden>
-  <Section id="partners" title={t.extra.partners.title} subtitle={t.extra.partners.description}>
+  <Section id="patrocinadores" title={t.extra.partners.title} subtitle={t.extra.partners.description}>
     <div class="grid grid-cols-2 gap-4 md:grid-cols-4" data-partners-grid></div>
   </Section>
 

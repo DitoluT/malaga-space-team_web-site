@@ -61,12 +61,14 @@ const live = t.extra.teamLive;
 </div>
 
 <script>
-  import { fetchList, fillTemplate, onPageLoad, safeUrl } from '~/scripts/live';
+  import { fetchList, fillTemplate, localized, onPageLoad, safeUrl } from '~/scripts/live';
 
-  interface Member {
+  interface Member extends Record<string, unknown> {
     name: string;
     role?: string;
+    role_en?: string;
     title?: string;
+    title_en?: string;
     department?: string;
     category?: string;
     email?: string;
@@ -75,7 +77,7 @@ const live = t.extra.teamLive;
     display_order?: number;
   }
 
-  // Orden de los departamentos y, dentro de cada uno, de los niveles jerárquicos
+  // Orden de los equipos en la página. Dentro de cada uno se respeta el orden de /admin.
   const DEPARTMENT_ORDER = [
     'professors',
     'management',
@@ -85,7 +87,6 @@ const live = t.extra.teamLive;
     'control_software',
     'marketing',
   ];
-  const CATEGORY_ORDER: Record<string, number> = { director: 0, leader: 1, member: 2, alumni: 3 };
   const ALUMNI = 'alumni';
 
   onPageLoad(async () => {
@@ -117,14 +118,14 @@ const live = t.extra.teamLive;
       .map((key) => {
         const group = fillTemplate(groupTemplate, { department: labels[key] ?? key });
         const grid = group.querySelector<HTMLElement>('[data-team-grid]');
-        const sorted = (byDepartment.get(key) ?? []).sort(
-          (a, b) =>
-            (CATEGORY_ORDER[a.category ?? 'member'] ?? 2) - (CATEGORY_ORDER[b.category ?? 'member'] ?? 2) ||
-            (a.display_order ?? 0) - (b.display_order ?? 0)
-        );
+        const sorted = byDepartment.get(key) ?? []; // la API ya los devuelve en el orden de /admin
 
         for (const member of sorted) {
-          const card = fillTemplate(memberTemplate, member as unknown as Record<string, unknown>);
+          const card = fillTemplate(memberTemplate, {
+            name: member.name,
+            role: localized(member, 'role'),
+            title: localized(member, 'title'),
+          });
 
           let hasLinks = false;
           card.querySelectorAll<HTMLElement>('[data-link-item]').forEach((item) => {

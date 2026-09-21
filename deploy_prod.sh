@@ -109,15 +109,19 @@ fi
 # Nota: en esta VM no se puede conectar a la propia IPv6 global desde dentro, así que se
 # prueba por loopback IPv4 e IPv6 (el proxy de la UMA entra por IPv6).
 # -k: igual que el proxy de la UMA, no se valida el certificado del servidor.
-check() { # web, paneles, /social (con URLs https) y API, por HTTP y HTTPS
+check() { # web, paneles, /social (con URLs https) y API por HTTPS; el puerto 80 solo redirige
   local ok=0 url base
   for i in $(seq 1 20); do
     ok=1
-    for base in "http://127.0.0.1" "http://[::1]" "https://127.0.0.1" "https://[::1]"; do
+    for base in "https://127.0.0.1" "https://[::1]"; do
       for url in / /en /inventario /admin /social/ /api/web/team; do
         code=$(curl -g -k -s --noproxy '*' -o /dev/null -w '%{http_code}' --max-time 5 -H "Host: $DOMAIN" "$base$url" || true)
         [ "$code" = "200" ] || ok=0
       done
+    done
+    for base in "http://127.0.0.1" "http://[::1]"; do
+      code=$(curl -g -s --noproxy '*' -o /dev/null -w '%{http_code}' --max-time 5 "$base/nginx-health" || true)
+      [ "$code" = "200" ] || ok=0
     done
     page="$(curl -g -k -s --noproxy '*' --max-time 5 -H "Host: $DOMAIN" "https://[::1]/social/" || true)"
     # (here-strings: con pipefail, `echo | grep -q` falla por SIGPIPE aunque haya coincidencia)
@@ -154,8 +158,8 @@ echo "🌍 Comprobando desde fuera (a través del proxy de la UMA)..."
 PUBLIC_OK=0
 for attempt in $(seq 1 24); do
   PUBLIC_OK=1
-  for url in "https://$DOMAIN/" "https://$DOMAIN/en" "https://$DOMAIN/social/" "https://$DOMAIN/inventario" "https://$DOMAIN/api/web/team"; do
-    code="$(curl -s -o /dev/null -w '%{http_code}' --max-time 20 "$url" || true)"
+  for url in "https://$DOMAIN/" "https://$DOMAIN/admin" "https://$DOMAIN/social/" "https://$DOMAIN/inventario" "https://$DOMAIN/api/web/team" "http://$DOMAIN/"; do
+    code="$(curl -sL -o /dev/null -w '%{http_code}' --max-time 20 "$url" || true)"
     [ "$code" = "200" ] || { PUBLIC_OK=0; echo "   (intento $attempt) $url -> $code"; break; }
   done
   if [ "$PUBLIC_OK" = 1 ]; then

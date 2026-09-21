@@ -1,0 +1,144 @@
+---
+// Lista gestionable del panel (alta, edición, ocultar, ordenar, borrar). La lógica está en
+// src/scripts/admin.ts; aquí solo se declara la estructura. Slots:
+//   filters  controles sobre la lista (p. ej. un <select data-filter="campo">)
+//   row      contenido de cada fila (usa data-field, data-inline, data-badge-if...)
+//   fields   campos del formulario del diálogo
+import { Icon } from 'astro-icon/components';
+import { card, eyebrow } from '~/components/mst/styles';
+
+export interface Props {
+  name: string;
+  endpoint: string;
+  title: string;
+  description: string;
+  addLabel: string;
+  itemLabel: string;
+  emptyText: string;
+  listPath?: string;
+  listKey?: string;
+  activeField?: string;
+  reorder?: boolean;
+}
+
+const {
+  name,
+  endpoint,
+  title,
+  description,
+  addLabel,
+  itemLabel,
+  emptyText,
+  listPath,
+  listKey,
+  activeField = 'active',
+  reorder = true,
+} = Astro.props;
+
+const iconButton =
+  'rounded-md border border-line p-2 text-muted hover:border-strong hover:text-heading disabled:opacity-30 disabled:hover:border-line';
+const textButton = 'rounded-md border border-line px-3 py-2 text-sm font-medium text-heading hover:border-strong';
+---
+
+<section
+  data-resource={name}
+  data-endpoint={endpoint}
+  data-list-path={listPath}
+  data-list-key={listKey}
+  data-active-field={activeField}
+>
+  <header class="flex flex-wrap items-end justify-between gap-4">
+    <div class="max-w-2xl">
+      <h2 class="text-2xl font-bold tracking-tight text-heading">
+        {title}
+        <span class="text-muted tabular-nums" data-count></span>
+      </h2>
+      <p class="mt-1 text-muted">{description}</p>
+    </div>
+    <div class="flex flex-wrap items-center gap-3">
+      <slot name="filters" />
+      <button type="button" class="btn-primary" data-add>{addLabel}</button>
+    </div>
+  </header>
+
+  <p data-status hidden role="status" aria-live="polite" class="form-status mt-6 rounded-md px-4 py-3 text-sm"></p>
+
+  <ul class="mt-6 space-y-2" data-list></ul>
+  <p class="mt-6 rounded-md border border-dashed border-line p-8 text-center text-muted" data-empty hidden>
+    {emptyText}
+  </p>
+
+  <template data-row>
+    <li class:list={[card, 'flex flex-wrap items-center gap-x-4 gap-y-3 p-4 data-[inactive=true]:opacity-60']}>
+      <div class="min-w-0 flex-1 basis-64">
+        <slot name="row" />
+      </div>
+      <div class="flex flex-wrap items-center gap-2">
+        {
+          reorder && (
+            <>
+              <button type="button" class={iconButton} data-action="up" aria-label="Subir">
+                <Icon name="tabler:arrow-up" class="h-4 w-4" />
+              </button>
+              <button type="button" class={iconButton} data-action="down" aria-label="Bajar">
+                <Icon name="tabler:arrow-down" class="h-4 w-4" />
+              </button>
+            </>
+          )
+        }
+        {
+          activeField && (
+            <button type="button" class={textButton} data-action="toggle" data-not-self>
+              Ocultar
+            </button>
+          )
+        }
+        <button type="button" class={textButton} data-action="edit">Editar</button>
+        <button type="button" class={textButton} data-action="delete" data-not-self>Eliminar</button>
+      </div>
+    </li>
+  </template>
+
+  <dialog
+    data-dialog
+    class="m-auto w-[min(94vw,42rem)] max-h-[92vh] overflow-y-auto rounded-md border border-strong bg-page p-0 text-default backdrop:bg-black/80"
+  >
+    <form class="p-6 md:p-8" novalidate>
+      <div class="flex items-start justify-between gap-4">
+        <div>
+          <p class={eyebrow}>{title}</p>
+          <h3
+            class="mt-1 text-2xl font-bold text-heading"
+            data-dialog-title
+            data-title-create={`Añadir ${itemLabel}`}
+            data-title-edit={`Editar ${itemLabel}`}
+          >
+          </h3>
+        </div>
+        <button type="button" data-close aria-label="Cerrar" class="rounded-md p-2 text-muted hover:text-heading">
+          <Icon name="tabler:x" class="h-5 w-5" />
+        </button>
+      </div>
+
+      <div class="mt-6 space-y-5">
+        <slot name="fields" />
+      </div>
+
+      <div data-secret hidden class="mt-6 rounded-md border border-strong p-4">
+        <p class="text-sm font-semibold text-heading">Contraseña temporal (solo se muestra ahora)</p>
+        <div class="mt-2 flex items-center gap-3">
+          <code class="rounded-sm border border-line px-3 py-1.5 text-lg" data-secret-value></code>
+          <button type="button" class={textButton} data-copy>Copiar</button>
+        </div>
+        <p class="mt-2 text-xs text-muted">Pásasela a la persona: tendrá que cambiarla en su primer acceso.</p>
+      </div>
+
+      <p data-status hidden role="status" aria-live="polite" class="form-status mt-6 rounded-md px-4 py-3 text-sm"></p>
+
+      <div class="mt-8 flex justify-end gap-3">
+        <button type="button" class="btn" data-close>Cerrar</button>
+        <button type="submit" class="btn-primary">Guardar</button>
+      </div>
+    </form>
+  </dialog>
+</section>

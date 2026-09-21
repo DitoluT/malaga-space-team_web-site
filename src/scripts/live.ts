@@ -50,3 +50,9 @@ export function fillTemplate(template: HTMLTemplateElement, fields: Record<strin
 export function onPageLoad(init: () => void): void {
   document.addEventListener('astro:page-load', init);
 }
+
+/** Devuelve la versión en inglés de un campo (`campo_en`) si la página está en inglés y existe. */
+export function localized<T extends Record<string, unknown>>(item: T, field: string): unknown {
+  const english = document.documentElement.lang === 'en' ? item[`${field}_en`] : null;
+  return english || item[field];
+}

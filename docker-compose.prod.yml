@@ -28,3 +28,4 @@ services:
     environment:
       - JWT_SECRET=${JWT_SECRET:?define JWT_SECRET en .env}
       - FRONTEND_URL=https://spaceteam.uma.es
+      - COOKIE_SECURE=true

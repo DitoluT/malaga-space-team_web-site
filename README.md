@@ -4,30 +4,36 @@ Sitio web oficial del Málaga Space Team, un proyecto CubeSat 2U desarrollado po
 
 ---
 
-## Añadir miembros al equipo y asignarles un rol
+## Gestionar la web desde `/admin`
 
-No hace falta tocar código ni recompilar: los miembros se gestionan desde el panel y aparecen
-en la web al momento.
+Todo el contenido vivo de la web se gestiona en `https://spaceteam.uma.es/admin`, sin tocar
+código ni recompilar: al guardar, el cambio ya está en la web.
 
-1. Entra en `https://spaceteam.uma.es/admin` e inicia sesión (rol `admin` o `manager`).
-2. Ve a **Equipo** → **Añadir**.
-3. Rellena la ficha:
-   - **Nombre** y **Rol / Cargo** (texto libre; el campo sugiere los roles habituales:
-     «Líder de Subsistema», «Ingeniero de Software»...).
-   - **Título académico** (opcional): «3º Grado», «PhD»...
-   - **Departamento**: decide en qué bloque de la web aparece (Profesorado, Dirección y
-     Coordinación, Estructura y Energía, Comunicaciones, Estación Terrena, Sistemas de Control
-     y Software, Marketing).
-   - **Nivel jerárquico**: Director/Profesor y Líder salen primero dentro de su departamento.
-     **«Antiguo miembro»** saca a la persona de la portada y la muestra solo en la página
-     [`/antiguos-miembros`](https://spaceteam.uma.es/antiguos-miembros).
-   - **LinkedIn URL** y **GitHub URL** (opcionales): se muestran como enlaces en su tarjeta.
-   - **Usuario vinculado** (opcional): permite a esa persona editar su propia ficha.
-4. **Guardar**. Para cambiar el rol de alguien, edita su ficha y guarda.
+| Pestaña                             | Qué gestiona                                                                                  | Dónde sale                                                                                                                                                                      |
+| ----------------------------------- | --------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Equipo**                          | Personas del equipo: nombre, equipo, rol, LinkedIn/GitHub                                     | Sección «Equipo» de la portada, agrupadas por equipo. Quien esté marcado como «Antiguo miembro» sale solo en [`/antiguos-miembros`](https://spaceteam.uma.es/antiguos-miembros) |
+| **Colaboradores**                   | Instituciones y grupos que apoyan el proyecto, con descripción (y versión en inglés opcional) | Sección «Nuestros Colaboradores»                                                                                                                                                |
+| **Patrocinadores**                  | Empresas patrocinadoras: nombre, web y logo                                                   | Sección «Patrocinadores» (oculta si no hay ninguno)                                                                                                                             |
+| **Usuarios** (solo administradores) | Cuentas del panel y del inventario                                                            | —                                                                                                                                                                               |
+| **Mi perfil**                       | Tu contraseña y el LinkedIn de tu ficha                                                       | —                                                                                                                                                                               |
 
-La web no muestra fotos de los miembros. Colaboradores y partners se gestionan igual, desde
-**Contenido** en el mismo panel; si no hay ninguno, la web muestra los colaboradores por defecto
-(UMA, MobileNet, LINK) y oculta la sección de partners.
+En las tres listas de contenido se puede **añadir**, **editar**, **ocultar/mostrar** (sin
+borrar), **ordenar** con las flechas (el orden de la lista es el orden en la web) y
+**eliminar**. En **Equipo**, el equipo y el rol se cambian directamente en la fila y se guardan
+al momento; el filtro de arriba ayuda a localizar a quien sigue «Sin asignar». Los logos se
+suben desde el propio formulario (PNG, JPG, WebP, GIF o SVG, hasta 10 MB). La web no muestra
+fotos de los miembros.
+
+**Permisos**
+
+- **Lector** (`viewer`): no edita nada, salvo el **enlace de LinkedIn de su propia ficha**
+  (pestaña «Mi perfil»), si un administrador ha vinculado su cuenta a esa ficha («Cuenta
+  vinculada» en el formulario del miembro).
+- **Gestor** (`manager`): equipo, colaboradores, patrocinadores e inventario.
+- **Administrador** (`admin`): además, usuarios.
+
+Al crear un usuario o restablecerle la contraseña, el panel genera una **contraseña temporal
+aleatoria** que se muestra una sola vez; la persona debe cambiarla en su primer acceso.
 
 ## Descripción
 
@@ -36,8 +42,9 @@ Web del Málaga Space Team (proyecto CubeSat 2U de la Universidad de Málaga):
 - **Web pública** (`/`, `/en`, `/unete`, `/antiguos-miembros`): [Astro](https://astro.build)
   sobre la plantilla [AstroWind](https://github.com/arthelokyo/astrowind), estática, en español
   e inglés, con un diseño minimalista en blanco y negro.
-- **Inventario y administración** (`/inventario`, `/admin`): apps React (Vite) en
-  [`panel/`](./panel).
+- **Panel de gestión** (`/admin`): página Astro que reutiliza los componentes de la web
+  ([`src/pages/admin.astro`](./src/pages/admin.astro), lógica en [`src/scripts/admin.ts`](./src/scripts/admin.ts)).
+- **Inventario** (`/inventario`): app React (Vite) en [`panel/`](./panel).
 - **Backend** (`/api`): Flask + SQLite en [`src/server/`](./src/server).
 - **Página de enlaces** (`/social`): LinkStack, en [`linkstack/`](./linkstack).
 
@@ -46,15 +53,16 @@ Web del Málaga Space Team (proyecto CubeSat 2U de la Universidad de Málaga):
 ```
 astro.config.ts        Configuración de Astro (i18n es/en, sitemap, fuentes)
 src/
-├── pages/             Rutas: index, unete, antiguos-miembros, 404 y sus versiones en /en
+├── pages/             Rutas: index, unete, antiguos-miembros, admin, 404 y versiones en /en
 ├── components/mst/    Secciones propias: portada, subsistemas, equipo, colaboradores, contacto
+├── components/admin/  Piezas del panel /admin (lista gestionable y campos de formulario)
 ├── components/        Cabecera, pie y utilidades heredadas de AstroWind
 ├── i18n/              Textos en es.json / en.json + rutas por idioma (index.ts)
-├── scripts/           Carga en vivo desde la API (live.ts) y formularios EmailJS (emailForm.ts)
+├── scripts/           Carga en vivo desde la API (live.ts), panel (admin.ts) y EmailJS (emailForm.ts)
 ├── assets/            Logos, favicons y estilos (CustomStyles.astro define la paleta)
 ├── config.yaml        Nombre del sitio, SEO por defecto, tema
 └── server/            Backend Flask (inventario, usuarios, contenido web)
-panel/                 Apps React de /inventario y /admin (proyecto Vite independiente)
+panel/                 App React de /inventario (proyecto Vite independiente)
 linkstack/             Imagen de LinkStack para /social
 nginx/, nginx*.conf    Configuración de nginx (desarrollo y producción)
 vendor/                Integración de AstroWind (licencia MIT en vendor/ASTROWIND-LICENSE.md)
@@ -78,7 +86,7 @@ La web lee el equipo y los colaboradores de `/api/web/*`; en desarrollo, `npm ru
 docker compose up -d --build inventory-backend
 ```
 
-Las apps de inventario y admin se desarrollan aparte:
+La app de inventario se desarrolla aparte:
 
 ```bash
 cd panel && npm install && npm run dev
@@ -100,7 +108,7 @@ docker compose up --build
 
 ## Página de enlaces (`/social`)
 
-En `spaceteam.uma.es/social` se sirve una página de enlaces tipo *link in bio* con
+En `spaceteam.uma.es/social` se sirve una página de enlaces tipo _link in bio_ con
 [LinkStack](https://github.com/LinkStackOrg/LinkStack). Corre como un servicio más del
 `docker-compose.yml` (`linkstack`, definido en [`linkstack/`](./linkstack)) y el nginx del
 frontend lo publica bajo `/social`.

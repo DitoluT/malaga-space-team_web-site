@@ -21,6 +21,9 @@ import sqlite3
 import jwt
 import datetime
 import os
+import re
+import secrets
+import uuid
 from functools import wraps
 
 app = Flask(__name__)
@@ -29,12 +32,55 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = os.environ.get('JWT_SECRET', 'malaga-space-team-secret-key-change-in-production')
 DATABASE_PATH = os.environ.get('DATABASE_PATH', os.path.join(os.path.dirname(__file__), '../database/inventory.db'))
 
+# Subidas (logos): tamaño máximo y tipos permitidos
+app.config['MAX_CONTENT_LENGTH'] = 10 * 1024 * 1024
+ALLOWED_IMAGE_EXTENSIONS = {'png', 'jpg', 'jpeg', 'webp', 'gif', 'svg'}
+
+# En producción (HTTPS) la cookie de sesión solo viaja cifrada
+COOKIE_SECURE = os.environ.get('COOKIE_SECURE', 'false').lower() == 'true'
+
 # CORS configuración
 CORS(app, 
      origins=['http://localhost:5173', 'http://localhost', os.environ.get('FRONTEND_URL', '*')],
      supports_credentials=True,
      allow_headers=['Content-Type', 'Authorization'],
      methods=['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'])
+
+DEFAULT_COLLABORATORS = [
+    {
+        "name": "Universidad de Málaga",
+        "short_name": "UMA",
+        "description": "Institución pública española fundada en 1972 que ofrece más de 60 titulaciones de grado y más de 100 de posgrado, con cerca de 40,000 estudiantes y 2,450 profesores distribuidos en 19 centros universitarios.",
+        "role": "Institución Principal",
+        "contribution": "Apoyo institucional, infraestructura y recursos académicos",
+        "description_en": "Spanish public institution founded in 1972 that offers more than 60 undergraduate degrees and more than 100 postgraduate degrees, with nearly 40,000 students and 2,450 professors distributed across 19 university centers.",
+        "role_en": "Main Institution",
+        "contribution_en": "Institutional support, infrastructure and academic resources",
+        "website": "https://www.uma.es/"
+    },
+    {
+        "name": "Mobile & Aerospace Networks Lab",
+        "short_name": "MobileNet",
+        "description": "Grupo de investigación especializado en redes de próxima generación e inteligencia artificial aplicada a redes inalámbricas. Cuenta con más de 30 investigadores y una infraestructura avanzada para el desarrollo tecnológico.",
+        "role": "Laboratorio de Investigación",
+        "contribution": "Expertise técnico, investigación y desarrollo tecnológico",
+        "description_en": "Research group specialized in next-generation networks and artificial intelligence applied to wireless networks. It has more than 30 researchers and advanced infrastructure for technological development.",
+        "role_en": "Research Laboratory",
+        "contribution_en": "Technical expertise, research and technological development",
+        "website": "https://mobilenet.uma.es/"
+    },
+    {
+        "name": "LINK by UMA-ATech",
+        "short_name": "Link Bayuma",
+        "description": "Espacio de encuentro real entre la Universidad de Málaga y las empresas, dedicado a la innovación y el emprendimiento. Facilita la colaboración universidad-industria.",
+        "role": "Hub de Innovación",
+        "contribution": "Conexión industrial, transferencia de conocimiento y emprendimiento",
+        "description_en": "Real meeting space between the University of Málaga and companies, dedicated to innovation and entrepreneurship. Facilitates university-industry collaboration.",
+        "role_en": "Innovation Hub",
+        "contribution_en": "Industrial connection, knowledge transfer and entrepreneurship",
+        "website": "https://www.link.uma.es/"
+    }
+]
 
 # ====================================
 # FUNCIONES DE BASE DE DATOS
@@ -148,6 +194,33 @@ def init_database():
         cursor.execute('ALTER TABLE web_sponsors ADD COLUMN image_url TEXT')
         print('✅ Columna image_url agregada a la tabla web_sponsors')
     
+    # Versión en inglés (opcional) de los textos que se muestran en la web
+    for table, columns in {
+        'web_team': ['role_en', 'title_en'],
+        'web_sponsors': ['role_en', 'description_en', 'contribution_en'],
+    }.items():
+        cursor.execute(f'PRAGMA table_info({table})')
+        existing = [column[1] for column in cursor.fetchall()]
+        for column in columns:
+            if column not in existing:
+                cursor.execute(f'ALTER TABLE {table} ADD COLUMN {column} TEXT')
+
+    # Colaboradores iniciales: se cargan una sola vez, para que aparezcan en /admin y se
+    # puedan editar o borrar desde allí (si se borran, no vuelven a crearse)
+    cursor.execute('CREATE TABLE IF NOT EXISTS web_meta (key TEXT PRIMARY KEY, value TEXT)')
+    seeded = cursor.execute("SELECT 1 FROM web_meta WHERE key = 'sponsors_seeded'").fetchone()
+    if not seeded:
+        if cursor.execute('SELECT COUNT(*) FROM web_sponsors').fetchone()[0] == 0:
+            for order, sponsor in enumerate(DEFAULT_COLLABORATORS):
+                cursor.execute('''
+                    INSERT INTO web_sponsors (name, short_name, description, role, website, contribution,
+                                              description_en, role_en, contribution_en, active, display_order)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 1, ?)
+                ''', (sponsor['name'], sponsor['short_name'], sponsor['description'], sponsor['role'],
+                      sponsor['website'], sponsor['contribution'], sponsor['description_en'],
+                      sponsor['role_en'], sponsor['contribution_en'], order))
+        cursor.execute("INSERT INTO web_meta (key, value) VALUES ('sponsors_seeded', '1')")
+
     # Agregar columna requiere_cambio_password si no existe (para bases de datos existentes)
     cursor.execute("PRAGMA table_info(usuarios)")
     columns = [column[1] for column in cursor.fetchall()]
@@ -316,7 +389,7 @@ def login():
         'token',
         token,
         httponly=True,
-        secure=False,  # True en producción con HTTPS
+        secure=COOKIE_SECURE,
         samesite='Lax',
         max_age=8 * 60 * 60  # 8 horas
     )
@@ -394,27 +467,38 @@ def change_password():
 
 @app.route('/api/upload', methods=['POST'])
 @token_required
+@role_required(['admin', 'manager'])
 def upload_file():
-    if 'file' not in request.files:
-        return jsonify({'error': 'No file part'}), 400
-    file = request.files['file']
-    if file.filename == '':
-        return jsonify({'error': 'No selected file'}), 400
+    """Sube una imagen (logo) y devuelve su URL pública (/uploads/...)."""
+    file = request.files.get('file')
+    if not file or not file.filename:
+        return jsonify({'error': 'No se ha enviado ningún fichero'}), 400
 
-    if file:
-        filename = secure_filename(file.filename)
-        unique_name = f"{int(datetime.datetime.now().timestamp())}_{filename}"
+    extension = file.filename.rsplit('.', 1)[-1].lower() if '.' in file.filename else ''
+    if extension not in ALLOWED_IMAGE_EXTENSIONS:
+        permitidos = ', '.join(sorted(ALLOWED_IMAGE_EXTENSIONS))
+        return jsonify({'error': f'Tipo de fichero no permitido. Usa una imagen: {permitidos}'}), 400
 
-        # Determine upload path relative to this script
-        # Script is in src/server/
-        # Uploads go to public/uploads/
-        base_dir = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
-        upload_folder = os.path.join(base_dir, 'public/uploads')
+    # El nombre original no se conserva: evita colisiones y rutas raras
+    unique_name = f'{uuid.uuid4().hex}.{extension}'
 
-        os.makedirs(upload_folder, exist_ok=True)
-        file.save(os.path.join(upload_folder, unique_name))
+    # Este script está en src/server/; las subidas van a public/uploads/ (volumen compartido con nginx)
+    base_dir = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
+    upload_folder = os.path.join(base_dir, 'public/uploads')
+    os.makedirs(upload_folder, exist_ok=True)
+    file.save(os.path.join(upload_folder, unique_name))
 
-        return jsonify({'success': True, 'url': f'/uploads/{unique_name}'})
+    return jsonify({'success': True, 'url': f'/uploads/{unique_name}'})
+
+
+@app.errorhandler(413)
+def file_too_large(_error):
+    return jsonify({'error': 'El fichero es demasiado grande (máximo 10 MB)'}), 413
+
+
+@app.errorhandler(500)
+def internal_error(_error):
+    return jsonify({'error': 'Error interno del servidor'}), 500
 
 # ====================================
 # RUTAS DE INVENTARIO
@@ -697,8 +781,16 @@ def create_user():
     if email and not email.endswith('@uma.es'):
          return jsonify({'error': 'El correo debe ser del dominio @uma.es'}), 400
     
-    if not all([username, password, nombre_completo, rol]):
-        return jsonify({'error': 'Todos los campos son requeridos'}), 400
+    # Sin contraseña: se genera una temporal aleatoria y se devuelve una sola vez
+    temp_password = None
+    if not password:
+        temp_password = secrets.token_urlsafe(9)
+        password = temp_password
+
+    if not all([username, nombre_completo, rol]):
+        return jsonify({'error': 'Nombre, usuario y rol son obligatorios'}), 400
+    if rol not in ('viewer', 'manager', 'admin'):
+        return jsonify({'error': 'Rol no válido'}), 400
     
     conn = get_db_connection()
     
@@ -713,8 +805,8 @@ def create_user():
     cursor = conn.cursor()
     
     cursor.execute('''
-        INSERT INTO usuarios (username, password, nombre_completo, email, rol)
-        VALUES (?, ?, ?, ?, ?)
+        INSERT INTO usuarios (username, password, nombre_completo, email, rol, requiere_cambio_password)
+        VALUES (?, ?, ?, ?, ?, 1)
     ''', (username, hashed_password, nombre_completo, email, rol))
     
     user_id = cursor.lastrowid
@@ -722,7 +814,7 @@ def create_user():
     conn.commit()
     conn.close()
     
-    return jsonify({'success': True, 'id': user_id}), 201
+    return jsonify({'success': True, 'id': user_id, 'temp_password': temp_password}), 201
 
 @app.route('/api/inventory/users/<int:user_id>', methods=['PUT'])
 @token_required
@@ -740,10 +832,16 @@ def update_user(user_id):
         conn.close()
         return jsonify({'error': 'Usuario no encontrado'}), 404
 
+    # Restablecer contraseña: temporal aleatoria (se devuelve una sola vez) y cambio obligatorio
+    temp_password = None
+    if data.get('reset_password'):
+        temp_password = secrets.token_urlsafe(9)
+        data['password'] = temp_password
+
     # Si se actualiza el password
     if 'password' in data and data['password']:
         hashed_password = bcrypt.hashpw(data['password'].encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
-        cursor.execute('UPDATE usuarios SET password = ? WHERE id = ?', (hashed_password, user_id))
+        cursor.execute('UPDATE usuarios SET password = ?, requiere_cambio_password = 1 WHERE id = ?', (hashed_password, user_id))
 
     # Actualizar otros campos
     campos = []
@@ -772,7 +870,7 @@ def update_user(user_id):
     conn.commit()
     conn.close()
 
-    return jsonify({'success': True})
+    return jsonify({'success': True, 'temp_password': temp_password})
 
 @app.route('/api/inventory/users/<int:user_id>', methods=['DELETE'])
 @token_required
@@ -803,64 +901,220 @@ def delete_user(user_id):
 # RUTAS DE GESTIÓN WEB (CMS)
 # ====================================
 
-# --- PARTNERS ---
+# Contenido de la web pública que se gestiona desde /admin. Las tres secciones comparten
+# la misma lógica; solo cambian la tabla y los campos.
+#
+#   team      -> miembros del equipo
+#   sponsors  -> colaboradores (tarjetas con descripción)
+#   partners  -> patrocinadores (logos)
+#
+# Tipos de campo: 'text' (longitud máxima), 'url' (http/https o ruta del sitio),
+# 'email', 'bool' e 'int'.
+WEB_CONTENT = {
+    'team': {
+        'table': 'web_team',
+        'fields': {
+            'name': ('text', 120), 'role': ('text', 120), 'role_en': ('text', 120),
+            'title': ('text', 120), 'title_en': ('text', 120),
+            'department': ('text', 40), 'category': ('text', 20),
+            'linkedin_url': ('url', 300), 'github_url': ('url', 300), 'email': ('email', 200),
+            'image_url': ('url', 300), 'user_id': ('int', None),
+            'active': ('bool', None), 'display_order': ('int', None),
+        },
+        # Lo único que puede editar de su propia ficha un usuario vinculado que no es gestor
+        'owner_fields': ['linkedin_url'],
+    },
+    'sponsors': {
+        'table': 'web_sponsors',
+        'fields': {
+            'name': ('text', 160), 'short_name': ('text', 60),
+            'role': ('text', 120), 'role_en': ('text', 120),
+            'description': ('text', 1200), 'description_en': ('text', 1200),
+            'contribution': ('text', 400), 'contribution_en': ('text', 400),
+            'website': ('url', 300), 'image_url': ('url', 300),
+            'icon': ('text', 40), 'color': ('text', 60),
+            'active': ('bool', None), 'display_order': ('int', None),
+        },
+    },
+    'partners': {
+        'table': 'web_partners',
+        'fields': {
+            'name': ('text', 160), 'logo_url': ('url', 300), 'url': ('url', 300),
+            'active': ('bool', None), 'display_order': ('int', None),
+        },
+    },
+}
 
-@app.route('/api/web/partners', methods=['GET'])
-def get_partners():
+CONTENT_MANAGERS = ['admin', 'manager']
+EMAIL_RE = re.compile(r'^[^\s@]+@[^\s@]+\.[^\s@]+$')
+
+
+def clean_content_payload(kind, data, allowed=None):
+    """Valida y normaliza los campos recibidos. Devuelve (valores, error)."""
+    if not isinstance(data, dict):
+        return None, 'Petición no válida'
+
+    values = {}
+    for field, (kind_of, max_length) in WEB_CONTENT[kind]['fields'].items():
+        if field not in data or (allowed is not None and field not in allowed):
+            continue
+        value = data[field]
+
+        if kind_of == 'bool':
+            values[field] = 1 if value in (1, True, '1', 'true') else 0
+            continue
+        if kind_of == 'int':
+            if value in (None, ''):
+                values[field] = None
+                continue
+            try:
+                values[field] = int(value)
+            except (TypeError, ValueError):
+                return None, f'El campo {field} debe ser un número'
+            continue
+
+        value = (value or '').strip() if isinstance(value, str) or value is None else str(value)
+        if not value:
+            values[field] = None
+            continue
+        if len(value) > max_length:
+            return None, f'El campo {field} es demasiado largo (máximo {max_length} caracteres)'
+        if kind_of == 'url':
+            is_site_path = value.startswith('/') and not value.startswith('//')
+            if not is_site_path and not re.match(r'^https?://[^\s]+$', value, re.IGNORECASE):
+                return None, f'La dirección «{value}» no es válida: debe empezar por https://'
+        if kind_of == 'email' and not EMAIL_RE.match(value):
+            return None, f'El correo «{value}» no es válido'
+        values[field] = value
+
+    return values, None
+
+
+def content_rows(kind, only_active):
     conn = get_db_connection()
-    partners = conn.execute('SELECT * FROM web_partners WHERE active = 1 ORDER BY display_order ASC').fetchall()
+    table = WEB_CONTENT[kind]['table']
+    where = 'WHERE active = 1' if only_active else ''
+    rows = conn.execute(f'SELECT * FROM {table} {where} ORDER BY display_order ASC, id ASC').fetchall()
     conn.close()
-    return jsonify({'success': True, 'data': [dict(p) for p in partners]})
+    return jsonify({'success': True, 'data': [dict(row) for row in rows]})
 
-@app.route('/api/web/partners/all', methods=['GET'])
+
+def register_web_content(kind):
+    table = WEB_CONTENT[kind]['table']
+    base = f'/api/web/{kind}'
+
+    def list_public():
+        return content_rows(kind, only_active=True)
+
+    @token_required
+    @role_required(CONTENT_MANAGERS)
+    def list_all():
+        """Para /admin: incluye los elementos ocultos"""
+        return content_rows(kind, only_active=False)
+
+    @token_required
+    @role_required(CONTENT_MANAGERS)
+    def create():
+        values, error = clean_content_payload(kind, request.get_json(silent=True))
+        if error:
+            return jsonify({'error': error}), 400
+        if not values.get('name'):
+            return jsonify({'error': 'El nombre es obligatorio'}), 400
+
+        conn = get_db_connection()
+        if values.get('display_order') is None:
+            # Lo nuevo va al final de la lista
+            last = conn.execute(f'SELECT COALESCE(MAX(display_order), -1) FROM {table}').fetchone()[0]
+            values['display_order'] = last + 1
+        values.setdefault('active', 1)
+
+        columns = ', '.join(values)
+        marks = ', '.join('?' for _ in values)
+        cursor = conn.execute(f'INSERT INTO {table} ({columns}) VALUES ({marks})', list(values.values()))
+        conn.commit()
+        new_id = cursor.lastrowid
+        conn.close()
+        return jsonify({'success': True, 'id': new_id}), 201
+
+    @token_required
+    def update(id):
+        conn = get_db_connection()
+        row = conn.execute(f'SELECT * FROM {table} WHERE id = ?', (id,)).fetchone()
+        if not row:
+            conn.close()
+            return jsonify({'error': 'Elemento no encontrado'}), 404
+
+        is_manager = request.user['rol'] in CONTENT_MANAGERS
+        is_owner = 'user_id' in row.keys() and row['user_id'] == request.user['id']
+        if not (is_manager or is_owner):
+            conn.close()
+            return jsonify({'error': 'Permisos insuficientes'}), 403
+
+        allowed = None if is_manager else WEB_CONTENT[kind].get('owner_fields', [])
+        values, error = clean_content_payload(kind, request.get_json(silent=True), allowed)
+        if error:
+            conn.close()
+            return jsonify({'error': error}), 400
+        if 'name' in values and not values['name']:
+            conn.close()
+            return jsonify({'error': 'El nombre es obligatorio'}), 400
+
+        # Actualización parcial: solo cambia lo que llega en la petición
+        if values:
+            assignments = ', '.join(f'{column} = ?' for column in values)
+            conn.execute(f'UPDATE {table} SET {assignments} WHERE id = ?', [*values.values(), id])
+            conn.commit()
+        conn.close()
+        return jsonify({'success': True})
+
+    @token_required
+    @role_required(CONTENT_MANAGERS)
+    def delete(id):
+        conn = get_db_connection()
+        deleted = conn.execute(f'DELETE FROM {table} WHERE id = ?', (id,)).rowcount
+        conn.commit()
+        conn.close()
+        if not deleted:
+            return jsonify({'error': 'Elemento no encontrado'}), 404
+        return jsonify({'success': True})
+
+    @token_required
+    @role_required(CONTENT_MANAGERS)
+    def reorder():
+        """Recibe {"ids": [...]} en el orden deseado y renumera display_order."""
+        data = request.get_json(silent=True) or {}
+        ids = data.get('ids')
+        if not isinstance(ids, list) or not all(isinstance(i, int) for i in ids):
+            return jsonify({'error': 'Se esperaba una lista de identificadores'}), 400
+        conn = get_db_connection()
+        for position, item_id in enumerate(ids):
+            conn.execute(f'UPDATE {table} SET display_order = ? WHERE id = ?', (position, item_id))
+        conn.commit()
+        conn.close()
+        return jsonify({'success': True})
+
+    app.add_url_rule(base, f'{kind}_list_public', list_public, methods=['GET'])
+    app.add_url_rule(f'{base}/all', f'{kind}_list_all', list_all, methods=['GET'])
+    app.add_url_rule(base, f'{kind}_create', create, methods=['POST'])
+    app.add_url_rule(f'{base}/reorder', f'{kind}_reorder', reorder, methods=['POST'])
+    app.add_url_rule(f'{base}/<int:id>', f'{kind}_update', update, methods=['PUT'])
+    app.add_url_rule(f'{base}/<int:id>', f'{kind}_delete', delete, methods=['DELETE'])
+
+
+@app.route('/api/web/team/me', methods=['GET'])
 @token_required
-@role_required(['admin', 'manager'])
-def get_all_partners():
-    """Para el admin panel, incluye inactivos"""
+def get_my_team_member():
+    """Ficha del equipo vinculada al usuario que ha iniciado sesión (si la hay)"""
     conn = get_db_connection()
-    partners = conn.execute('SELECT * FROM web_partners ORDER BY display_order ASC').fetchall()
+    member = conn.execute('SELECT * FROM web_team WHERE user_id = ?', (request.user['id'],)).fetchone()
     conn.close()
-    return jsonify({'success': True, 'data': [dict(p) for p in partners]})
+    if member:
+        return jsonify({'success': True, 'data': dict(member)})
+    return jsonify({'success': False, 'message': 'No linked team member found'})
 
-@app.route('/api/web/partners', methods=['POST'])
-@token_required
-@role_required(['admin', 'manager'])
-def create_partner():
-    data = request.get_json()
-    conn = get_db_connection()
-    cursor = conn.cursor()
-    cursor.execute('''
-        INSERT INTO web_partners (name, logo_url, url, active, display_order)
-        VALUES (?, ?, ?, ?, ?)
-    ''', (data['name'], data.get('logo_url'), data.get('url'), data.get('active', 1), data.get('display_order', 0)))
-    conn.commit()
-    new_id = cursor.lastrowid
-    conn.close()
-    return jsonify({'success': True, 'id': new_id})
 
-@app.route('/api/web/partners/<int:id>', methods=['PUT'])
-@token_required
-@role_required(['admin', 'manager'])
-def update_partner(id):
-    data = request.get_json()
-    conn = get_db_connection()
-    conn.execute('''
-        UPDATE web_partners SET name=?, logo_url=?, url=?, active=?, display_order=?
-        WHERE id=?
-    ''', (data['name'], data.get('logo_url'), data.get('url'), data.get('active', 1), data.get('display_order', 0), id))
-    conn.commit()
-    conn.close()
-    return jsonify({'success': True})
-
-@app.route('/api/web/partners/<int:id>', methods=['DELETE'])
-@token_required
-@role_required(['admin'])
-def delete_partner(id):
-    conn = get_db_connection()
-    conn.execute('DELETE FROM web_partners WHERE id=?', (id,))
-    conn.commit()
-    conn.close()
-    return jsonify({'success': True})
+for _kind in WEB_CONTENT:
+    register_web_content(_kind)
 
 # --- TIMELINE ---
 
@@ -926,191 +1180,6 @@ def delete_timeline(id):
     conn.close()
     return jsonify({'success': True})
 
-# --- TEAM ---
-
-@app.route('/api/web/team', methods=['GET'])
-def get_team():
-    conn = get_db_connection()
-    team = conn.execute('SELECT * FROM web_team WHERE active = 1 ORDER BY display_order ASC').fetchall()
-    conn.close()
-    return jsonify({'success': True, 'data': [dict(m) for m in team]})
-
-@app.route('/api/web/team/all', methods=['GET'])
-@token_required
-@role_required(['admin', 'manager'])
-def get_all_team():
-    conn = get_db_connection()
-    team = conn.execute('SELECT * FROM web_team ORDER BY display_order ASC').fetchall()
-    conn.close()
-    return jsonify({'success': True, 'data': [dict(m) for m in team]})
-
-@app.route('/api/web/team/me', methods=['GET'])
-@token_required
-def get_my_team_member():
-    conn = get_db_connection()
-    member = conn.execute('SELECT * FROM web_team WHERE user_id = ?', (request.user['id'],)).fetchone()
-    conn.close()
-
-    if member:
-        return jsonify({'success': True, 'data': dict(member)})
-    else:
-        return jsonify({'success': False, 'message': 'No linked team member found'})
-
-@app.route('/api/web/team', methods=['POST'])
-@token_required
-@role_required(['admin', 'manager'])
-def create_team_member():
-    data = request.get_json()
-    conn = get_db_connection()
-    cursor = conn.cursor()
-    cursor.execute('''
-        INSERT INTO web_team (name, role, department, category, image_url, linkedin_url, github_url, email, active, display_order, title, user_id)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    ''', (
-        data['name'], data.get('role'), data.get('department'), data.get('category', 'member'),
-        data.get('image_url'), data.get('linkedin_url'), data.get('github_url'), data.get('email'),
-        data.get('active', 1), data.get('display_order', 0), data.get('title'), data.get('user_id')
-    ))
-    conn.commit()
-    new_id = cursor.lastrowid
-    conn.close()
-    return jsonify({'success': True, 'id': new_id})
-
-@app.route('/api/web/team/<int:id>', methods=['PUT'])
-@token_required
-def update_team_member(id):
-    # Permissions: Admin, Manager, or the linked user
-    conn = get_db_connection()
-    member = conn.execute('SELECT * FROM web_team WHERE id = ?', (id,)).fetchone()
-
-    if not member:
-        conn.close()
-        return jsonify({'error': 'Miembro no encontrado'}), 404
-
-    is_admin = request.user['rol'] in ['admin', 'manager']
-    is_owner = member['user_id'] == request.user['id']
-
-    if not (is_admin or is_owner):
-        conn.close()
-        return jsonify({'error': 'Permisos insuficientes'}), 403
-
-    data = request.get_json()
-
-    # If not admin, restrict fields
-    if not is_admin:
-        # User can only update personal info
-        conn.execute('''
-            UPDATE web_team SET name=?, image_url=?, linkedin_url=?, github_url=?, email=?
-            WHERE id=?
-        ''', (
-            data.get('name', member['name']),
-            data.get('image_url', member['image_url']),
-            data.get('linkedin_url', member['linkedin_url']),
-            data.get('github_url', member['github_url']),
-            data.get('email', member['email']),
-            id
-        ))
-    else:
-        # Admin can update everything
-        conn.execute('''
-            UPDATE web_team SET name=?, role=?, department=?, category=?, image_url=?, linkedin_url=?, github_url=?, email=?, active=?, display_order=?, title=?, user_id=?
-            WHERE id=?
-        ''', (
-            data.get('name', member['name']),
-            data.get('role', member['role']),
-            data.get('department', member['department']),
-            data.get('category', member['category']),
-            data.get('image_url', member['image_url']),
-            data.get('linkedin_url', member['linkedin_url']),
-            data.get('github_url', member['github_url']),
-            data.get('email', member['email']),
-            data.get('active', member['active']),
-            data.get('display_order', member['display_order']),
-            data.get('title', member['title']),
-            data.get('user_id', member['user_id']),
-            id
-        ))
-
-    conn.commit()
-    conn.close()
-    return jsonify({'success': True})
-
-@app.route('/api/web/team/<int:id>', methods=['DELETE'])
-@token_required
-@role_required(['admin'])
-def delete_team_member(id):
-    conn = get_db_connection()
-    conn.execute('DELETE FROM web_team WHERE id=?', (id,))
-    conn.commit()
-    conn.close()
-    return jsonify({'success': True})
-
-# --- SPONSORS ---
-
-@app.route('/api/web/sponsors', methods=['GET'])
-def get_sponsors():
-    conn = get_db_connection()
-    sponsors = conn.execute('SELECT * FROM web_sponsors WHERE active = 1 ORDER BY display_order ASC').fetchall()
-    conn.close()
-    return jsonify({'success': True, 'data': [dict(s) for s in sponsors]})
-
-@app.route('/api/web/sponsors/all', methods=['GET'])
-@token_required
-@role_required(['admin', 'manager'])
-def get_all_sponsors():
-    conn = get_db_connection()
-    sponsors = conn.execute('SELECT * FROM web_sponsors ORDER BY display_order ASC').fetchall()
-    conn.close()
-    return jsonify({'success': True, 'data': [dict(s) for s in sponsors]})
-
-@app.route('/api/web/sponsors', methods=['POST'])
-@token_required
-@role_required(['admin', 'manager'])
-def create_sponsor():
-    data = request.get_json()
-    conn = get_db_connection()
-    cursor = conn.cursor()
-    cursor.execute('''
-        INSERT INTO web_sponsors (name, short_name, description, role, icon, color, website, contribution, active, display_order, image_url)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    ''', (
-        data['name'], data.get('short_name'), data.get('description'), data.get('role'),
-        data.get('icon'), data.get('color'), data.get('website'), data.get('contribution'),
-        data.get('active', 1), data.get('display_order', 0), data.get('image_url')
-    ))
-    conn.commit()
-    new_id = cursor.lastrowid
-    conn.close()
-    return jsonify({'success': True, 'id': new_id})
-
-@app.route('/api/web/sponsors/<int:id>', methods=['PUT'])
-@token_required
-@role_required(['admin', 'manager'])
-def update_sponsor(id):
-    data = request.get_json()
-    conn = get_db_connection()
-    conn.execute('''
-        UPDATE web_sponsors SET name=?, short_name=?, description=?, role=?, icon=?, color=?, website=?, contribution=?, active=?, display_order=?, image_url=?
-        WHERE id=?
-    ''', (
-        data['name'], data.get('short_name'), data.get('description'), data.get('role'),
-        data.get('icon'), data.get('color'), data.get('website'), data.get('contribution'),
-        data.get('active', 1), data.get('display_order', 0), data.get('image_url'), id
-    ))
-    conn.commit()
-    conn.close()
-    return jsonify({'success': True})
-
-@app.route('/api/web/sponsors/<int:id>', methods=['DELETE'])
-@token_required
-@role_required(['admin'])
-def delete_sponsor(id):
-    conn = get_db_connection()
-    conn.execute('DELETE FROM web_sponsors WHERE id=?', (id,))
-    conn.commit()
-    conn.close()
-    return jsonify({'success': True})
-
 # ====================================
 # INICIALIZACIÓN
 # ====================================
@@ -1134,4 +1203,4 @@ if __name__ == '__main__':
     print('\n' + '='*50 + '\n')
     
     # Iniciar servidor
-    app.run(host='0.0.0.0', port=3001, debug=True)
+    app.run(host='0.0.0.0', port=3001, debug=os.environ.get('FLASK_ENV') == 'development')

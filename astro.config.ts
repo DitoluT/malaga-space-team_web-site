@@ -41,6 +41,7 @@ export default defineConfig({
 
   integrations: [
     sitemap({
+      filter: (page) => !page.includes('/admin'),
       i18n: { defaultLocale: 'es', locales: { es: 'es-ES', en: 'en-US' } },
     }),
     icon({

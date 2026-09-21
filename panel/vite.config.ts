@@ -11,7 +11,6 @@ export default defineConfig({
     rollupOptions: {
       input: {
         inventario: './inventario.html',
-        admin: './admin.html',
       },
     },
   },

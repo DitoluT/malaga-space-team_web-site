@@ -1,0 +1,41 @@
+---
+// Campo de formulario del panel, con los mismos estilos que los formularios de la web.
+import { input, label as labelClass } from '~/components/mst/styles';
+
+export interface Props {
+  name: string;
+  label: string;
+  type?: 'text' | 'url' | 'email' | 'password' | 'textarea' | 'select';
+  required?: boolean;
+  placeholder?: string;
+  hint?: string;
+  rows?: number;
+  maxlength?: number;
+  autocomplete?: string;
+  list?: string;
+  /** Para type="select": [valor, etiqueta][] */
+  options?: Array<[string, string]>;
+  [key: `data-${string}`]: string | undefined;
+}
+
+const { name, label, type = 'text', required = false, hint, rows = 3, options = [], ...rest } = Astro.props;
+const id = `f-${Math.random().toString(36).slice(2, 8)}-${name}`;
+---
+
+<div>
+  <label for={id} class={labelClass}>{label}{required && ' *'}</label>
+  {
+    type === 'textarea' ? (
+      <textarea id={id} name={name} rows={rows} required={required} class={input} {...rest} />
+    ) : type === 'select' ? (
+      <select id={id} name={name} required={required} class={input} {...rest}>
+        {options.map(([value, text]) => (
+          <option value={value}>{text}</option>
+        ))}
+      </select>
+    ) : (
+      <input id={id} name={name} type={type} required={required} class={input} {...rest} />
+    )
+  }
+  {hint && <p class="mt-1 text-xs text-muted">{hint}</p>}
+</div>

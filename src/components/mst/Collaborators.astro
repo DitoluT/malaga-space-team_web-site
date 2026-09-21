@@ -91,9 +91,9 @@ const benefits = [
 </Section>
 
 <script>
-  import { fetchList, fillTemplate, onPageLoad, safeUrl } from '~/scripts/live';
+  import { fetchList, fillTemplate, localized, onPageLoad, safeUrl } from '~/scripts/live';
 
-  interface Sponsor {
+  interface Sponsor extends Record<string, unknown> {
     name: string;
     description?: string;
     role?: string;
@@ -111,7 +111,12 @@ const benefits = [
     if (!sponsors.length) return; // se mantiene el contenido de respaldo
 
     const nodes = sponsors.map((sponsor) => {
-      const node = fillTemplate(template, sponsor as unknown as Record<string, unknown>) as HTMLAnchorElement;
+      const node = fillTemplate(template, {
+        name: sponsor.name,
+        role: localized(sponsor, 'role'),
+        description: localized(sponsor, 'description'),
+        contribution: localized(sponsor, 'contribution'),
+      }) as HTMLAnchorElement;
       const website = safeUrl(sponsor.website);
       if (website) node.href = website;
       else node.querySelector('[data-visit]')?.remove();

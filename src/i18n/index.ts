@@ -14,8 +14,8 @@ const extra = {
     heroTitleMuted: 'para la investigación espacial',
     openMenu: 'Abrir menú',
     partners: {
-      title: 'Partners',
-      description: 'Organizaciones que colaboran con el proyecto.',
+      title: 'Patrocinadores',
+      description: 'Empresas y entidades que hacen posible el proyecto con su patrocinio.',
     },
     teamLive: {
       title: 'Quiénes somos',
@@ -30,7 +30,7 @@ const extra = {
         ground_station: 'Estación Terrena',
         control_software: 'Sistemas de Control y Software',
         marketing: 'Marketing',
-        other: 'Otros',
+        other: 'Equipo',
       },
     },
     alumni: {
@@ -59,8 +59,8 @@ const extra = {
     heroTitleMuted: 'for space research',
     openMenu: 'Open menu',
     partners: {
-      title: 'Partners',
-      description: 'Organisations collaborating with the project.',
+      title: 'Sponsors',
+      description: 'Companies and organisations that make the project possible through their sponsorship.',
     },
     teamLive: {
       title: 'Who we are',
@@ -75,7 +75,7 @@ const extra = {
         ground_station: 'Ground Station',
         control_software: 'Control Systems and Software',
         marketing: 'Marketing',
-        other: 'Other',
+        other: 'Team',
       },
     },
     alumni: {
