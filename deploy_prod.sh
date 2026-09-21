@@ -85,20 +85,19 @@ if [ -f data/inventory.db ]; then
   cp -p data/inventory.db "data/inventory.db.bak-$(date +%Y%m%d-%H%M%S)"
 fi
 
-# El proxy de la UMA entra por HTTP a la IPv6 global del servidor: se prueba por ahí
-ADDR6="$(ip -6 -o addr show scope global | awk '{print $4}' | cut -d/ -f1 | grep -v '^2001:db8' | head -1)"
-[ -n "$ADDR6" ] && BASE_HOST="[$ADDR6]" || BASE_HOST="127.0.0.1"
-echo "   Las comprobaciones locales usan http://$BASE_HOST"
-
+# Nota: en esta VM no se puede conectar a la propia IPv6 global desde dentro (ni siquiera
+# a Apache), así que se prueba por loopback IPv4 e IPv6; el proxy de la UMA entra por IPv6.
 check() { # check <puerto> : web, /social (con URLs https) y API, como las pediría el proxy de la UMA
-  local p="$1" ok=0 url
-  for i in $(seq 1 30); do
+  local p="$1" ok=0 url base
+  for i in $(seq 1 20); do
     ok=1
-    for url in / /social/ /api/web/team; do
-      code=$(curl -g -s -o /dev/null -w '%{http_code}' --max-time 10 -H "Host: $DOMAIN" "http://$BASE_HOST:$p$url" || true)
-      [ "$code" = "200" ] || ok=0
+    for base in "127.0.0.1" "[::1]"; do
+      for url in / /social/ /api/web/team; do
+        code=$(curl -g -s --noproxy '*' -o /dev/null -w '%{http_code}' --max-time 5 -H "Host: $DOMAIN" "http://$base:$p$url" || true)
+        [ "$code" = "200" ] || ok=0
+      done
     done
-    page="$(curl -g -s --max-time 10 -H "Host: $DOMAIN" "http://$BASE_HOST:$p/social/" || true)"
+    page="$(curl -g -s --noproxy '*' --max-time 5 -H "Host: $DOMAIN" "http://[::1]:$p/social/" || true)"
     # (here-strings: con pipefail, `echo | grep -q` falla por SIGPIPE aunque haya coincidencia)
     grep -q "linkedin.com/company/malaga-space-team" <<<"$page" || ok=0
     grep -q "https://$DOMAIN/social/" <<<"$page" || ok=0
