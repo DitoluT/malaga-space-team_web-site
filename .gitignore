@@ -46,3 +46,8 @@ src/database/
 *.db-wal
 *.db-shm
 apache-proxy-config.conf
+
+# Astro
+dist/
+.astro/
+.claude/

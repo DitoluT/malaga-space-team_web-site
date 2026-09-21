@@ -4,134 +4,99 @@ Sitio web oficial del Málaga Space Team, un proyecto CubeSat 2U desarrollado po
 
 ---
 
-## 📝 ¿Quieres editar el contenido de la web?
+## Añadir miembros al equipo y asignarles un rol
 
-### Para Editores de Contenido (No técnicos):
+No hace falta tocar código ni recompilar: los miembros se gestionan desde el panel y aparecen
+en la web al momento.
 
-1. **📖 Lee la guía completa:** [`GUIA-EDICION-CONTENIDO.md`](./GUIA-EDICION-CONTENIDO.md)
-2. **🚀 Guía rápida:** [`GUIA-RAPIDA.md`](./GUIA-RAPIDA.md)
-3. **👥 Añadir participantes:** [`PLANTILLA-PARTICIPANTES.md`](./PLANTILLA-PARTICIPANTES.md)
-4. **📋 Índice de contenidos:** [`src/content/index.ts`](./src/content/index.ts)
+1. Entra en `https://spaceteam.uma.es/admin` e inicia sesión (rol `admin` o `manager`).
+2. Ve a **Equipo** → **Añadir**.
+3. Rellena la ficha:
+   - **Nombre** y **Rol / Cargo** (texto libre; el campo sugiere los roles habituales:
+     «Líder de Subsistema», «Ingeniero de Software»...).
+   - **Título académico** (opcional): «3º Grado», «PhD»...
+   - **Departamento**: decide en qué bloque de la web aparece (Profesorado, Dirección y
+     Coordinación, Estructura y Energía, Comunicaciones, Estación Terrena, Sistemas de Control
+     y Software, Marketing).
+   - **Nivel jerárquico**: Director/Profesor y Líder salen primero dentro de su departamento.
+     **«Antiguo miembro»** saca a la persona de la portada y la muestra solo en la página
+     [`/antiguos-miembros`](https://spaceteam.uma.es/antiguos-miembros).
+   - **LinkedIn URL** y **GitHub URL** (opcionales): se muestran como enlaces en su tarjeta.
+   - **Usuario vinculado** (opcional): permite a esa persona editar su propia ficha.
+4. **Guardar**. Para cambiar el rol de alguien, edita su ficha y guarda.
 
-### Para Desarrolladores:
-
-Continúa leyendo esta documentación técnica.
-
----
+La web no muestra fotos de los miembros. Colaboradores y partners se gestionan igual, desde
+**Contenido** en el mismo panel; si no hay ninguno, la web muestra los colaboradores por defecto
+(UMA, MobileNet, LINK) y oculta la sección de partners.
 
 ## Descripción
 
-Este sitio web presenta el proyecto CubeSat del Málaga Space Team, desarrollado con React/TypeScript y Vite. El sitio incluye información sobre:
+Web del Málaga Space Team (proyecto CubeSat 2U de la Universidad de Málaga):
 
-- Misión y objetivos del proyecto
-- Cronograma de desarrollo
-- Subsistemas del CubeSat
-- Información del equipo
-- Contacto y colaboración
+- **Web pública** (`/`, `/en`, `/unete`, `/antiguos-miembros`): [Astro](https://astro.build)
+  sobre la plantilla [AstroWind](https://github.com/arthelokyo/astrowind), estática, en español
+  e inglés, con un diseño minimalista en blanco y negro.
+- **Inventario y administración** (`/inventario`, `/admin`): apps React (Vite) en
+  [`panel/`](./panel).
+- **Backend** (`/api`): Flask + SQLite en [`src/server/`](./src/server).
+- **Página de enlaces** (`/social`): LinkStack, en [`linkstack/`](./linkstack).
 
-## Tecnologías Utilizadas
+## Estructura del proyecto
 
-- **Frontend**: React 18, TypeScript
-- **Build Tool**: Vite
-- **Styling**: Tailwind CSS
-- **Animaciones**: Framer Motion
-- **Iconos**: Lucide React
-- **Email**: EmailJS
+```
+astro.config.ts        Configuración de Astro (i18n es/en, sitemap, fuentes)
+src/
+├── pages/             Rutas: index, unete, antiguos-miembros, 404 y sus versiones en /en
+├── components/mst/    Secciones propias: portada, subsistemas, equipo, colaboradores, contacto
+├── components/        Cabecera, pie y utilidades heredadas de AstroWind
+├── i18n/              Textos en es.json / en.json + rutas por idioma (index.ts)
+├── scripts/           Carga en vivo desde la API (live.ts) y formularios EmailJS (emailForm.ts)
+├── assets/            Logos, favicons y estilos (CustomStyles.astro define la paleta)
+├── config.yaml        Nombre del sitio, SEO por defecto, tema
+└── server/            Backend Flask (inventario, usuarios, contenido web)
+panel/                 Apps React de /inventario y /admin (proyecto Vite independiente)
+linkstack/             Imagen de LinkStack para /social
+nginx/, nginx*.conf    Configuración de nginx (desarrollo y producción)
+vendor/                Integración de AstroWind (licencia MIT en vendor/ASTROWIND-LICENSE.md)
+```
 
-## Instalación y Desarrollo
+## Desarrollo
+
+Requiere Node 22 o superior.
 
 ```bash
-# Instalar dependencias
 npm install
-
-# Ejecutar en modo desarrollo
-npm run dev
-
-# Construir para producción
-npm run build
-
-# Previsualizar build de producción
-npm run preview
+npm run dev            # web pública en http://localhost:4321
+npm run build          # genera dist/
+npm run check          # tipos, eslint y prettier
 ```
 
-## Optimizaciones SEO Implementadas
+La web lee el equipo y los colaboradores de `/api/web/*`; en desarrollo, `npm run dev` reenvía
+`/api` a `http://localhost:3001`. Para tener el backend en local:
 
-### Meta Tags y HTML Structure
-- ✅ Tags meta completos incluyendo title, description, keywords
-- ✅ Open Graph tags para redes sociales
-- ✅ Twitter Cards para compartir en Twitter
-- ✅ Meta tags adicionales para PWA y dispositivos móviles
-- ✅ Canonical URL configurada
-- ✅ Idioma configurado en español (es)
-
-### Estructura HTML Semántica
-- ✅ Etiqueta H1 principal en sección hero
-- ✅ Jerarquía correcta de headers (h1, h2, h3, h4)
-- ✅ Navegación semántica con elementos `<nav>`
-- ✅ Etiquetas `<main>`, `<section>`, `<footer>` apropiadas
-- ✅ Roles ARIA para mejor accesibilidad
-
-### Imágenes y Media
-- ✅ Atributos alt en todas las imágenes
-- ✅ Imágenes optimizadas para web
-- ✅ Favicon y touch icons configurados
-- ✅ Dimensiones especificadas para evitar layout shifts
-
-### Datos Estructurados (Schema.org)
-- ✅ Structured data JSON-LD para Organization
-- ✅ Structured data JSON-LD para WebSite
-- ✅ Información de contacto estructurada
-- ✅ Breadcrumbs semánticos en navegación
-
-### Archivos Técnicos SEO
-- ✅ `robots.txt` configurado correctamente
-- ✅ `sitemap.xml` con todas las secciones
-- ✅ URLs amigables con anchors semánticos
-
-### Accesibilidad
-- ✅ Etiquetas ARIA apropiadas
-- ✅ Contraste de colores adecuado
-- ✅ Navegación por teclado
-- ✅ Formularios con labels asociados
-- ✅ Estados de focus visibles
-
-### Performance
-- ✅ Recursos optimizados con Vite
-- ✅ DNS prefetch para recursos externos
-- ✅ Preload de recursos críticos
-- ✅ Lazy loading donde es apropiado
-- ✅ Compresión gzip habilitada
-
-## Estructura del Proyecto
-
-```
-src/
-├── components/          # Componentes React
-│   ├── ui/             # Componentes UI base
-│   ├── HeroSection.tsx # Sección principal
-│   ├── Navigation.tsx  # Navegación principal
-│   ├── MissionSection.tsx
-│   ├── TeamSection.tsx
-│   └── ...
-├── content/            # Contenido estático
-├── hooks/              # Custom hooks
-├── utils/              # Utilidades
-└── styles/             # Estilos globales
-
-public/
-├── robots.txt          # Directivas para crawlers
-├── sitemap.xml         # Mapa del sitio
-├── Logo negativo.png   # Logo principal
-└── ...
+```bash
+docker compose up -d --build inventory-backend
 ```
 
-## Configuración de Despliegue
+Las apps de inventario y admin se desarrollan aparte:
 
-El sitio está optimizado para despliegue en:
-- GitHub Pages
-- Netlify
-- Vercel
-- Servidores web estáticos
+```bash
+cd panel && npm install && npm run dev
+```
+
+Para probar todo junto como en producción (nginx + backend + LinkStack):
+
+```bash
+docker compose up --build
+```
+
+### Editar textos y diseño
+
+- **Textos:** [`src/i18n/es.json`](./src/i18n/es.json) y [`src/i18n/en.json`](./src/i18n/en.json).
+- **Colores y tipografía:** [`src/components/CustomStyles.astro`](./src/components/CustomStyles.astro)
+  (paleta monocroma) y [`src/components/mst/styles.ts`](./src/components/mst/styles.ts).
+- **Secciones de la portada:** [`src/components/mst/HomePage.astro`](./src/components/mst/HomePage.astro).
+- **Formularios:** usan EmailJS ([`src/config/emailjs.ts`](./src/config/emailjs.ts)).
 
 ## Página de enlaces (`/social`)
 

@@ -1,0 +1,28 @@
+---
+import Layout from '~/layouts/PageLayout.astro';
+import { getDictionary, route } from '~/i18n';
+
+// nginx sirve esta página para cualquier ruta inexistente; va en español e inglés
+const es = getDictionary('es').extra.notFound;
+const en = getDictionary('en').extra.notFound;
+---
+
+<Layout metadata={{ title: 'Error 404', robots: { index: false, follow: false } }} lang="es">
+  <section class="flex items-center p-16">
+    <div class="container mx-auto my-8 flex flex-col items-center justify-center px-5">
+      <div class="max-w-md text-center">
+        <h1 class="mb-8 text-9xl font-bold">
+          <span class="sr-only">Error</span>
+          <span class="text-primary">404</span>
+        </h1>
+        <p class="text-3xl font-semibold">{es.title}</p>
+        <p class="mt-2 text-lg text-muted" lang="en">{en.title}</p>
+        <p class="mt-6 mb-8 text-muted">{es.description}</p>
+        <div class="flex justify-center gap-3">
+          <a href={route('home', 'es')} class="btn-primary">{es.back}</a>
+          <a href={route('home', 'en')} class="btn" lang="en">{en.back}</a>
+        </div>
+      </div>
+    </div>
+  </section>
+</Layout>

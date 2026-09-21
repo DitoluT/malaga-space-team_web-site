@@ -1,0 +1,142 @@
+---
+import Section from './Section.astro';
+import { card, eyebrow, input, label } from './styles';
+import { CONTACT } from '~/i18n';
+import type { Dictionary } from '~/i18n';
+
+export interface Props {
+  t: Dictionary;
+  id?: string;
+}
+
+const { t, id = 'contacto' } = Astro.props;
+const f = t.contact.form;
+
+const info = [
+  { label: t.contact.coordination, text: CONTACT.email, href: `mailto:${CONTACT.email}` },
+  { label: t.contact.phone, text: CONTACT.phone, href: `tel:${CONTACT.phone.replace(/\s/g, '')}` },
+  { label: t.contact.location, text: `${t.contact.address}, ${t.contact.city}` },
+];
+
+const social = [
+  { text: 'LinkedIn', href: CONTACT.linkedin, external: true },
+  { text: 'Instagram', href: CONTACT.instagram, external: true },
+  { text: t.extra.social, href: CONTACT.social, external: false },
+];
+---
+
+<Section id={id} title={t.contact.title} subtitle={t.contact.description}>
+  <div class="grid gap-12 lg:grid-cols-5">
+    <div class="lg:col-span-2">
+      <dl class="space-y-6">
+        {
+          info.map((item) => (
+            <div>
+              <dt class={eyebrow}>{item.label}</dt>
+              <dd class="mt-1 text-lg text-heading">
+                {item.href ? (
+                  <a href={item.href} class="underline-offset-4 hover:underline">
+                    {item.text}
+                  </a>
+                ) : (
+                  item.text
+                )}
+              </dd>
+            </div>
+          ))
+        }
+      </dl>
+      <ul class="mt-10 flex flex-wrap gap-x-6 gap-y-2 border-t border-line pt-6 text-sm font-semibold text-heading">
+        {
+          social.map((link) => (
+            <li>
+              <a
+                href={link.href}
+                class="underline-offset-4 hover:underline"
+                {...(link.external ? { target: '_blank', rel: 'noopener noreferrer' } : { 'data-astro-reload': true })}
+              >
+                {link.text}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+
+    <div class:list={[card, 'p-6 md:p-8 lg:col-span-3']}>
+      <h3 class="mb-6 text-xl font-bold text-heading">{f.title}</h3>
+      <form
+        data-email-form
+        data-msg-required={f.validation.required}
+        data-msg-invalid-email={f.validation.invalidEmail}
+        data-msg-loading={f.loading}
+        data-msg-success={f.success}
+        data-msg-error={f.error}
+        novalidate
+      >
+        <div class="grid gap-6 md:grid-cols-2">
+          <div>
+            <label for="contact-name" class={label}>{f.name}</label>
+            <input
+              id="contact-name"
+              name="name"
+              type="text"
+              autocomplete="name"
+              placeholder={f.namePlaceholder}
+              class={input}
+              required
+            />
+          </div>
+          <div>
+            <label for="contact-email" class={label}>{f.email}</label>
+            <input
+              id="contact-email"
+              name="email"
+              type="email"
+              autocomplete="email"
+              placeholder={f.emailPlaceholder}
+              class={input}
+              required
+            />
+          </div>
+        </div>
+        <div class="mt-6">
+          <label for="contact-subject" class={label}>{f.subject}</label>
+          <input
+            id="contact-subject"
+            name="subject"
+            type="text"
+            placeholder={f.subjectPlaceholder}
+            class={input}
+            required
+          />
+        </div>
+        <div class="mt-6">
+          <label for="contact-message" class={label}>{f.message}</label>
+          <textarea
+            id="contact-message"
+            name="message"
+            rows="5"
+            placeholder={f.messagePlaceholder}
+            class={input}
+            required></textarea>
+        </div>
+        <p
+          data-form-status
+          hidden
+          role="status"
+          aria-live="polite"
+          class="form-status mt-6 rounded-md px-4 py-3 text-sm"
+        >
+        </p>
+        <div class="mt-6">
+          <button type="submit" class="btn-primary w-full">{f.submit}</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</Section>
+
+<script>
+  import '~/scripts/emailForm';
+</script>

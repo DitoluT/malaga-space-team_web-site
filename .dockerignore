@@ -21,3 +21,10 @@ coverage
 deploy.sh
 Dockerfile
 .dockerignore
+# Astro / panel
+.astro
+panel/node_modules
+panel/dist
+venv
+data
+linkstack

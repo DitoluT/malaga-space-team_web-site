@@ -1,0 +1,71 @@
+---
+import Section from './Section.astro';
+import { cardInteractive } from './styles';
+import type { Dictionary } from '~/i18n';
+
+export interface Props {
+  t: Dictionary;
+}
+
+const { t } = Astro.props;
+---
+
+{/* Oculta hasta que /admin tenga partners: no hay contenido de respaldo real que mostrar */}
+<div data-live-partners hidden>
+  <Section id="partners" title={t.extra.partners.title} subtitle={t.extra.partners.description}>
+    <div class="grid grid-cols-2 gap-4 md:grid-cols-4" data-partners-grid></div>
+  </Section>
+
+  <template data-partner-template>
+    <a
+      target="_blank"
+      rel="noopener noreferrer"
+      class:list={[cardInteractive, 'flex flex-col items-center justify-center gap-3 p-5 text-center']}
+    >
+      <img
+        data-logo
+        alt=""
+        loading="lazy"
+        class="aspect-video w-full rounded-sm bg-white object-contain p-2 grayscale"
+      />
+      <span class="text-sm font-semibold text-heading" data-field="name"></span>
+    </a>
+  </template>
+</div>
+
+<script>
+  import { fetchList, fillTemplate, onPageLoad, safeUrl } from '~/scripts/live';
+
+  interface Partner {
+    name: string;
+    logo_url?: string;
+    url?: string;
+  }
+
+  onPageLoad(async () => {
+    const section = document.querySelector<HTMLElement>('[data-live-partners]');
+    const grid = section?.querySelector<HTMLElement>('[data-partners-grid]');
+    const template = section?.querySelector<HTMLTemplateElement>('template[data-partner-template]');
+    if (!section || !grid || !template) return;
+
+    const partners = await fetchList<Partner>('/api/web/partners');
+    if (!partners.length) return;
+
+    const nodes = partners.map((partner) => {
+      const node = fillTemplate(template, { name: partner.name }) as HTMLAnchorElement;
+      const url = safeUrl(partner.url);
+      if (url) node.href = url;
+      const logo = safeUrl(partner.logo_url);
+      const img = node.querySelector<HTMLImageElement>('[data-logo]');
+      if (logo && img) {
+        img.src = logo;
+        img.alt = partner.name;
+      } else {
+        img?.remove();
+      }
+      return node;
+    });
+    grid.replaceChildren(...nodes);
+    section.hidden = false;
+  });
+</script>

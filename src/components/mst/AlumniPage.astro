@@ -1,0 +1,36 @@
+---
+import Layout from '~/layouts/PageLayout.astro';
+import TeamMembers from './TeamMembers.astro';
+import { eyebrow } from './styles';
+import { getDictionary, route } from '~/i18n';
+import type { Lang } from '~/i18n';
+
+export interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const t = getDictionary(lang);
+const a = t.extra.alumni;
+---
+
+<Layout metadata={{ title: a.title, description: a.description }} lang={lang} page="alumni">
+  <section class="mx-auto max-w-6xl px-4 py-16 sm:px-6 md:py-24">
+    <header class="mb-12 max-w-3xl">
+      <p class={eyebrow}>{t.navigation.team}</p>
+      <h1 class="mt-4 text-4xl font-bold tracking-tight text-heading md:text-5xl">{a.title}</h1>
+      <p class="mt-4 text-lg text-muted">{a.description}</p>
+    </header>
+
+    <TeamMembers t={t} mode="alumni" />
+
+    <p class="mt-16 border-t border-line pt-6">
+      <a
+        href={route('home', lang, '#equipo')}
+        class="text-sm font-semibold text-heading underline-offset-4 hover:underline"
+      >
+        ← {a.backToTeam}
+      </a>
+    </p>
+  </section>
+</Layout>

@@ -1,0 +1,16 @@
+---
+import logoWhite from '~/assets/images/logo-white.png';
+import logoDark from '~/assets/images/logo-dark.png';
+import { Image } from 'astro:assets';
+---
+
+<span class="flex items-center ml-1">
+  <Image src={logoDark} alt="Málaga Space Team" height={40} class="h-9 md:h-10 w-auto dark:hidden" loading="eager" />
+  <Image
+    src={logoWhite}
+    alt="Málaga Space Team"
+    height={40}
+    class="h-9 md:h-10 w-auto hidden dark:block"
+    loading="eager"
+  />
+</span>

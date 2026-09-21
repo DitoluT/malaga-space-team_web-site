@@ -1,0 +1,154 @@
+---
+import { card, eyebrow } from './styles';
+import type { Dictionary } from '~/i18n';
+
+export interface Props {
+  t: Dictionary;
+  /** 'current': miembros actuales (página principal) · 'alumni': antiguos miembros (página propia) */
+  mode?: 'current' | 'alumni';
+}
+
+const { t, mode = 'current' } = Astro.props;
+const live = t.extra.teamLive;
+---
+
+{
+  /*
+  Miembros del equipo, en vivo desde /api/web/team. Se gestionan en /admin → Equipo
+  (nombre, rol, departamento, LinkedIn, GitHub...): al guardar allí aparecen aquí, sin recompilar.
+  Quien tenga el nivel "Antiguo miembro" sale solo en la página de antiguos miembros.
+*/
+}
+<div data-live-team data-mode={mode} data-departments={JSON.stringify(live.departments)} hidden={mode === 'current'}>
+  <slot />
+  <div class="space-y-12" data-team-groups></div>
+  {
+    mode === 'alumni' && (
+      <p class="text-muted" data-team-empty hidden>
+        {live.alumniEmpty}
+      </p>
+    )
+  }
+
+  <template data-team-group-template>
+    <section>
+      <h4 class:list={[eyebrow, 'mb-4 border-b border-strong pb-2']} data-field="department"></h4>
+      <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3" data-team-grid></div>
+    </section>
+  </template>
+
+  <template data-team-member-template>
+    <article class:list={[card, 'flex flex-col p-5']}>
+      <h5 class="font-bold leading-tight text-heading" data-field="name"></h5>
+      <p class="mt-1 text-sm font-medium text-heading" data-field="role" data-optional></p>
+      <p class="mt-1 text-sm text-muted" data-field="title" data-optional></p>
+      <ul
+        class="mt-4 flex flex-wrap gap-x-4 gap-y-1 border-t border-line pt-3 text-sm font-semibold text-heading"
+        data-links
+      >
+        <li data-link-item="linkedin_url" hidden>
+          <a target="_blank" rel="noopener noreferrer" class="underline-offset-4 hover:underline">LinkedIn</a>
+        </li>
+        <li data-link-item="github_url" hidden>
+          <a target="_blank" rel="noopener noreferrer" class="underline-offset-4 hover:underline">GitHub</a>
+        </li>
+        <li data-link-item="email" hidden>
+          <a class="underline-offset-4 hover:underline">Email</a>
+        </li>
+      </ul>
+    </article>
+  </template>
+</div>
+
+<script>
+  import { fetchList, fillTemplate, onPageLoad, safeUrl } from '~/scripts/live';
+
+  interface Member {
+    name: string;
+    role?: string;
+    title?: string;
+    department?: string;
+    category?: string;
+    email?: string;
+    linkedin_url?: string;
+    github_url?: string;
+    display_order?: number;
+  }
+
+  // Orden de los departamentos y, dentro de cada uno, de los niveles jerárquicos
+  const DEPARTMENT_ORDER = [
+    'professors',
+    'management',
+    'structure_energy',
+    'comms',
+    'ground_station',
+    'control_software',
+    'marketing',
+  ];
+  const CATEGORY_ORDER: Record<string, number> = { director: 0, leader: 1, member: 2, alumni: 3 };
+  const ALUMNI = 'alumni';
+
+  onPageLoad(async () => {
+    const section = document.querySelector<HTMLElement>('[data-live-team]');
+    const groups = section?.querySelector<HTMLElement>('[data-team-groups]');
+    const groupTemplate = section?.querySelector<HTMLTemplateElement>('template[data-team-group-template]');
+    const memberTemplate = section?.querySelector<HTMLTemplateElement>('template[data-team-member-template]');
+    if (!section || !groups || !groupTemplate || !memberTemplate) return;
+
+    const wantAlumni = section.dataset.mode === ALUMNI;
+    const members = (await fetchList<Member>('/api/web/team')).filter(
+      (member) => (member.category === ALUMNI) === wantAlumni
+    );
+
+    if (!members.length) {
+      section.querySelector<HTMLElement>('[data-team-empty]')?.removeAttribute('hidden');
+      return;
+    }
+
+    const labels = JSON.parse(section.dataset.departments ?? '{}') as Record<string, string>;
+    const byDepartment = new Map<string, Member[]>();
+    for (const member of members) {
+      const key = member.department && DEPARTMENT_ORDER.includes(member.department) ? member.department : 'other';
+      byDepartment.set(key, [...(byDepartment.get(key) ?? []), member]);
+    }
+
+    const nodes = [...DEPARTMENT_ORDER, 'other']
+      .filter((key) => byDepartment.has(key))
+      .map((key) => {
+        const group = fillTemplate(groupTemplate, { department: labels[key] ?? key });
+        const grid = group.querySelector<HTMLElement>('[data-team-grid]');
+        const sorted = (byDepartment.get(key) ?? []).sort(
+          (a, b) =>
+            (CATEGORY_ORDER[a.category ?? 'member'] ?? 2) - (CATEGORY_ORDER[b.category ?? 'member'] ?? 2) ||
+            (a.display_order ?? 0) - (b.display_order ?? 0)
+        );
+
+        for (const member of sorted) {
+          const card = fillTemplate(memberTemplate, member as unknown as Record<string, unknown>);
+
+          let hasLinks = false;
+          card.querySelectorAll<HTMLElement>('[data-link-item]').forEach((item) => {
+            const field = item.dataset.linkItem as 'linkedin_url' | 'github_url' | 'email';
+            const raw = member[field];
+            const url = field === 'email' && raw ? safeUrl(`mailto:${raw}`, { allowMailto: true }) : safeUrl(raw);
+            const anchor = item.querySelector('a');
+            if (url && anchor) {
+              anchor.href = url;
+              anchor.setAttribute('aria-label', `${anchor.textContent} · ${member.name}`);
+              item.hidden = false;
+              hasLinks = true;
+            } else {
+              item.remove();
+            }
+          });
+          if (!hasLinks) card.querySelector('[data-links]')?.remove();
+
+          grid?.append(card);
+        }
+        return group;
+      });
+
+    groups.replaceChildren(...nodes);
+    section.hidden = false;
+  });
+</script>

@@ -1,0 +1,248 @@
+---
+import Layout from '~/layouts/PageLayout.astro';
+import { card, eyebrow, input, label } from './styles';
+import { getDictionary } from '~/i18n';
+import type { Lang } from '~/i18n';
+
+export interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const t = getDictionary(lang);
+const j = t.team.joinModal;
+const v = j.validation;
+
+const reasons = Object.entries(j.contactReason.reasons); // joinTeam, academicCollaboration, ...
+const years = Object.values(j.academicInfo.years);
+const interests = Object.entries(j.interests.subsystems);
+
+const metadata = { title: t.extra.join.metaTitle, description: j.description };
+---
+
+<Layout metadata={metadata} lang={lang} page="join">
+  <section class="mx-auto max-w-3xl px-4 py-16 sm:px-6 md:py-24">
+    <header class="mb-12">
+      <p class={eyebrow}>{t.navigation.joinTeam}</p>
+      <h1 class="mt-4 text-4xl font-bold tracking-tight text-heading md:text-5xl">{j.title}</h1>
+      <p class="mt-4 text-lg text-muted">{j.description}</p>
+    </header>
+
+    <form
+      class:list={[card, 'p-6 md:p-8']}
+      data-email-form
+      data-join-form
+      data-join-reason={j.contactReason.reasons.joinTeam}
+      data-msg-required={v.requiredFields}
+      data-msg-invalid-email={v.invalidEmail}
+      data-msg-message-length={v.messageLength}
+      data-msg-academic={v.academicInfo}
+      data-msg-loading={t.extra.join.sending}
+      data-msg-success={v.success}
+      data-msg-error={v.error}
+      data-label-message-join={j.message.labelJoin}
+      data-label-message-default={j.message.labelDefault}
+      data-placeholder-join={j.message.placeholderJoin}
+      data-placeholder-default={j.message.placeholderDefault}
+      novalidate
+    >
+      {/* Campos que espera la plantilla de EmailJS; subject y message se componen al enviar */}
+      <input type="hidden" name="subject" />
+      <input type="hidden" name="message" />
+
+      <fieldset>
+        <legend class="mb-4 w-full border-b border-strong pb-2 text-lg font-bold text-heading"
+          >{j.personalInfo.title}</legend
+        >
+        <div class="grid gap-6 md:grid-cols-2">
+          <div>
+            <label for="join-name" class={label}>{j.personalInfo.name}</label>
+            <input
+              id="join-name"
+              name="name"
+              type="text"
+              autocomplete="name"
+              placeholder={j.personalInfo.namePlaceholder}
+              class={input}
+              required
+            />
+          </div>
+          <div>
+            <label for="join-email" class={label}>{j.personalInfo.email}</label>
+            <input
+              id="join-email"
+              name="email"
+              type="email"
+              autocomplete="email"
+              placeholder={j.personalInfo.emailPlaceholder}
+              class={input}
+              required
+            />
+          </div>
+        </div>
+      </fieldset>
+
+      <fieldset class="mt-8">
+        <legend class="mb-4 w-full border-b border-strong pb-2 text-lg font-bold text-heading"
+          >{j.contactReason.title}</legend
+        >
+        <label for="join-reason" class={label}>{j.contactReason.label}</label>
+        <select id="join-reason" data-reason class={input} required>
+          <option value="">{j.contactReason.placeholder}</option>
+          {reasons.map(([, label]) => <option value={label}>{label}</option>)}
+        </select>
+      </fieldset>
+
+      <div data-join-only hidden>
+        <fieldset class="mt-8">
+          <legend class="mb-4 w-full border-b border-strong pb-2 text-lg font-bold text-heading"
+            >{j.academicInfo.title}</legend
+          >
+          <div class="grid gap-6 md:grid-cols-2">
+            <div>
+              <label for="join-degree" class={label}>{j.academicInfo.degree}</label>
+              <input
+                id="join-degree"
+                data-degree
+                type="text"
+                placeholder={j.academicInfo.degreePlaceholder}
+                class={input}
+              />
+            </div>
+            <div>
+              <label for="join-year" class={label}>{j.academicInfo.year}</label>
+              <select id="join-year" data-year class={input}>
+                <option value="">{j.academicInfo.yearPlaceholder}</option>
+                {years.map((year) => <option value={year}>{year}</option>)}
+              </select>
+            </div>
+          </div>
+        </fieldset>
+
+        <fieldset class="mt-8">
+          <legend class="mb-2 w-full border-b border-strong pb-2 text-lg font-bold text-heading"
+            >{j.interests.title}</legend
+          >
+          <p class="mb-4 text-sm text-muted">{j.interests.label}</p>
+          <div class="grid gap-3 sm:grid-cols-2">
+            {
+              interests.map(([key, item]) => (
+                <label class="flex cursor-pointer items-start gap-3 rounded-md border border-line p-3 hover:border-strong has-[:checked]:border-strong">
+                  <input
+                    type="checkbox"
+                    data-interest
+                    value={item.name}
+                    class="mt-1 h-4 w-4 accent-[var(--aw-color-primary)]"
+                    id={`interest-${key}`}
+                  />
+                  <span>
+                    <span class="block text-sm font-semibold text-heading">{item.name}</span>
+                    <span class="block text-xs text-muted">{item.description}</span>
+                  </span>
+                </label>
+              ))
+            }
+          </div>
+        </fieldset>
+      </div>
+
+      <fieldset class="mt-8">
+        <legend class="mb-4 w-full border-b border-strong pb-2 text-lg font-bold text-heading">{j.message.title}</legend
+        >
+        <label for="join-message" class={label} data-message-label>{j.message.labelDefault}</label>
+        <textarea
+          id="join-message"
+          data-user-message
+          rows="6"
+          placeholder={j.message.placeholderDefault}
+          class={input}
+          required></textarea>
+        <p class="mt-1 text-xs text-muted"><span data-counter>0</span> · {j.message.counterText}</p>
+      </fieldset>
+
+      <div class="mt-8 rounded-md border border-line p-4 text-sm">
+        <p class="mb-2 font-semibold text-heading">{j.importantInfo.title}</p>
+        <ul class="space-y-1 text-muted">
+          {
+            j.importantInfo.joinItems.map((item: string) => (
+              <li class="flex gap-2" data-join-only hidden>
+                <span aria-hidden="true">—</span>
+                {item}
+              </li>
+            ))
+          }
+          <li class="flex gap-2">
+            <span aria-hidden="true">—</span>
+            {j.importantInfo.generalItem}
+          </li>
+        </ul>
+      </div>
+
+      <p data-form-status hidden role="status" aria-live="polite" class="form-status mt-6 rounded-md px-4 py-3 text-sm">
+      </p>
+
+      <div class="mt-6">
+        <button type="submit" class="btn-primary w-full">{j.submitButton}</button>
+      </div>
+    </form>
+  </section>
+</Layout>
+
+<script>
+  import '~/scripts/emailForm';
+  import { onPageLoad } from '~/scripts/live';
+
+  type JoinForm = HTMLFormElement & { composeEmail?: () => string | null };
+
+  onPageLoad(() => {
+    const form = document.querySelector<JoinForm>('form[data-join-form]');
+    if (!form || form.dataset.joinBound) return;
+    form.dataset.joinBound = 'true';
+
+    const d = form.dataset;
+    const reason = form.querySelector<HTMLSelectElement>('[data-reason]')!;
+    const degree = form.querySelector<HTMLInputElement>('[data-degree]')!;
+    const year = form.querySelector<HTMLSelectElement>('[data-year]')!;
+    const message = form.querySelector<HTMLTextAreaElement>('[data-user-message]')!;
+    const label = form.querySelector<HTMLElement>('[data-message-label]')!;
+    const counter = form.querySelector<HTMLElement>('[data-counter]')!;
+    const joinOnly = form.querySelectorAll<HTMLElement>('[data-join-only]');
+    const isJoin = () => reason.value === d.joinReason;
+
+    const sync = () => {
+      joinOnly.forEach((el) => (el.hidden = !isJoin()));
+      label.textContent = (isJoin() ? d.labelMessageJoin : d.labelMessageDefault) ?? '';
+      message.placeholder = (isJoin() ? d.placeholderJoin : d.placeholderDefault) ?? '';
+    };
+    reason.addEventListener('change', sync);
+    form.addEventListener('reset', () => setTimeout(() => (sync(), (counter.textContent = '0'))));
+    message.addEventListener('input', () => (counter.textContent = String(message.value.length)));
+    sync();
+
+    // Valida lo específico de este formulario y compone subject/message para EmailJS
+    form.composeEmail = () => {
+      const name = (form.elements.namedItem('name') as HTMLInputElement).value.trim();
+      const text = message.value.trim();
+      if (!name || !reason.value || !text) return d.msgRequired ?? '';
+      if (text.length < 50) return d.msgMessageLength ?? '';
+
+      const interests = [...form.querySelectorAll<HTMLInputElement>('[data-interest]:checked')].map((i) => i.value);
+      if (isJoin() && (!degree.value.trim() || !year.value || interests.length === 0)) return d.msgAcademic ?? '';
+
+      const lines = [`Motivo del contacto: ${reason.value}`];
+      if (isJoin()) {
+        lines.push(
+          '',
+          `Grado/Carrera: ${degree.value.trim()}`,
+          `Curso actual: ${year.value}`,
+          `Áreas de interés: ${interests.join(', ')}`
+        );
+      }
+      lines.push('', 'Mensaje:', text);
+
+      (form.elements.namedItem('subject') as HTMLInputElement).value = `${reason.value} - Solicitud de ${name}`;
+      (form.elements.namedItem('message') as HTMLInputElement).value = lines.join('\n');
+      return null;
+    };
+  });
+</script>

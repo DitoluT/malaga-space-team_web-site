@@ -1,0 +1,32 @@
+---
+// Sección base: ancho máximo, aire generoso y un encabezado sobrio alineado a la izquierda.
+import { eyebrow } from './styles';
+
+export interface Props {
+  id?: string;
+  eyebrow?: string;
+  title?: string;
+  subtitle?: string;
+  width?: 'normal' | 'narrow';
+  divider?: boolean;
+}
+
+const { id, eyebrow: eyebrowText, title, subtitle, width = 'normal', divider = true } = Astro.props;
+---
+
+<section id={id} class="scroll-mt-[72px]">
+  <div class:list={['mx-auto px-4 sm:px-6', width === 'narrow' ? 'max-w-3xl' : 'max-w-6xl']}>
+    <div class:list={['py-16 md:py-24', { 'border-t border-line': divider }]}>
+      {
+        (title || subtitle) && (
+          <header class="mb-10 max-w-3xl md:mb-14">
+            {eyebrowText && <p class:list={[eyebrow, 'mb-3']}>{eyebrowText}</p>}
+            {title && <h2 class="text-3xl font-bold tracking-tight text-heading md:text-4xl">{title}</h2>}
+            {subtitle && <p class="mt-4 text-lg text-muted text-pretty">{subtitle}</p>}
+          </header>
+        )
+      }
+      <slot />
+    </div>
+  </div>
+</section>

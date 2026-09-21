@@ -1,0 +1,50 @@
+---
+// Paleta monocroma del Málaga Space Team: blanco y negro, con grises solo para jerarquía.
+// La tipografía (Inter) la sirve la API de fuentes de Astro como `--font-inter`.
+---
+
+<style is:inline>
+  :root {
+    --aw-font-sans: var(--font-inter);
+    --aw-font-serif: var(--font-inter);
+    --aw-font-heading: var(--font-inter);
+
+    --aw-color-primary: rgb(10 10 10);
+    --aw-color-secondary: rgb(38 38 38);
+    --aw-color-accent: rgb(10 10 10);
+    --aw-color-on-primary: rgb(255 255 255);
+
+    --aw-color-text-heading: rgb(10 10 10);
+    --aw-color-text-default: rgb(23 23 23);
+    --aw-color-text-muted: rgb(23 23 23 / 60%);
+    --aw-color-bg-page: rgb(255 255 255);
+    --aw-color-border: rgb(10 10 10 / 12%);
+    --aw-color-border-strong: rgb(10 10 10);
+
+    --aw-color-bg-page-dark: rgb(0 0 0);
+
+    ::selection {
+      background-color: rgb(10 10 10);
+      color: rgb(255 255 255);
+    }
+  }
+
+  .dark {
+    --aw-color-primary: rgb(255 255 255);
+    --aw-color-secondary: rgb(212 212 212);
+    --aw-color-accent: rgb(255 255 255);
+    --aw-color-on-primary: rgb(0 0 0);
+
+    --aw-color-text-heading: rgb(255 255 255);
+    --aw-color-text-default: rgb(237 237 237);
+    --aw-color-text-muted: rgb(237 237 237 / 60%);
+    --aw-color-bg-page: rgb(0 0 0);
+    --aw-color-border: rgb(255 255 255 / 16%);
+    --aw-color-border-strong: rgb(255 255 255);
+
+    ::selection {
+      background-color: rgb(255 255 255);
+      color: rgb(0 0 0);
+    }
+  }
+</style>

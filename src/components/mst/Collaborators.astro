@@ -1,0 +1,133 @@
+---
+import { Icon } from 'astro-icon/components';
+import Section from './Section.astro';
+import { cardInteractive, eyebrow } from './styles';
+import type { Dictionary } from '~/i18n';
+
+export interface Props {
+  t: Dictionary;
+  id?: string;
+}
+
+const { t, id = 'colaboradores' } = Astro.props;
+const c = t.sponsors.collaborators;
+
+// Respaldo estático; si /admin tiene colaboradores, el script los sustituye.
+const fallback = [
+  { ...c.uma, website: 'https://www.uma.es/' },
+  { ...c.mobilenet, website: 'https://mobilenet.uma.es/' },
+  { ...c.link, website: 'https://www.link.uma.es/' },
+];
+
+const benefits = [
+  t.sponsors.benefits.advancedResearch,
+  t.sponsors.benefits.techTransfer,
+  t.sponsors.benefits.specializedTraining,
+];
+---
+
+<Section id={id} title={t.sponsors.title} subtitle={t.sponsors.description}>
+  <div class="grid gap-4 lg:grid-cols-3" data-live-collaborators>
+    {
+      fallback.map((item) => (
+        <a
+          href={item.website}
+          target="_blank"
+          rel="noopener noreferrer"
+          class:list={[cardInteractive, 'group flex flex-col p-6']}
+        >
+          <p class={eyebrow}>{item.role}</p>
+          <h3 class="mt-2 text-xl font-bold leading-tight text-heading">{item.name}</h3>
+          <p class="mt-4 flex-1 text-sm text-muted">{item.description}</p>
+          <div class="mt-6 border-t border-line pt-4 text-sm">
+            <p class="font-semibold text-heading">{t.sponsors.contributionLabel}</p>
+            <p class="text-muted">{item.contribution}</p>
+          </div>
+          <span class="mt-6 inline-flex items-center gap-1 text-sm font-semibold text-heading underline-offset-4 group-hover:underline">
+            {t.sponsors.visitWebsite}
+            <Icon name="tabler:external-link" class="h-4 w-4" />
+          </span>
+        </a>
+      ))
+    }
+  </div>
+
+  <template data-collaborator-template>
+    <a target="_blank" rel="noopener noreferrer" class:list={[cardInteractive, 'group flex flex-col p-6']}>
+      <img
+        data-logo
+        hidden
+        alt=""
+        loading="lazy"
+        class="mb-4 h-12 w-auto max-w-[10rem] self-start object-contain grayscale"
+      />
+      <p class={eyebrow} data-field="role" data-optional></p>
+      <h3 class="mt-2 text-xl font-bold leading-tight text-heading" data-field="name"></h3>
+      <p class="mt-4 flex-1 text-sm text-muted" data-field="description" data-optional></p>
+      <div class="mt-6 border-t border-line pt-4 text-sm" data-contribution>
+        <p class="font-semibold text-heading">{t.sponsors.contributionLabel}</p>
+        <p class="text-muted" data-field="contribution"></p>
+      </div>
+      <span
+        class="mt-6 inline-flex items-center gap-1 text-sm font-semibold text-heading underline-offset-4 group-hover:underline"
+        data-visit
+      >
+        {t.sponsors.visitWebsite}
+        <Icon name="tabler:external-link" class="h-4 w-4" />
+      </span>
+    </a>
+  </template>
+
+  <dl class="mt-16 grid gap-8 md:grid-cols-3">
+    {
+      benefits.map((b) => (
+        <div class="border-t border-strong pt-4">
+          <dt class="font-bold text-heading">{b.title}</dt>
+          <dd class="mt-1 text-sm text-muted">{b.description}</dd>
+        </div>
+      ))
+    }
+  </dl>
+</Section>
+
+<script>
+  import { fetchList, fillTemplate, onPageLoad, safeUrl } from '~/scripts/live';
+
+  interface Sponsor {
+    name: string;
+    description?: string;
+    role?: string;
+    website?: string;
+    contribution?: string;
+    image_url?: string;
+  }
+
+  onPageLoad(async () => {
+    const grid = document.querySelector<HTMLElement>('[data-live-collaborators]');
+    const template = document.querySelector<HTMLTemplateElement>('template[data-collaborator-template]');
+    if (!grid || !template) return;
+
+    const sponsors = await fetchList<Sponsor>('/api/web/sponsors');
+    if (!sponsors.length) return; // se mantiene el contenido de respaldo
+
+    const nodes = sponsors.map((sponsor) => {
+      const node = fillTemplate(template, sponsor as unknown as Record<string, unknown>) as HTMLAnchorElement;
+      const website = safeUrl(sponsor.website);
+      if (website) node.href = website;
+      else node.querySelector('[data-visit]')?.remove();
+      if (!sponsor.contribution) node.querySelector('[data-contribution]')?.remove();
+
+      const logo = safeUrl(sponsor.image_url);
+      const img = node.querySelector<HTMLImageElement>('[data-logo]');
+      if (logo && img) {
+        img.src = logo;
+        img.alt = sponsor.name;
+        img.hidden = false;
+      } else {
+        img?.remove();
+      }
+      return node;
+    });
+    grid.replaceChildren(...nodes);
+  });
+</script>

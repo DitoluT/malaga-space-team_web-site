@@ -1,0 +1,43 @@
+---
+import Layout from '~/layouts/Layout.astro';
+import Header from '~/components/widgets/Header.astro';
+import Footer from '~/components/widgets/Footer.astro';
+
+import { getHeaderData, getFooterData } from '~/navigation';
+import { DEFAULT_LANG, HTML_LANG, LANGS, OG_LOCALE, route } from '~/i18n';
+import type { Lang, RouteKey } from '~/i18n';
+
+import type { MetaData } from '~/types';
+
+export interface Props {
+  metadata?: MetaData;
+  lang?: Lang;
+  /** Identificador de la página, para enlazar su equivalente en el otro idioma */
+  page?: RouteKey;
+}
+
+const { metadata = {}, lang = DEFAULT_LANG, page = 'home' } = Astro.props;
+
+const { langSwitch, ...headerData } = getHeaderData(lang, page);
+const footerData = getFooterData(lang);
+const homeHref = route('home', lang);
+
+const absolute = (path: string) => new URL(path, Astro.site).href;
+const meta: MetaData = {
+  ...metadata,
+  openGraph: { locale: OG_LOCALE[lang], ...(metadata.openGraph ?? {}) },
+};
+---
+
+<Layout metadata={meta} lang={HTML_LANG[lang]}>
+  <Fragment slot="head">
+    {LANGS.map((l) => <link rel="alternate" hreflang={HTML_LANG[l]} href={absolute(route(page, l))} />)}
+    <link rel="alternate" hreflang="x-default" href={absolute(route(page, DEFAULT_LANG))} />
+    <slot name="head" />
+  </Fragment>
+  <Header {...headerData} langSwitch={langSwitch} homeHref={homeHref} isSticky showToggleTheme />
+  <main class="flex-1">
+    <slot />
+  </main>
+  <Footer {...footerData} homeHref={homeHref} />
+</Layout>

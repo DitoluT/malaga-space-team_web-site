@@ -1,0 +1,40 @@
+site:
+  name: Málaga Space Team
+  site: 'https://spaceteam.uma.es'
+  base: '/'
+  trailingSlash: false
+
+# Metadatos SEO por defecto (cada página/idioma los sobreescribe)
+metadata:
+  title:
+    default: Málaga Space Team
+    template: '%s — Málaga Space Team'
+  description: 'Proyecto CubeSat 2U de la Universidad de Málaga. Desarrollando tecnología espacial de vanguardia para la investigación, la educación y la innovación.'
+  robots:
+    index: true
+    follow: true
+  openGraph:
+    site_name: Málaga Space Team
+    images:
+      - url: '~/assets/images/og-default.png'
+        width: 1200
+        height: 628
+    type: website
+  twitter:
+    cardType: summary_large_image
+
+i18n:
+  language: es
+  textDirection: ltr
+
+apps:
+  blog:
+    isEnabled: false
+
+analytics:
+  vendors:
+    googleAnalytics:
+      id: null
+
+ui:
+  theme: 'dark' # La web del equipo es oscura por defecto; el visitante puede cambiarla
