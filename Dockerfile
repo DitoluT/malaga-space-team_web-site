@@ -7,8 +7,9 @@ WORKDIR /app
 # Copy package files
 COPY package*.json ./
 
-# Install dependencies
-RUN npm ci && \
+# Install dependencies (better-sqlite3 se compila si no hay binario precompilado)
+RUN apk add --no-cache python3 make g++ && \
+    npm ci && \
     npm cache clean --force
 
 # Copy source code
