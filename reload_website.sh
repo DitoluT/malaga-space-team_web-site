@@ -10,6 +10,12 @@
 set -euo pipefail
 cd "$(dirname "$(readlink -f "$0")")"
 
+# La VM solo sale a internet por el proxy del SCI, y el servicio /reload no hereda esas
+# variables de la sesión: sin ellas, git no llega a GitHub.
+export http_proxy="${http_proxy:-http://jano8.sci.uma.es:3128/}"
+export https_proxy="${https_proxy:-$http_proxy}"
+export no_proxy="${no_proxy:-localhost,127.0.0.1,::1}"
+
 exec 9>/tmp/malaga-reload.lock
 flock -n 9 || { echo "Ya hay un despliegue en curso."; exit 0; }
 
